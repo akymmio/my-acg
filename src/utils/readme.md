@@ -1,7 +1,7 @@
 消息响应格式
 ~~~
 {
-    "code":200,
+    "code":0,
     "msg":"success"
     "data":{
 
