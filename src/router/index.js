@@ -5,10 +5,6 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/explore'
-    },
-    {
-      path: '/index',
       component: () => import('@/views/layout/layoutContainer.vue'),
       redirect: '/explore',
       children: [
@@ -23,6 +19,10 @@ const router = createRouter({
         {
           path: '/notification',
           component: () => import('@/views/notify/notifyPage.vue')
+        },
+        {
+          path: '/publish',
+          component: () => import('@/views/publish/publishPage.vue')
         }
       ]
     },

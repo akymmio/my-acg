@@ -1,25 +1,21 @@
 <template>
   <div>
-    <Waterfall :list="cardList" :hasAroundGutter="false" style="">
+    <Waterfall :list="cardList" :hasAroundGutter="false">
       @scroll="scroll">
       <template #item="{ item }">
-        <LazyImg
-          :url="item.src"
-          style="border-radius: 8px"
-          @click="dialogTableVisible = true"
-        />
-        <!-- <div class="item-body">
-                    <div class="item-desc">{{ item.title }}</div>
-                    <div class="item-footer">
-                        <div class="footer-left">
-                            <img :src="item.avatar" alt="" srcset="" />
-                            <div class="name">{{ item.user }}</div>
-                        </div>
-                        <div class="like">
-                            <div class="like-total">{{ item.vote_num }}</div>
-                        </div>
-                    </div>
-                </div> -->
+        <LazyImg :url="item.src" style="border-radius: 20px" @click="dialogTableVisible = true" />
+        <div class="item-body">
+          <div class="item-desc">{{ item.title }}</div>
+          <div class="item-footer">
+            <div class="footer-left">
+              <img :src="item.avatar" alt="" srcset="" />
+              <div class="name">{{ item.user }}</div>
+            </div>
+            <div class="like">
+              <div class="like-total">{{ item.vote_num }}</div>
+            </div>
+          </div>
+        </div>
       </template>
     </Waterfall>
   </div>
