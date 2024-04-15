@@ -27,5 +27,12 @@ module.exports = {
         ignores: ['index']
       }
     ]
+  },
+  // 全局变量
+  globals: {
+    ElMessage: 'readonly',
+    ElMessageBox: 'readonly',
+    ElLoading: 'readonly',
+    ElNotification: 'readonly'
   }
 }

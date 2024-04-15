@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { userRegisterService } from '@/api/user'
 const isRegister = ref(true)
 //表单数据
 const userform = ref({
@@ -7,6 +8,18 @@ const userform = ref({
   password: '',
   repassword: ''
 })
+const form = ref()
+const register = async () => {
+  await form.value.validate()
+  await userRegisterService(userform.value)
+  ElNotification({
+    title: 'Success',
+    message: 'This is a success message',
+    type: 'success'
+  })
+  //切换登录页面
+  isRegister.value = true
+}
 //表单校验规则
 const rules = ref({
   username: [
@@ -14,12 +27,12 @@ const rules = ref({
     { min: 2, max: 26, message: '长度大于3', trigger: 'change' }
   ],
   password: [
-    { required: true, message: '请输入密码', trigger: 'change' },
-    { pattern: /^\S{8,15}$/, message: '长度大于8', trigger: 'change' }
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { pattern: /^\S{8,15}$/, message: '长度大于8', trigger: 'blur' }
   ],
   repassword: [
-    { required: true, message: '请输入密码', trigger: 'change' },
-    { pattern: /^\S{8,15}$/, message: '长度大于8', trigger: 'change' },
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { pattern: /^\S{8,15}$/, message: '长度大于8', trigger: 'blur' },
     //自定义校验队则
     {
       validator: (rule, value, callback) => {
@@ -37,7 +50,7 @@ const rules = ref({
 <template>
   <el-card class="layout">
     <!-- 登录 -->
-    <el-form :model="userform" :rules="rules" v-if="isRegister">
+    <el-form :model="userform" :rules="rules" ref="form" v-if="isRegister">
       <el-form-item prop="username">
         <el-input v-model="userform.username" placeholder="用户名" />
       </el-form-item>
@@ -45,12 +58,12 @@ const rules = ref({
         <el-input v-model="userform.password" type="password" placeholder="密码" />
       </el-form-item>
       <el-form-item>
-        <button class="button">登录</button>
+        <el-button class="button">登录</el-button>
       </el-form-item>
       <el-link @click="isRegister = false">注册</el-link>
     </el-form>
     <!-- 注册 -->
-    <el-form :model="userform" :rules="rules" v-else>
+    <el-form :model="userform" :rules="rules" ref="form" v-else>
       <el-form-item prop="username">
         <el-input v-model="userform.username" placeholder="用户名" />
       </el-form-item>
@@ -61,7 +74,7 @@ const rules = ref({
         <el-input v-model="userform.repassword" type="password" placeholder="确认密码" />
       </el-form-item>
       <el-form-item>
-        <button class="button">注册</button>
+        <el-button class="button" @click="register">注册</el-button>
       </el-form-item>
       <el-link @click="isRegister = !isRegister">返回</el-link>
     </el-form>

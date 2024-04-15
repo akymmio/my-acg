@@ -1,9 +1,9 @@
 import axios from 'axios'
-import { ElNotification } from 'element-plus'
+
 import { useUserStore } from '@/stores'
 import router from '@/router'
 
-const baseURL = 'https://my-acg.com'
+const baseURL = 'https://big-event-vue-api-t.itheima.net'
 const instance = axios.create({
   //基础地址
   baseURL,
@@ -12,7 +12,7 @@ const instance = axios.create({
 })
 
 // 添加请求拦截器
-axios.interceptors.request.use(
+instance.interceptors.request.use(
   function (config) {
     //token
     const userStore = useUserStore()
@@ -29,11 +29,12 @@ axios.interceptors.request.use(
 )
 
 // 添加响应拦截器
-axios.interceptors.response.use(
+instance.interceptors.response.use(
   function (res) {
     // 2xx 范围内的状态码都会触发该函数。
-    if (res.data.code === 200) return res
+    if (res.data.code === 0) return res
     //业务处理失败，抛出错误
+
     ElNotification({
       title: 'Error',
       message: res.data.message || '服务异常',
