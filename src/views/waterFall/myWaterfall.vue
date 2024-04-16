@@ -1,6 +1,11 @@
 <template>
   <div>
-    <Waterfall :list="props.cardList" :hasAroundGutter="false">
+    <Waterfall
+      :list="props.cardList"
+      :width="250"
+      :hasAroundGutter="false"
+      style="max-width: 1300px"
+    >
       @scroll="scroll">
       <template #item="{ item }">
         <LazyImg :url="item.src" style="border-radius: 20px" @click="dialogTableVisible = true" />

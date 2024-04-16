@@ -10,11 +10,16 @@ const showCard = ref(false)
 
 <template>
   <el-container class="layout">
-    <el-header class="top-header">
-      <input class="inputSearch" v-model="input1" placeholder="搜索" />
-      <button class="inputIcon">
-        <el-icon size="large" class="searchIcon"><Search /></el-icon>
-      </button>
+    <el-header>
+      <el-row>
+        <el-col :span="8" style="padding-left: 100px">test</el-col>
+        <el-col :span="8" style="display: flex; justify-content: center; align-items: center">
+          <input class="inputSearch" v-model="input1" placeholder="搜索" />
+          <button class="inputIcon">
+            <el-icon size="large" class="searchIcon"><Search /></el-icon></button
+        ></el-col>
+        <el-col :span="8">test</el-col></el-row
+      >
     </el-header>
     <el-container>
       <el-aside class="left-aside">
@@ -35,12 +40,12 @@ const showCard = ref(false)
             <el-icon><Bell /></el-icon>
             <span>我</span>
           </el-menu-item>
-          <el-menu-item @click="showCard = !showCard">
+          <el-menu-item @click="showCard = !showCard" class="card">
             <el-icon><Bell /></el-icon>
             <span>更多</span>
           </el-menu-item>
         </el-menu>
-        <el-card style="max-width: 100%" v-if="showCard" @mouseleave="showCard = !showCard">
+        <el-card v-if="showCard" @mouseleave="showCard = !showCard">
           <template #header
             ><el-menu>
               <button>
@@ -63,9 +68,7 @@ const showCard = ref(false)
           >
         </el-card>
       </el-aside>
-      <div style="width: 100%">
-        <router-view></router-view>
-      </div>
+      <div style="width: 100%"><router-view></router-view></div>
     </el-container>
   </el-container>
 </template>
@@ -79,6 +82,7 @@ const showCard = ref(false)
   .el-header {
     height: 100px;
     background: rgb(255, 255, 255);
+
     .inputSearch {
       margin-top: 20px;
       width: 400px;
@@ -107,27 +111,34 @@ const showCard = ref(false)
   }
 }
 .left-aside {
-  padding-left: 80px;
-  max-width: 50%;
-  // el-card {
-  //   transition: all 0.5s ease;
-  // }
+  width: 20%;
+  .card {
+    position: relative;
+    bottom: 0;
+  }
+  .el-menu {
+    float: right;
+    border-right: 0;
+    padding-right: 20px;
+  }
+  .el-menu-item {
+    min-width: 250px;
+
+    border-radius: 40px;
+    margin-bottom: 10px;
+    font-size: large;
+    font-weight: bold;
+  }
+  .el-menu-item:hover {
+    background: rgb(255, 234, 252);
+  }
+  .el-menu-item.is-active {
+    background-color: #f6f6f6 !important;
+  }
 }
 .inner-header {
   // vertical-align: middle;
   height: 60px;
   background: rgb(255, 255, 255);
-}
-.el-menu {
-  border-right: 0;
-}
-.el-menu-item {
-  border-radius: 40px;
-  margin-bottom: 10px;
-  font-size: large;
-  font-weight: bold;
-}
-.el-menu-item.is-active {
-  background-color: #f6f6f6 !important;
 }
 </style>
