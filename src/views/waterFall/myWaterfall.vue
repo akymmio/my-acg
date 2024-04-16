@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Waterfall :list="cardList" :hasAroundGutter="false">
+    <Waterfall :list="props.cardList" :hasAroundGutter="false">
       @scroll="scroll">
       <template #item="{ item }">
         <LazyImg :url="item.src" style="border-radius: 20px" @click="dialogTableVisible = true" />
@@ -26,7 +26,7 @@
 import { ref } from 'vue'
 import { LazyImg, Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
-defineProps({
+const props = defineProps({
   cardList: {
     type: Array,
     default: () => [] //默认值

@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import { useUserStore } from '@/stores'
 import router from '@/router'
+const userStore = useUserStore()
 //基础地址
 const baseURL = 'https://big-event-vue-api-t.itheima.net'
 const instance = axios.create({
@@ -14,7 +15,6 @@ const instance = axios.create({
 instance.interceptors.request.use(
   function (config) {
     //pinia中获取token
-    const userStore = useUserStore()
     if (userStore.token) {
       //请求头携带token
       config.headers.Authorization = userStore.token

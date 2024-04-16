@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
+import { useUserStore } from '@/stores'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -31,6 +31,13 @@ const router = createRouter({
       component: () => import('@/views/login/loginPage.vue')
     }
   ]
+})
+router.beforeEach((to) => {
+  //没有token，访问非登录页面，跳转到登录页面
+  const userStore = useUserStore()
+  if (!userStore.token && to.path !== '/login') {
+    return '/login'
+  }
 })
 
 export default router

@@ -6,6 +6,7 @@
     <button>推荐</button>
     <button>推荐</button>
     <button>推荐</button>
+    <!-- 首页瀑布流 -->
     <my-waterfall :cardList="cardList"></my-waterfall>
   </div>
 </template>
@@ -13,80 +14,116 @@
 import { ref } from 'vue'
 import myWaterfall from '@/views/waterFall/myWaterfall.vue'
 import { requireImg } from '@/utils/requireImg'
+//瀑布流数据
 const cardList = ref([
   {
-    src: requireImg('@/components/icon/1.png'),
-    avatar: requireImg('@/components/icon/1.png'),
+    src: requireImg('@/assets/icon/1.jpg'),
+    avatar: requireImg('@/assets/icon/1.jpg'),
     user: 'Lewis',
     vote_num: 999,
     title: 'Noice cancelling is a secret weapon'
   },
   {
-    src: requireImg('@/components/icon/2.jpg'),
-    avatar: requireImg('@/components/icon/2.jpg'),
+    src: requireImg('@/assets/icon/2.jpg'),
+    avatar: requireImg('@/assets/icon/2.jpg'),
     user: 'Lewis',
     vote_num: 999,
     title: 'Noice cancelling is a secret weapon'
   },
   {
-    src: requireImg('@/components/icon/3.jpg'),
-    avatar: requireImg('@/components/icon/3.jpg'),
+    src: requireImg('@/assets/icon/3.jpg'),
+    avatar: requireImg('@/assets/icon/3.jpg'),
     user: 'Lewis',
     vote_num: 999,
     title: 'Noice cancelling is a secret weapon'
   },
   {
-    src: requireImg('@/components/icon/2.jpg'),
-    avatar: requireImg('@/components/icon/2.jpg'),
+    src: requireImg('@/assets/icon/4.jpg'),
+    avatar: requireImg('@/assets/icon/4.jpg'),
     user: 'Lewis',
     vote_num: 999,
     title: 'Noice cancelling is a secret weapon'
   },
   {
-    src: requireImg('@/components/icon/1.png'),
-    avatar: requireImg('@/components/icon/1.png'),
+    src: requireImg('@/assets/icon/5.jpg'),
+    avatar: requireImg('@/assets/icon/5.jpg'),
     user: 'Lewis',
     vote_num: 999,
     title: 'Noice cancelling is a secret weapon'
   },
   {
-    src: requireImg('@/components/icon/1.png'),
-    avatar: requireImg('@/components/icon/1.png'),
+    src: requireImg('@/assets/icon/6.jpg'),
+    avatar: requireImg('@/assets/icon/6.jpg'),
     user: 'Lewis',
     vote_num: 999,
     title: 'Noice cancelling is a secret weapon'
   },
   {
-    src: requireImg('@/components/icon/2.jpg'),
-    avatar: requireImg('@/components/icon/2.jpg'),
+    src: requireImg('@/assets/icon/2.jpg'),
+    avatar: requireImg('@/assets/icon/2.jpg'),
     user: 'Lewis',
     vote_num: 999,
     title: 'Noice cancelling is a secret weapon'
   },
   {
-    src: requireImg('@/components/icon/1.png'),
-    avatar: requireImg('@/components/icon/1.png'),
+    src: requireImg('@/assets/icon/1.jpg'),
+    avatar: requireImg('@/assets/icon/1.jpg'),
     user: 'Lewis',
     vote_num: 999,
     title: 'Noice cancelling is a secret weapon'
   },
   {
-    src: requireImg('@/components/icon/1.png'),
-    avatar: requireImg('@/components/icon/1.png'),
+    src: requireImg('@/assets/icon/4.jpg'),
+    avatar: requireImg('@/assets/icon/4.jpg'),
     user: 'Lewis',
     vote_num: 999,
     title: 'Noice cancelling is a secret weapon'
   },
   {
-    src: requireImg('@/components/icon/1.png'),
-    avatar: requireImg('@/components/icon/1.png'),
+    src: requireImg('@/assets/icon/1.jpg'),
+    avatar: requireImg('@/assets/icon/1.jpg'),
     user: 'Lewis',
     vote_num: 999,
     title: 'Noice cancelling is a secret weapon'
   },
   {
-    src: requireImg('@/components/icon/2.jpg'),
-    avatar: requireImg('@/components/icon/2.jpg'),
+    src: requireImg('@/assets/icon/6.jpg'),
+    avatar: requireImg('@/assets/icon/6.jpg'),
+    user: 'Lewis',
+    vote_num: 999,
+    title: 'Noice cancelling is a secret weapon'
+  },
+  {
+    src: requireImg('@/assets/icon/5.jpg'),
+    avatar: requireImg('@/assets/icon/5.jpg'),
+    user: 'Lewis',
+    vote_num: 999,
+    title: 'Noice cancelling is a secret weapon'
+  },
+  {
+    src: requireImg('@/assets/icon/2.jpg'),
+    avatar: requireImg('@/assets/icon/2.jpg'),
+    user: 'Lewis',
+    vote_num: 999,
+    title: 'Noice cancelling is a secret weapon'
+  },
+  {
+    src: requireImg('@/assets/icon/3.jpg'),
+    avatar: requireImg('@/assets/icon/3.jpg'),
+    user: 'Lewis',
+    vote_num: 999,
+    title: 'Noice cancelling is a secret weapon'
+  },
+  {
+    src: requireImg('@/assets/icon/4.jpg'),
+    avatar: requireImg('@/assets/icon/4.jpg'),
+    user: 'Lewis',
+    vote_num: 999,
+    title: 'Noice cancelling is a secret weapon'
+  },
+  {
+    src: requireImg('@/assets/icon/1.jpg'),
+    avatar: requireImg('@/assets/icon/1.jpg'),
     user: 'Lewis',
     vote_num: 999,
     title: 'Noice cancelling is a secret weapon'
@@ -102,8 +139,8 @@ button {
   font-size: large;
   background-color: white;
   border: 0;
-  width: 80px; /* 指定宽度，单位可以是像素、百分比等 */
-  height: 40px; /* 指定高度，单位可以是像素、百分比等 */
+  width: 80px;
+  height: 40px;
   margin-bottom: 15px;
 }
 button:hover {
