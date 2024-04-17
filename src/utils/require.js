@@ -2,19 +2,20 @@ import axios from 'axios'
 
 import { useUserStore } from '@/stores'
 import router from '@/router'
-const userStore = useUserStore()
+
 //基础地址
 // const baseURL = 'https://big-event-vue-api-t.itheima.net'
 const baseURL = '/api'
 const instance = axios.create({
   baseURL,
-  timeout: 1000
+  timeout: 10000
   // headers: { 'X-Custom-Header': 'foobar' }
 })
 
 // 添加请求拦截器
 instance.interceptors.request.use(
   function (config) {
+    const userStore = useUserStore()
     //pinia中获取token
     if (userStore.token) {
       //请求头携带token
@@ -37,7 +38,7 @@ instance.interceptors.response.use(
 
     ElNotification({
       title: 'Error',
-      message: res.data.message || '服务异常',
+      message: res.data.message || 'test',
       type: 'error'
     })
     return Promise.reject(res.data.message)

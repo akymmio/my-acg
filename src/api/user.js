@@ -18,3 +18,7 @@ export const userLoginService = (loginData) => {
   }
   return require.post('/user/login', params)
 }
+// 获取用户信息
+export const getUserInfoService = () => {
+  return require.get('/user/userInfo')
+}

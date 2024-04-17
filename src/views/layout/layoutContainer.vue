@@ -1,16 +1,26 @@
 <script setup>
-import { House, Bell, Search, Plus } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { House, Bell, Search, Plus, Operation } from '@element-plus/icons-vue'
+// import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
-const showCard = ref(false)
+// const showCard = ref(false)
 import { useUserStore } from '@/stores'
 const userStore = useUserStore()
-
-// const input = ref('')
-// watch(showCard, () => {
-//   showCard.value != showCard.value
-// })
+//如果已经登录了获取用户信息,存入store
+if (userStore.token) {
+  userStore.getUser()
+}
+// userStore.getUser()
+const logout = () => {
+  userStore.removeToken()
+  userStore.removeUser()
+  ElNotification({
+    title: 'Success',
+    message: '退出登录成功',
+    type: 'success'
+  })
+  router.go('/')
+}
 </script>
 
 <template>
@@ -23,13 +33,14 @@ const userStore = useUserStore()
           <button class="inputIcon">
             <el-icon size="large" class="searchIcon"><Search /></el-icon></button
         ></el-col>
-        <el-col :span="8">test</el-col></el-row
-      >
+        <el-col :span="8">test</el-col>
+      </el-row>
     </el-header>
     <el-row>
-      <el-col :span="4">
+      <el-col :span="2"></el-col>
+      <el-col :span="3">
         <div class="left-aside">
-          <ui class="el-menu">
+          <ui>
             <li class="el-menu-item" @click="router.push('/explore')">
               <el-icon><House /></el-icon>
               <span>发现</span>
@@ -46,11 +57,24 @@ const userStore = useUserStore()
               <el-icon><Bell /></el-icon>
               <span>我</span>
             </li>
-            <li v-else class="loginItem" @click="router.push('/login')">登录</li>
+            <li v-else class="loginItem" @click="router.push('/login')" style="color: white">
+              登录
+            </li>
+            <li>
+              <el-popover placement="bottom" :width="200" trigger="click">
+                <template #reference>
+                  <el-button style="margin-right: 16px">
+                    <el-icon><Operation /></el-icon>
+                    <span>更多</span>
+                  </el-button>
+                </template>
+                <button @click="logout">exit</button>
+              </el-popover>
+            </li>
           </ui>
         </div>
       </el-col>
-      <el-col :span="16">
+      <el-col :span="19">
         <div style="width: 100%"><router-view></router-view></div>
       </el-col>
     </el-row>
@@ -95,9 +119,11 @@ const userStore = useUserStore()
   }
 }
 .left-aside {
-  padding-left: 100px;
-  list-style-type: none;
-
+  padding-right: 20px;
+  ul {
+    list-style-type: none;
+    // padding-left: 100px;
+  }
   li {
     padding-left: 20px;
     min-height: 48px;
