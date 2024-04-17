@@ -4,7 +4,8 @@ import { useUserStore } from '@/stores'
 import router from '@/router'
 const userStore = useUserStore()
 //基础地址
-const baseURL = 'https://big-event-vue-api-t.itheima.net'
+// const baseURL = 'https://big-event-vue-api-t.itheima.net'
+const baseURL = '/api'
 const instance = axios.create({
   baseURL,
   timeout: 1000

@@ -2,7 +2,7 @@
   <div>
     <Waterfall
       :list="props.cardList"
-      :width="250"
+      :width="240"
       :hasAroundGutter="false"
       style="max-width: 1300px"
     >

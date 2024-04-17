@@ -45,7 +45,7 @@ const login = async () => {
     type: 'success'
   })
   //存储token
-  userStore.setToken(res.data.token)
+  userStore.setToken(res.data)
   //跳转首页
   router.push('/')
 }

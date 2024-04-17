@@ -1,7 +1,12 @@
 <script setup>
-import { House, Bell, Search } from '@element-plus/icons-vue'
+import { House, Bell, Search, Plus } from '@element-plus/icons-vue'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const showCard = ref(false)
+import { useUserStore } from '@/stores'
+const userStore = useUserStore()
+
 // const input = ref('')
 // watch(showCard, () => {
 //   showCard.value != showCard.value
@@ -21,55 +26,34 @@ const showCard = ref(false)
         <el-col :span="8">test</el-col></el-row
       >
     </el-header>
-    <el-container>
-      <el-aside class="left-aside">
-        <el-menu active-text-color="black" :default-active="$route.path" router>
-          <el-menu-item index="/explore">
-            <el-icon><House /></el-icon>
-            <span>发现</span>
-          </el-menu-item>
-          <el-menu-item index="/notification">
-            <el-icon><Bell /></el-icon>
-            <span>通知</span>
-          </el-menu-item>
-          <el-menu-item index="/publish">
-            <el-icon><Bell /></el-icon>
-            <span>发布</span>
-          </el-menu-item>
-          <el-menu-item index="/user/profile">
-            <el-icon><Bell /></el-icon>
-            <span>我</span>
-          </el-menu-item>
-          <el-menu-item @click="showCard = !showCard" class="card">
-            <el-icon><Bell /></el-icon>
-            <span>更多</span>
-          </el-menu-item>
-        </el-menu>
-        <el-card v-if="showCard" @mouseleave="showCard = !showCard">
-          <template #header
-            ><el-menu>
-              <button>
-                <el-icon><Bell /></el-icon>退出
-              </button>
-            </el-menu></template
-          >
-          <el-menu>
-            <button>
-              <el-icon><Bell /></el-icon>退出
-            </button>
-          </el-menu>
-
-          <template #footer>
-            <el-menu>
-              <button>
-                <el-icon><Bell /></el-icon>退出
-              </button>
-            </el-menu></template
-          >
-        </el-card>
-      </el-aside>
-      <div style="width: 100%"><router-view></router-view></div>
-    </el-container>
+    <el-row>
+      <el-col :span="4">
+        <div class="left-aside">
+          <ui class="el-menu">
+            <li class="el-menu-item" @click="router.push('/explore')">
+              <el-icon><House /></el-icon>
+              <span>发现</span>
+            </li>
+            <li class="el-menu-item" @click="router.push('/publish')">
+              <el-icon><Plus /></el-icon>
+              <span>发布</span>
+            </li>
+            <li class="el-menu-item" @click="router.push('/notification')">
+              <el-icon><Bell /></el-icon>
+              <span>通知</span>
+            </li>
+            <li class="el-menu-item" v-if="userStore.token" @click="router.push('/user/profile')">
+              <el-icon><Bell /></el-icon>
+              <span>我</span>
+            </li>
+            <li v-else class="loginItem" @click="router.push('/login')">登录</li>
+          </ui>
+        </div>
+      </el-col>
+      <el-col :span="16">
+        <div style="width: 100%"><router-view></router-view></div>
+      </el-col>
+    </el-row>
   </el-container>
 </template>
 <style lang="less" scoped>
@@ -111,23 +95,35 @@ const showCard = ref(false)
   }
 }
 .left-aside {
-  width: 20%;
-  .card {
-    position: relative;
-    bottom: 0;
-  }
-  .el-menu {
-    float: right;
-    border-right: 0;
-    padding-right: 20px;
-  }
-  .el-menu-item {
-    min-width: 250px;
+  padding-left: 100px;
+  list-style-type: none;
 
+  li {
+    padding-left: 20px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    span {
+      margin-left: 10px;
+    }
+  }
+  .loginItem {
+    padding-left: 0;
     border-radius: 40px;
-    margin-bottom: 10px;
     font-size: large;
     font-weight: bold;
+    background: crimson;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    // text-align: center;
+  }
+  .el-menu-item {
+    border-radius: 40px;
+    font-size: large;
+    font-weight: bold;
+    vertical-align: middle;
   }
   .el-menu-item:hover {
     background: rgb(255, 234, 252);
