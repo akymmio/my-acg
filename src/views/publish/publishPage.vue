@@ -68,55 +68,57 @@ const sizeForm = ref({
 </script>
 <template>
   <div class="container">
-    <div style="background: #f6f6f6">
-      <el-upload
-        multiple="true"
-        v-model:file-list="fileList.images"
-        :auto-upload="false"
-        list-type="picture-card"
-        :on-preview="handlePictureCardPreview"
-        :on-change="selectFiles"
-        :on-remove="removeImage"
-      >
-        <el-icon><Plus /></el-icon>
-      </el-upload>
-    </div>
-
-    <el-row>
-      <el-col :span="12">
-        <el-form
-          ref="form"
-          style="max-width: 600px"
-          :model="sizeForm"
-          label-width="auto"
-          size="default"
-          label-position="left"
+    <div>
+      <div style="background: #f6f6f6">
+        <el-upload
+          multiple="true"
+          v-model:file-list="fileList.images"
+          :auto-upload="false"
+          list-type="picture-card"
+          :on-preview="handlePictureCardPreview"
+          :on-change="selectFiles"
+          :on-remove="removeImage"
         >
-          <el-form-item></el-form-item>
-          <el-form-item>
-            <el-input v-model="sizeForm.name" placeholder="请输入标题" />
-          </el-form-item>
+          <el-icon><Plus /></el-icon>
+        </el-upload>
+      </div>
 
-          <quill-editor
-            style="height: 200px"
-            theme="snow"
-            v-model:content="fileList.content"
-            content-type="html"
-          ></quill-editor>
+      <el-row>
+        <el-col :span="12">
+          <el-form
+            ref="form"
+            :model="sizeForm"
+            label-width="auto"
+            size="default"
+            label-position="left"
+          >
+            <el-form-item></el-form-item>
+            <el-form-item>
+              <el-input v-model="sizeForm.name" placeholder="请输入标题" />
+            </el-form-item>
 
-          <el-form-item label="权限">
+            <quill-editor
+              style="height: 200px"
+              theme="snow"
+              v-model:content="fileList.content"
+              content-type="html"
+            ></quill-editor>
+
+            <!-- <el-form-item label="权限">
             <input type="radio" name="exampleGroup" value="option1" />公开
             <input type="radio" name="exampleGroup" value="option1" />私人
-          </el-form-item>
-          <el-form-item>
-            <button @click="publish('草稿')">编辑</button>
-            <button @click="publish('发布')">发布</button>
-          </el-form-item>
-        </el-form></el-col
-      >
-      <el-col :span="12"></el-col>
-    </el-row>
+          </el-form-item> -->
+            <el-form-item>
+              <button @click="publish('草稿')">草稿</button>
+              <button @click="publish('发布')">发布</button>
+            </el-form-item>
+          </el-form></el-col
+        >
+        <el-col :span="12"></el-col>
+      </el-row>
+    </div>
   </div>
+
   <el-dialog v-model="dialogVisible">
     <img w-full :src="dialogImageUrl" alt="Preview Image" class="showImg" />
   </el-dialog>
@@ -127,10 +129,12 @@ const sizeForm = ref({
   max-width: 600px;
   min-height: 200px;
   max-height: 600px;
-  //   height: 100%;
 }
 .container {
-  // background: #f6f6f6;
+  // flex: 1;
+  // padding: 0 24px;
+  // width: 67%;
+  // margin: 0 auto;
 }
 .el-form-item {
   padding-bottom: 5px;

@@ -1,9 +1,24 @@
 <script setup>
 import { ref } from 'vue'
-import { useUserStore } from '@/stores/index'
 import { Female, Male } from '@element-plus/icons-vue'
+import { getUserInfoByIdService } from '@/api/user'
+import { useRoute } from 'vue-router'
+const route = useRoute()
+const userInfo = ref({})
+import { useUserStore } from '@/stores'
 const userStore = useUserStore()
-const userInfo = userStore.user
+const user = userStore.user
+//通过用户名查询账号信息
+const getUserInfo = async () => {
+  console.log(user.id)
+
+  const res = await getUserInfoByIdService(route.params.id)
+  console.log(res)
+  userInfo.value = res.data.data
+}
+getUserInfo()
+
+const cover = 'cover'
 </script>
 
 <template>
@@ -21,30 +36,29 @@ const userInfo = userStore.user
         >
           <el-descriptions-item label="账号">{{ userInfo.username }}</el-descriptions-item>
           <el-descriptions-item>
-            <e-slot v-if="userInfo.sex === '0'">
-              <el-icon><Female /></el-icon>
-            </e-slot>
-            <e-slot v-else>
-              <el-icon><Male /></el-icon>
-            </e-slot>
-
+            <el-icon v-if="userInfo.sex === '0'"><Female /></el-icon>
+            <el-icon v-else><Male /></el-icon>
             <!-- 当 sex 为 1 时显示 Male 图标 -->
             <!-- <el-icon v-else><Male /></el-icon> -->
           </el-descriptions-item>
           <!-- <el-descriptions-item label="昵称">{{ userInfo.nickname }}</el-descriptions-item> -->
           <el-descriptions-item label="简介">{{ userInfo.introduction }}</el-descriptions-item>
           <el-descriptions-item>
-            <span style="margin-right: 10px">关注{{ userInfo.follow }}</span>
-            <span>获赞{{ userInfo.liked }}</span>
+            <span style="margin-right: 10px">关注 {{ userInfo.follow }}</span>
+            <span>获赞 {{ userInfo.liked }}</span>
           </el-descriptions-item>
         </el-descriptions>
+      </div>
+      <div class="element">
+        <button class="unFollowButton" v-if="userInfo.followed">已关注</button>
+        <button class="followButton" v-else>关注</button>
       </div>
       <!-- {{ userInfo.username }} -->
     </div>
     <div>
       <button class="button">笔记</button>
-      <button>收藏</button>
-      <button>点赞</button>
+      <button class="button">收藏</button>
+      <button class="button">点赞</button>
     </div>
     <div>test</div>
   </div>
@@ -62,7 +76,7 @@ const userInfo = userStore.user
 .main {
   padding-top: 20px;
 }
-button {
+.button {
   border-radius: 40px;
   font-size: 18px;
   background-color: white;
@@ -71,12 +85,42 @@ button {
   height: 40px;
   margin-bottom: 15px;
 }
-button:hover {
+.button:hover {
   background-color: #f6f6f6;
 }
-button:focus {
+.button:focus {
   background-color: #f6f6f6;
   // font-weight: bold;
-  font-size: 19px;
+
+}
+.followButton {
+  color: rgb(255, 255, 255);
+  border: 0;
+  border-radius: 40px;
+  font-size: large;
+  font-weight: bold;
+  background: rgb(255, 48, 89);
+  width: 80px;
+  height: 40px;
+  margin-left: 150px
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
+}
+.unFollowButton {
+  border:solid 1px;
+  border-radius: 40px;
+  font-size: large;
+  font-weight: bold;
+  background: rgb(255, 255, 255);
+  width: 80px;
+  height: 40px;
+  margin-left: 150px
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
+}
+.unFollowButton:hover{
+  background: #f6f6f6;
 }
 </style>

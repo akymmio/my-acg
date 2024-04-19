@@ -13,7 +13,7 @@ const router = createRouter({
           component: () => import('@/views/explore/explorePage.vue')
         },
         {
-          path: '/user/profile',
+          path: '/user/profile/:id',
           component: () => import('@/views/user/userProfile.vue')
         },
         {
@@ -24,6 +24,11 @@ const router = createRouter({
           path: '/publish',
           component: () => import('@/views/publish/publishPage.vue')
         }
+        // ,
+        // {
+        //   path: '/explore/`channel_id=${channelId}`',
+        //   component: () => import('@/views/explore/explorePage.vue')
+        // }
       ]
     },
     {

@@ -1,11 +1,7 @@
 <template>
   <div>
-    <button>推荐</button>
-    <button>推荐</button>
-    <button>推荐</button>
-    <button>推荐</button>
-    <button>推荐</button>
-    <button>推荐</button>
+    <button @click="selectChannel(0)" :class="{ active: channelId == 0 }">推荐</button>
+    <button @click="selectChannel(1)">推荐</button>
     <!-- 首页瀑布流 -->
     <my-waterfall :cardList="cardList"></my-waterfall>
   </div>
@@ -14,6 +10,13 @@
 import { ref } from 'vue'
 import myWaterfall from '@/views/waterFall/myWaterfall.vue'
 import { requireImg } from '@/utils/requireImg'
+import { getArticleService } from '@/api/article'
+import { useRouter, useRoute } from 'vue-router'
+const router = useRouter()
+const route = useRoute()
+import { useUserStore } from '@/stores'
+const userStore = useUserStore()
+userStore.getUser()
 //瀑布流数据
 const cardList = ref([
   {
@@ -131,6 +134,12 @@ const cardList = ref([
 
   // ... 其他卡片数据
 ])
+const selectChannel = async (channelId) => {
+  router.push({ path: '/explore', query: { channel_id: channelId } })
+  const queryWord = route.query.channel_id
+  console.log(queryWord)
+  await getArticleService(channelId)
+}
 </script>
 
 <style scoped lang="less">

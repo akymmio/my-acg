@@ -4,7 +4,8 @@
       :list="props.cardList"
       :width="240"
       :hasAroundGutter="false"
-      style="max-width: 1300px"
+      style="max-width: 1260px"
+      @click="detail"
     >
       @scroll="scroll">
       <template #item="{ item }">
@@ -39,6 +40,10 @@ const props = defineProps({
 })
 
 const dialogTableVisible = ref(false)
+
+const detail = (articleid) => {
+  console.log(articleid)
+}
 </script>
 
 <style lang="less" scoped>

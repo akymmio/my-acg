@@ -22,3 +22,8 @@ export const userLoginService = (loginData) => {
 export const getUserInfoService = () => {
   return require.get('/user/userInfo')
 }
+
+// 获取用户信息
+export const getUserInfoByIdService = (userId) => {
+  return require.get(`/user?id=${userId}`)
+}

@@ -5,12 +5,19 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 // const showCard = ref(false)
 import { useUserStore } from '@/stores'
+import { ref } from 'vue'
 const userStore = useUserStore()
-//如果已经登录了获取用户信息,存入store
-if (userStore.token) {
-  userStore.getUser()
+const user = ref()
+
+const push = () => {
+  //如果已经获取了用户信息就不用再去获取
+  if (user.value == null) {
+    userStore.getUser()
+    user.value = userStore.user
+  }
+  router.push(`/user/profile/${user.value.id}`)
 }
-// userStore.getUser()
+//如果用户信息为空,查询用户信息
 const logout = () => {
   userStore.removeToken()
   userStore.removeUser()
@@ -53,7 +60,7 @@ const logout = () => {
               <el-icon><Bell /></el-icon>
               <span>通知</span>
             </li>
-            <li class="el-menu-item" v-if="userStore.token" @click="router.push('/user/profile')">
+            <li class="el-menu-item" v-if="userStore.token" @click="push">
               <el-icon><Bell /></el-icon>
               <span>我</span>
             </li>
