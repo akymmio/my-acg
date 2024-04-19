@@ -37,7 +37,7 @@ const logout = () => {
       </el-row>
     </el-header>
     <el-row>
-      <el-col :span="2"></el-col>
+      <el-col :span="1"></el-col>
       <el-col :span="3">
         <div class="left-aside">
           <ui>

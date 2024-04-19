@@ -50,7 +50,7 @@ instance.interceptors.response.use(
     }
     ElNotification({
       title: 'Error',
-      message: error.response.data.message || '服务异常',
+      message: error.response.data.message || '请重新登录',
       type: 'error'
     })
     // 超出 2xx 范围的状态码都会触发该函数。
