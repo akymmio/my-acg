@@ -1,11 +1,12 @@
 <script setup>
 import { House, Bell, Search, Plus, Operation } from '@element-plus/icons-vue'
+import loginPage from '@/views/login/loginPage.vue'
 // import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 // const showCard = ref(false)
 import { useUserStore } from '@/stores'
-import { ref, watch } from 'vue'
+import { ref, watch, h } from 'vue'
 const userStore = useUserStore()
 const user = ref(null)
 
@@ -16,15 +17,7 @@ watch(
     user.value = newValue
   }
 )
-const push = () => {
-  //如果已经获取了用户信息就不用再去获取
-  // if (user.value === null) {
-  //   userStore.getUser()
-  //   user.value = userStore.user
-  //   console.log(user.value)
-  // }
-  router.push(`/user/profile/${user.value.id}`)
-}
+
 //如果用户信息为空,查询用户信息
 const logout = () => {
   userStore.removeToken()
@@ -36,19 +29,39 @@ const logout = () => {
   })
   router.go('/')
 }
+
+const showLoginPage = ref(false)
+const toChild = (param) => {
+  showLoginPage.value = param
+}
+
+const routeTo = (path) => {
+  if (!user.value) {
+    showLoginPage.value = true
+    ElNotification({
+      message: h('i', { style: 'color: teal' }, '请先登录')
+    })
+    return
+  }
+  if (path == 'publish') {
+    router.push('/publish')
+  } else if (path === 'notification') {
+    router.push('/notification')
+  }
+}
 </script>
 
 <template>
   <el-container class="layout">
     <el-header>
       <el-row>
-        <el-col :span="8" style="padding-left: 100px">test</el-col>
+        <el-col :span="8" style="padding-left: 100px"></el-col>
         <el-col :span="8" style="display: flex; justify-content: center; align-items: center">
           <input class="inputSearch" v-model="input1" placeholder="搜索" />
           <button class="inputIcon">
             <el-icon size="large" class="searchIcon"><Search /></el-icon></button
         ></el-col>
-        <el-col :span="8">test</el-col>
+        <el-col :span="8"></el-col>
       </el-row>
     </el-header>
     <el-row>
@@ -56,15 +69,15 @@ const logout = () => {
       <el-col :span="3">
         <div class="left-aside">
           <ui>
-            <li class="el-menu-item" @click="router.push('/explore')">
+            <li class="el-menu-item" @click="router.push('explore')">
               <el-icon><House /></el-icon>
               <span>发现</span>
             </li>
-            <li class="el-menu-item" @click="router.push('/publish')">
+            <li class="el-menu-item" @click="routeTo('publish')">
               <el-icon><Plus /></el-icon>
               <span>发布</span>
             </li>
-            <li class="el-menu-item" @click="router.push('/notification')">
+            <li class="el-menu-item" @click="routeTo('notification')">
               <el-icon><Bell /></el-icon>
               <span>通知</span>
             </li>
@@ -72,7 +85,7 @@ const logout = () => {
               <el-icon><Bell /></el-icon>
               <span>我</span>
             </li>
-            <li v-else class="loginItem" @click="router.push('/login')" style="color: white">
+            <li v-else class="loginItem" @click="showLoginPage = true" style="color: white">
               登录
             </li>
             <li>
@@ -94,6 +107,7 @@ const logout = () => {
       </el-col>
     </el-row>
   </el-container>
+  <loginPage v-show="showLoginPage" @toParent="toChild"></loginPage>
 </template>
 <style lang="less" scoped>
 .layout {
@@ -154,7 +168,7 @@ const logout = () => {
     border-radius: 40px;
     font-size: large;
     font-weight: bold;
-    background: crimson;
+    background: #ff2e4d;
     display: flex;
     justify-content: center;
     align-items: center;

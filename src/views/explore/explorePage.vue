@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <button @click="selectChannel(0)" :class="{ active: channelId == 0 }">推荐</button>
+    <button @click="selectChannel(0)">推荐</button>
     <button @click="selectChannel(1)">推荐</button>
     <!-- 首页瀑布流 -->
     <!-- <my-waterfall :cardList="cardList" style="overflow-y: hidden"></my-waterfall> -->
@@ -16,7 +16,7 @@
     >
       <template #item="{ item }">
         <div>
-          <LazyImg :url="item.src" class="lazyImg" @click="dialogTableVisible = true" />
+          <LazyImg :url="item.src" class="lazyImg" @click="showContent(id)" />
           <div class="item-body">
             <div class="item-desc">{{ item.title }}</div>
             <div class="item-footer">
@@ -33,14 +33,24 @@
       </template>
     </Waterfall>
   </div>
+  <div class="mask" v-show="show">
+    <div class="login-container">
+      <div @click="show = false" class="close">
+        <el-icon><Close /></el-icon>
+      </div>
+      <div class="left"></div>
+      <div class="right"></div>
+    </div>
+  </div>
 </template>
 <script setup>
 import { ref } from 'vue'
 // import myWaterfall from '@/views/waterFall/myWaterfall.vue'
 import { requireImg } from '@/utils/requireImg'
-import { getArticleService } from '@/api/article'
+// import { getArticleService } from '@/api/article'
 import { useRouter, useRoute } from 'vue-router'
 import { LazyImg, Waterfall } from 'vue-waterfall-plugin-next'
+import { Close } from '@element-plus/icons-vue'
 import 'vue-waterfall-plugin-next/dist/style.css'
 const router = useRouter()
 const route = useRoute()
@@ -175,10 +185,91 @@ const selectChannel = async (channelId) => {
   router.push({ path: '/explore', query: { channel_id: channelId } })
   const queryWord = route.query.channel_id
   console.log(queryWord)
-  await getArticleService(channelId)
+  // await getArticleService(channelId)
+}
+const show = ref(false)
+const showContent = (id) => {
+  router.push({ name: '/explore', params: { id: 1 } })
+  show.value = true
 }
 </script>
 <style scoped lang="less">
+.mask {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.25);
+  overflow-y: hidden;
+  // @media (max-width: 599px) {
+  //   .login-container {
+  //     // width: 60%;
+  //     // height: 80%;
+  //   }
+  // }
+
+  /* 当窗口宽度在600px到900px之间时应用的样式 */
+  // @media (min-width: 600px) and (max-width: 899px) {
+  //   .login-container {
+  //     width: 60%;
+  //     height: 80%;
+  //   }
+  // }
+
+  // /* 当窗口宽度大于900px时应用的样式 */
+  // @media (min-width: 900px) {
+  //   .login-container {
+  //     width: 60%;
+  //     height: 80%;
+  //   }
+  // }
+  .login-container {
+    display: flex;
+    background-color: #fff;
+    border-radius: 20px;
+    // position: relative; //?
+    box-sizing: border-box;
+    /* 当窗口宽度小于600px时应用的样式 */
+    width: 60%;
+    height: 90%;
+    .close {
+      position: absolute;
+      top: 5%;
+      right: 18%;
+      width: 30px;
+      height: 30px;
+      background: rgb(255, 255, 255);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close:hover {
+      background-color: #f9f7f7;
+      border-radius: 50%;
+      // background-color: #f6f6f6;
+    }
+    .left {
+      width: 50%;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      border-right: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .right {
+      width: 400px;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      margin-top: 48px;
+    }
+  }
+}
 button {
   border-radius: 40px;
   font-size: large;
