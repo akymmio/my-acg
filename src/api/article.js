@@ -6,9 +6,4 @@ export const publishArticleService = (data) => {
 
 export const getArticleService = (channelId) => {
   return require.get(`/article?channel_id=${channelId}`)
-  // return require.get('/article', {
-  //   params: {
-  //     channel_id: channelId
-  //   }
-  // })
 }

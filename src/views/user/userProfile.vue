@@ -11,9 +11,7 @@ const user = userStore.user
 //通过用户名查询账号信息
 const getUserInfo = async () => {
   console.log(user.id)
-
   const res = await getUserInfoByIdService(route.params.id)
-  console.log(res)
   userInfo.value = res.data.data
 }
 getUserInfo()

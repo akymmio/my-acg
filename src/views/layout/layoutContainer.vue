@@ -5,16 +5,24 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 // const showCard = ref(false)
 import { useUserStore } from '@/stores'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 const userStore = useUserStore()
-const user = ref()
+const user = ref(null)
 
+//监视user数据的变化
+watch(
+  () => userStore.user,
+  (newValue) => {
+    user.value = newValue
+  }
+)
 const push = () => {
   //如果已经获取了用户信息就不用再去获取
-  if (user.value == null) {
-    userStore.getUser()
-    user.value = userStore.user
-  }
+  // if (user.value === null) {
+  //   userStore.getUser()
+  //   user.value = userStore.user
+  //   console.log(user.value)
+  // }
   router.push(`/user/profile/${user.value.id}`)
 }
 //如果用户信息为空,查询用户信息
@@ -95,7 +103,7 @@ const logout = () => {
   width: 100%;
   height: 100%;
   .el-header {
-    height: 100px;
+    height: 80px;
     background: rgb(255, 255, 255);
 
     .inputSearch {
