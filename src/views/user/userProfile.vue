@@ -23,7 +23,7 @@ const cover = 'cover'
   <div style="text-align: center">
     <div class="header">
       <div class="element">
-        <el-avatar :size="180" :src="userInfo.userPic" :fit="cover" />
+        <el-avatar :size="180" :src="userInfo.avatar" :fit="cover" />
       </div>
       <div class="element">
         <el-descriptions

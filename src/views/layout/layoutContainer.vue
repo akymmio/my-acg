@@ -8,15 +8,18 @@ const router = useRouter()
 import { useUserStore } from '@/stores'
 import { ref, watch, h } from 'vue'
 const userStore = useUserStore()
-const user = ref(null)
+// 创建一个响应式变量 user 来绑定到模板中
+const user = ref(userStore.user)
 
-//监视user数据的变化
-watch(
-  () => userStore.user,
-  (newValue) => {
-    user.value = newValue
-  }
-)
+// 使用 watch 函数监听 userStore.user 的变化
+// watch(
+//   () => userStore.user,
+//   (newValue) => {
+//     // 当 userStore.user 更新时，将新值赋给 user
+//     user.value = newValue
+//   },
+//   { immediate: true } // 设置 immediate 为 true，确保在初始渲染时也执行一次
+// )
 
 //如果用户信息为空,查询用户信息
 const logout = () => {
@@ -29,14 +32,14 @@ const logout = () => {
   })
   router.go('/')
 }
-
+//接收登录页面串参数
 const showLoginPage = ref(false)
 const toChild = (param) => {
   showLoginPage.value = param
 }
 
 const routeTo = (path) => {
-  if (!user.value) {
+  if (!userStore.token) {
     showLoginPage.value = true
     ElNotification({
       message: h('i', { style: 'color: teal' }, '请先登录')
@@ -48,6 +51,10 @@ const routeTo = (path) => {
   } else if (path === 'notification') {
     router.push('/notification')
   }
+}
+const push = () => {
+  console.log(user.value)
+  router.push(`/user/profile/${user.value.id}`)
 }
 </script>
 
@@ -69,7 +76,7 @@ const routeTo = (path) => {
       <el-col :span="3">
         <div class="left-aside">
           <ui>
-            <li class="el-menu-item" @click="router.push('explore')">
+            <li class="el-menu-item" @click="router.push('/explore')">
               <el-icon><House /></el-icon>
               <span>发现</span>
             </li>
@@ -163,6 +170,9 @@ const routeTo = (path) => {
       margin-left: 10px;
     }
   }
+  .el-menu-item.is-active {
+    background-color: rgb(0, 0, 0) !important;
+  }
   .loginItem {
     padding-left: 0;
     border-radius: 40px;
@@ -183,8 +193,8 @@ const routeTo = (path) => {
   .el-menu-item:hover {
     background: rgb(255, 234, 252);
   }
-  .el-menu-item.is-active {
-    background-color: #f6f6f6 !important;
+  .el-menu-item:focus {
+    background: rgb(16, 16, 16) !important;
   }
 }
 .inner-header {

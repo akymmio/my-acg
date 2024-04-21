@@ -54,16 +54,6 @@ import { Close } from '@element-plus/icons-vue'
 import 'vue-waterfall-plugin-next/dist/style.css'
 const router = useRouter()
 const route = useRoute()
-import { useUserStore } from '@/stores'
-const userStore = useUserStore()
-//user信息要更新确保其为响应式对象
-const getUserService = () => {
-  if (userStore.token && !!userStore.user) {
-    //如果有登录就且没有获取用户信息
-    userStore.getUser()
-  }
-}
-getUserService()
 
 const cardList = ref([
   {
@@ -187,9 +177,11 @@ const selectChannel = async (channelId) => {
   console.log(queryWord)
   // await getArticleService(channelId)
 }
+
 const show = ref(false)
-const showContent = (id) => {
-  router.push({ name: '/explore', params: { id: 1 } })
+const showContent = () => {
+  // router.push({ name: '/explore', params: { id: 1 } })
+  router.push(`/explore/1`)
   show.value = true
 }
 </script>
@@ -239,7 +231,7 @@ const showContent = (id) => {
     .close {
       position: absolute;
       top: 5%;
-      right: 18%;
+      right: 17%;
       width: 30px;
       height: 30px;
       background: rgb(255, 255, 255);
@@ -255,7 +247,7 @@ const showContent = (id) => {
       // background-color: #f6f6f6;
     }
     .left {
-      width: 50%;
+      width: 70%;
       display: flex;
       align-items: center;
       flex-direction: column;

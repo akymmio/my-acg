@@ -47,6 +47,8 @@ const login = async () => {
   })
   //存储token
   userStore.setToken(res.data.data)
+  //获取用户信息
+  userStore.getUser()
   //跳转首页
   router.push('/')
 }
