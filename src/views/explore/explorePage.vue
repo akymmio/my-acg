@@ -48,7 +48,7 @@
       <div class="right"></div>
     </div>
   </div> -->
-  <!-- <contentPage v-show="show" @toParent="toChild"></contentPage> -->
+  <contentPage v-if="show" @toParent="toChild"></contentPage>
 </template>
 <script setup>
 import { ref } from 'vue'
@@ -182,14 +182,14 @@ const selectChannel = async (channelId) => {
   router.push({ path: '/explore', query: { channel_id: channelId } })
   const queryWord = route.query.channel_id
   console.log(queryWord)
-  // await getArticleService(channelId)
 }
 
 const show = ref(false)
-const user = ref(1)
+const user = ref({})
 const showContent = () => {
-  // router.push({ name: '/explore', params: { id: 1 } })
-  router.push(`/explore/${user.value}`)
+  user.value.id = '1'
+  router.push(`/explore/${user.value.id}`)
+  // router.push(`/user/profile/${user.value.id}`)
 }
 const toChild = (param) => {
   show.value = param

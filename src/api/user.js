@@ -25,5 +25,5 @@ export const getUserInfoService = () => {
 
 // 获取用户信息
 export const getUserInfoByIdService = (userId) => {
-  return require.get(`/user?id=${userId}`)
+  return require.get(`/user/profile?id=${userId}`)
 }

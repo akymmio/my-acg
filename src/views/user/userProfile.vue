@@ -3,24 +3,18 @@ import { ref } from 'vue'
 import { Female, Male } from '@element-plus/icons-vue'
 import { getUserInfoByIdService } from '@/api/user'
 import { useRoute } from 'vue-router'
-const route = useRoute()
-const userInfo = ref({})
 import { useUserStore } from '@/stores'
 const userStore = useUserStore()
-const user = userStore.user
+const route = useRoute()
+const user = ref(userStore.user)
 //通过用户名查询账号信息
 const getUserInfo = async () => {
-  console.log(user.id)
-  console.log(userInfo)
   //没有用户信息需要通过id查询
-  if (!user) {
-    await getUserInfoByIdService(route.params.id)
-  }
+  const res = await getUserInfoByIdService(route.params.id)
+  user.value = res.data.data
+  console.log(user.value)
 }
 getUserInfo()
-setTimeout(() => {
-  console.log(route.params)
-}, 2000)
 </script>
 
 <template>

@@ -1,27 +1,31 @@
 <script setup>
-// import { ref } from 'vue'
 import { Close } from '@element-plus/icons-vue'
-
 import { requireImg } from '@/utils/requireImg'
-import { useUserStore } from '@/stores'
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-const route = useRouter()
-const userStore = useUserStore()
+import { ref } from 'vue'
+import { getUserInfoByIdService } from '@/api/user'
+import { getArticleContentService } from '@/api/article'
+import { useRoute, useRouter } from 'vue-router'
+const route = useRoute()
+const router = useRouter()
 // 创建一个响应式变量 user 来绑定到模板中
-const user = ref(userStore.user)
-const emit = defineEmits(['toParent'])
+const user = ref({})
+const article = ref({})
 const close = () => {
-  route.go(-1)
-
-  // emit('toParent', false)
+  //路由返回
+  router.go(-1)
 }
-setTimeout(() => {
-  console.log(route.params)
-}, 2000)
-// onMounted(() => {
-//   console.log(route.params.id)
-// })
+//加载数据
+const getUserInfo = async () => {
+  //根据文章id,获取文章信息
+  const res = await getArticleContentService(route.params.id)
+  article.value = res.data.data
+  //获取用户信息
+  const res1 = await getUserInfoByIdService(article.value.userId)
+  user.value = res1.data.data
+  console.log(res1)
+  console.log(res)
+}
+getUserInfo()
 
 const url = requireImg('@/assets/icon/2.jpg')
 const srcList = [requireImg('@/assets/icon/2.jpg')]
@@ -40,17 +44,23 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
         />
       </div>
       <div class="right">
-        <div class="title">
+        <div class="header">
           <div class="avatar">
             <el-avatar :size="40" :src="user.avatar" />
             <span style="padding-left: 5px">{{ user.nickname }}</span>
           </div>
           <div class="followButton">
-            <span>关注</span>
+            <span v-if="false">关注</span>
+            <span v-else>取关</span>
           </div>
         </div>
-        <div><h1>asdf</h1></div>
-        <div>test</div>
+
+        <div class="content">
+          <h1>{{ article.title }}</h1>
+          <el-text class="text" size="large">{{ article.content }}</el-text>
+          <span class="time">{{ article.createTime }}</span>
+        </div>
+        <div class="footer"></div>
       </div>
     </div>
   </div>
@@ -122,10 +132,11 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
     .right {
       padding: 20px;
       width: 50%;
-      .title {
+      .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
+
         .avatar {
           display: flex; /* 使得avatar和文本可以在同一行上 */
           align-items: center; /* 垂直居中文本和avatar */
@@ -141,7 +152,19 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
           font-weight: bold;
           background: rgb(255, 48, 89);
           width: 80px;
-          height: 35px;
+          height: 40px;
+        }
+      }
+      .content {
+        display: flex;
+        flex-direction: column;
+        .text {
+          width: 100%;
+        }
+        .time {
+          font-size: smaller;
+          color: rgb(153, 153, 153);
+          padding-top: 10px;
         }
       }
     }

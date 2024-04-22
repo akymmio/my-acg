@@ -38,7 +38,7 @@ const routeTo = (path) => {
   if (!userStore.token) {
     showLoginPage.value = true
     ElNotification({
-      message: h('i', { style: 'color: teal' }, '请先登录')
+      message: h('i', { style: 'color: black' }, '请先登录')
     })
     return
   }
