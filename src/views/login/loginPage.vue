@@ -2,9 +2,9 @@
 import { ref, watch } from 'vue'
 import { userRegisterService, userLoginService } from '@/api/user'
 import { Close } from '@element-plus/icons-vue'
-import { useRouter } from 'vue-router'
+// import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/index'
-const router = useRouter()
+// const router = useRouter()
 const isRegister = ref(true)
 //表单数据
 const userform = ref({
@@ -48,9 +48,11 @@ const login = async () => {
   //存储token
   userStore.setToken(res.data.data)
   //获取用户信息
-  userStore.getUser()
+  const tmp = userStore.getUser()
+  console.log(tmp)
   //跳转首页
-  router.push('/')
+  // router.push('/explore')
+  close()
 }
 
 //表单校验规则
@@ -61,11 +63,11 @@ const rules = ref({
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { pattern: /^\S{8,15}$/, message: '长度大于8', trigger: 'blur' }
+    { pattern: /^\S{5,16}$/, message: '长度大于5,小于16', trigger: 'blur' }
   ],
   repassword: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { pattern: /^\S{8,15}$/, message: '长度大于8', trigger: 'blur' },
+    { pattern: /^\S{5,16}$/, message: '长度大于8,小于16', trigger: 'blur' },
     //自定义校验队则
     {
       validator: (rule, value, callback) => {
@@ -81,10 +83,8 @@ const rules = ref({
 })
 
 //传递父组件
-
 const emit = defineEmits(['toParent'])
 const close = () => {
-  console.log(1)
   emit('toParent', false)
 }
 </script>
@@ -106,7 +106,7 @@ const close = () => {
             <input v-model="userform.password" type="password" placeholder="密码" />
           </el-form-item>
           <el-form-item>
-            <button class="loginButton" @click="login">登录</button>
+            <button class="loginButton" @click="login" type="button">登录</button>
           </el-form-item>
           <el-link @click="isRegister = false">注册</el-link>
         </el-form>
@@ -128,6 +128,7 @@ const close = () => {
           </el-form-item>
           <el-form-item>
             <button
+              type="button"
               class="loginButton"
               @click="register"
               size="large"

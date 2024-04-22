@@ -8,9 +8,6 @@
       :list="cardList"
       :hasAroundGutter="false"
       style="max-width: 1300px"
-      @click="detail"
-      @scroll="scroll"
-      :align="left"
       :width="240"
       :gutter="20"
     >
@@ -33,15 +30,25 @@
       </template>
     </Waterfall>
   </div>
-  <div class="mask" v-show="show">
+  <!-- <div class="mask" v-show="show">
     <div class="login-container">
       <div @click="show = false" class="close">
         <el-icon><Close /></el-icon>
       </div>
-      <div class="left"></div>
+      <div class="left">
+        <div class="block text-center">
+          <span class="demonstration">Motion blur the switch (default)</span>
+          <el-carousel height="200px" motion-blur>
+            <el-carousel-item v-for="item in 4" :key="item">
+              <h3 class="small justify-center" text="2xl">{{ item }}</h3>
+            </el-carousel-item>
+          </el-carousel>
+        </div>
+      </div>
       <div class="right"></div>
     </div>
-  </div>
+  </div> -->
+  <!-- <contentPage v-show="show" @toParent="toChild"></contentPage> -->
 </template>
 <script setup>
 import { ref } from 'vue'
@@ -50,8 +57,8 @@ import { requireImg } from '@/utils/requireImg'
 // import { getArticleService } from '@/api/article'
 import { useRouter, useRoute } from 'vue-router'
 import { LazyImg, Waterfall } from 'vue-waterfall-plugin-next'
-import { Close } from '@element-plus/icons-vue'
 import 'vue-waterfall-plugin-next/dist/style.css'
+import contentPage from '@/views/content/contentPage.vue'
 const router = useRouter()
 const route = useRoute()
 
@@ -179,10 +186,13 @@ const selectChannel = async (channelId) => {
 }
 
 const show = ref(false)
+const user = ref(1)
 const showContent = () => {
   // router.push({ name: '/explore', params: { id: 1 } })
-  router.push(`/explore/1`)
-  show.value = true
+  router.push(`/explore/${user.value}`)
+}
+const toChild = (param) => {
+  show.value = param
 }
 </script>
 <style scoped lang="less">
@@ -247,7 +257,7 @@ const showContent = () => {
       // background-color: #f6f6f6;
     }
     .left {
-      width: 70%;
+      width: 60%;
       display: flex;
       align-items: center;
       flex-direction: column;

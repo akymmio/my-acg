@@ -6,20 +6,10 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 // const showCard = ref(false)
 import { useUserStore } from '@/stores'
-import { ref, watch, h } from 'vue'
+import { ref, h, watch } from 'vue'
 const userStore = useUserStore()
 // 创建一个响应式变量 user 来绑定到模板中
 const user = ref(userStore.user)
-
-// 使用 watch 函数监听 userStore.user 的变化
-// watch(
-//   () => userStore.user,
-//   (newValue) => {
-//     // 当 userStore.user 更新时，将新值赋给 user
-//     user.value = newValue
-//   },
-//   { immediate: true } // 设置 immediate 为 true，确保在初始渲染时也执行一次
-// )
 
 //如果用户信息为空,查询用户信息
 const logout = () => {
@@ -38,6 +28,12 @@ const toChild = (param) => {
   showLoginPage.value = param
 }
 
+watch(
+  () => userStore.user,
+  (newUser) => {
+    user.value = newUser
+  }
+)
 const routeTo = (path) => {
   if (!userStore.token) {
     showLoginPage.value = true
@@ -53,7 +49,6 @@ const routeTo = (path) => {
   }
 }
 const push = () => {
-  console.log(user.value)
   router.push(`/user/profile/${user.value.id}`)
 }
 </script>
@@ -66,41 +61,42 @@ const push = () => {
         <el-col :span="8" style="display: flex; justify-content: center; align-items: center">
           <input class="inputSearch" v-model="input1" placeholder="搜索" />
           <button class="inputIcon">
-            <el-icon size="large" class="searchIcon"><Search /></el-icon></button
-        ></el-col>
+            <el-icon size="large" class="searchIcon"><Search /></el-icon>
+          </button>
+        </el-col>
         <el-col :span="8"></el-col>
       </el-row>
     </el-header>
     <el-row>
       <el-col :span="1"></el-col>
       <el-col :span="3">
-        <div class="left-aside">
+        <div class="side">
           <ui>
             <li class="el-menu-item" @click="router.push('/explore')">
               <el-icon><House /></el-icon>
-              <span>发现</span>
+              <span> 探索</span>
             </li>
             <li class="el-menu-item" @click="routeTo('publish')">
               <el-icon><Plus /></el-icon>
-              <span>发布</span>
+              <span> 发布</span>
             </li>
             <li class="el-menu-item" @click="routeTo('notification')">
               <el-icon><Bell /></el-icon>
               <span>通知</span>
             </li>
             <li class="el-menu-item" v-if="userStore.token" @click="push">
-              <el-icon><Bell /></el-icon>
+              <el-avatar :size="30" :src="user.avatar" style="margin-left: 0" />
               <span>我</span>
             </li>
             <li v-else class="loginItem" @click="showLoginPage = true" style="color: white">
-              登录
+              <span>登录</span>
             </li>
             <li>
               <el-popover placement="bottom" :width="200" trigger="click">
                 <template #reference>
                   <el-button style="margin-right: 16px">
                     <el-icon><Operation /></el-icon>
-                    <span>更多</span>
+                    <span> 更多</span>
                   </el-button>
                 </template>
                 <button @click="logout">exit</button>
@@ -109,8 +105,11 @@ const push = () => {
           </ui>
         </div>
       </el-col>
+      <!-- <el-col :span="1"></el-col> -->
       <el-col :span="19">
-        <div style="width: 100%"><router-view></router-view></div>
+        <keep-alive>
+          <router-view></router-view>
+        </keep-alive>
       </el-col>
     </el-row>
   </el-container>
@@ -154,15 +153,16 @@ const push = () => {
     }
   }
 }
-.left-aside {
-  padding-right: 20px;
+.side {
+  // padding-right: 20px;
+  // margin-right: 20px;
   ul {
     list-style-type: none;
     // padding-left: 100px;
   }
   li {
     padding-left: 20px;
-    min-height: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     margin-bottom: 8px;
@@ -193,8 +193,14 @@ const push = () => {
   .el-menu-item:hover {
     background: rgb(255, 234, 252);
   }
-  .el-menu-item:focus {
-    background: rgb(16, 16, 16) !important;
+  // .el-menu-item:focus {
+  //   background: rgb(16, 16, 16) !important;
+  // }
+}
+/* 响应式布局 - 当屏幕小于 700 像素宽时，让两列堆叠而不是并排 */
+@media screen and (max-width: 800px) {
+  .side {
+    display: none;
   }
 }
 .inner-header {

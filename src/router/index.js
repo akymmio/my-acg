@@ -14,7 +14,7 @@ const router = createRouter({
         },
         {
           path: '/explore/:id',
-          component: () => import('@/views/explore/explorePage.vue')
+          component: () => import('@/views/content/contentPage.vue')
         },
         {
           path: '/user/profile/:id',
@@ -34,18 +34,19 @@ const router = createRouter({
         //   component: () => import('@/views/explore/explorePage.vue')
         // }
       ]
-    },
-    {
-      path: '/login',
-      component: () => import('@/views/login/loginPage.vue')
     }
+    // ,
+    // {
+    //   path: '/login',
+    //   component: () => import('@/views/login/loginPage.vue')
+    // }
   ]
 })
 //没有token，访问非登录页面，跳转到登录页面
 router.beforeEach((to) => {
   const userStore = useUserStore()
-  if (!userStore.token && to.path.startsWith('/user')) {
-    return '/login'
+  if (!userStore.token && !to.path.startsWith('/explore')) {
+    return '/'
   }
 })
 

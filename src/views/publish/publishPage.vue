@@ -84,7 +84,7 @@ const sizeForm = ref({
       </div>
 
       <el-row>
-        <el-col :span="12">
+        <el-col :span="10">
           <el-form
             ref="form"
             :model="sizeForm"
@@ -114,41 +114,40 @@ const sizeForm = ref({
             </el-form-item>
           </el-form></el-col
         >
-        <el-col :span="12"></el-col>
+        <el-col :span="14"></el-col>
       </el-row>
     </div>
   </div>
 
-  <el-dialog v-model="dialogVisible">
-    <img w-full :src="dialogImageUrl" alt="Preview Image" class="showImg" />
+  <el-dialog v-model="dialogVisible" class="showImg">
+    <img w-full :src="dialogImageUrl" alt="Preview Image" />
   </el-dialog>
 </template>
 
 <style lang="less" scoped>
-.showImg {
-  max-width: 600px;
-  min-height: 200px;
-  max-height: 600px;
+// .showImg {
+//   // width: 100%; /* 或者其他你需要的宽度，比如特定的像素值 */
+//   /* 可以添加其他样式，比如 padding、margin 或 border */
+// }
+.showImg img {
+  max-width: 100%; /* 图片最大宽度为容器宽度 */
+  // height: auto; /* 高度自动调整，保持原始宽高比 */
+  // display: block; /* 消除图片下方的空白间隙（如果图片是行内元素的话） */
 }
-.container {
-  // flex: 1;
-  // padding: 0 24px;
-  // width: 67%;
-  // margin: 0 auto;
-}
-.el-form-item {
-  padding-bottom: 5px;
-  padding-top: 5px;
-}
-.el-upload--picture-card {
-  width: 100px;
-  height: 100px;
-  line-height: 100px;
-}
-.el-upload-list--picture-card .el-upload-list__item {
-  width: 100px;
-  height: 100px;
-}
-.el-upload-list--picture-card .el-upload-list__item-actions {
-}
+
+// .el-form-item {
+//   padding-bottom: 5px;
+//   padding-top: 5px;
+// }
+// .el-upload--picture-card {
+//   width: 100px;
+//   height: 100px;
+//   line-height: 100px;
+// }
+// .el-upload-list--picture-card .el-upload-list__item {
+//   width: 100px;
+//   height: 100px;
+// }
+// .el-upload-list--picture-card .el-upload-list__item-actions {
+// }
 </style>
