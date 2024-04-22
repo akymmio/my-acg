@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 //文本编辑器quill
 import { QuillEditor } from '@vueup/vue-quill'
@@ -7,63 +7,82 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { publishArticleService } from '@/api/article'
 import { useRouter } from 'vue-router'
 const router = useRouter()
+import { useUserStore } from '@/stores'
+const userStore = useUserStore()
+const user = ref(userStore.user)
+watch(
+  () => userStore.user,
+  (newUser) => {
+    user.value = newUser
+  }
+)
 //图片数据对象
 const fileList = ref({
   //存储多张图片
   coverImg: [],
   title: '',
-  content: '',
-  state: ''
+  content: ''
 })
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
 
+//预览
 const handlePictureCardPreview = function (uploadFile) {
   dialogImageUrl.value = uploadFile.url
   //显示弹窗
   dialogVisible.value = true
 }
+//存储图片
 const selectFiles = (uploadFile) => {
   fileList.value.coverImg.push(uploadFile.raw)
-  console.log(uploadFile.raw)
+  // console.log(uploadFile.raw)
 }
-const publish = async (state) => {
-  fileList.value.state = state
-  const formData = new FormData()
-  for (let key in fileList.value.coverImg) {
-    formData.append(`images[]`, fileList.value.coverImg[key])
-  }
+const form = ref()
+const loading = ref(false)
+const publish = async () => {
+  await form.value.validate()
+  // const formData = new FormData()
+  // for (let key in fileList.value.coverImg) {
+  //   formData.append(`images[]`, fileList.value.coverImg[key])
+  // }
 
-  // 添加其他表单字段到formData中
-  formData.append('title', fileList.value.title)
-  formData.append('content', fileList.value.content)
-  formData.append('state', fileList.value.state)
-  //调用发布文章接口
-  const res = await publishArticleService(formData)
-  // console.log(res)
-  ElMessage({
-    message: res.data.message || '发布成功',
-    type: 'success'
-  })
-  //刷新页面，清除数据
+  // // 添加其他表单字段到formData中
+  // formData.append('title', fileList.value.title)
+  // formData.append('content', fileList.value.content)
+  // formData.append('userId', user.value.id)
+  // formData.append('state', fileList.value.state)
+  // formData.append('channelId', 1)
+  // //调用发布文章接口
+  // const res = await publishArticleService(formData)
+  // // console.log(res)
+  // ElMessage({
+  //   message: res.data.message || '发布成功',
+  //   type: 'success'
+  // })
+  //显示加载图层
+  loading.value = true
   setTimeout(() => {
-    router.go('/publish')
+    router.go(0)
   }, 1000)
+  // 置空数据
+  // watch(loading, () => {
+  //   fileList.value = {
+  //     coverImg: [],
+  //     title: '',
+  //     content: ''
+  //   }
+  // })
+}
+const cancel = () => {
+  router.go(0)
 }
 //删除图片
 const removeImage = () => {
   console.log('removeImage')
 }
-
-const sizeForm = ref({
-  name: '',
-  region: '',
-  date1: '',
-  date2: '',
-  delivery: false,
-  type: [],
-  resource: '',
-  desc: ''
+//校验规则
+const rules = ref({
+  title: [{ required: true, message: '请输入标题', trigger: 'blur' }]
 })
 </script>
 <template>
@@ -86,18 +105,18 @@ const sizeForm = ref({
       <el-row>
         <el-col :span="10">
           <el-form
-            ref="form"
-            :model="sizeForm"
+            :rules="rules"
+            :model="fileList"
             label-width="auto"
             size="default"
             label-position="left"
           >
-            <el-form-item></el-form-item>
-            <el-form-item>
-              <el-input v-model="sizeForm.name" placeholder="请输入标题" />
+            <el-form-item prop="title" ref="form">
+              <el-input v-model="fileList.title" placeholder="请输入标题" />
             </el-form-item>
 
             <quill-editor
+              ref="quill"
               style="height: 200px"
               theme="snow"
               v-model:content="fileList.content"
@@ -109,8 +128,15 @@ const sizeForm = ref({
             <input type="radio" name="exampleGroup" value="option1" />私人
           </el-form-item> -->
             <el-form-item>
-              <button @click="publish('草稿')">草稿</button>
-              <button @click="publish('发布')">发布</button>
+              <button type="button" @click="cancel">取消</button>
+              <button
+                v-loading.fullscreen.lock="loading"
+                element-loading-text="发布中"
+                type="button"
+                @click="publish()"
+              >
+                发布
+              </button>
             </el-form-item>
           </el-form></el-col
         >

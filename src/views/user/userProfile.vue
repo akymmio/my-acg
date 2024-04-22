@@ -10,9 +10,11 @@ const user = ref(userStore.user)
 //通过用户名查询账号信息
 const getUserInfo = async () => {
   //没有用户信息需要通过id查询
-  const res = await getUserInfoByIdService(route.params.id)
-  user.value = res.data.data
-  console.log(user.value)
+  if (route.params.id !== user.value.id) {
+    const res = await getUserInfoByIdService(route.params.id)
+    user.value = res.data.data
+    console.log(user.value)
+  }
 }
 getUserInfo()
 </script>
