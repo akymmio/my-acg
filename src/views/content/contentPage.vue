@@ -1,38 +1,40 @@
 <script setup>
-import { Close, ChatRound, ArrowUp } from '@element-plus/icons-vue'
+import { Close, ChatRound, ArrowUp, Star } from '@element-plus/icons-vue'
 import { requireImg } from '@/utils/requireImg'
 import { ref } from 'vue'
-import { getUserInfoByIdService } from '@/api/user'
 import { getArticleByIdService } from '@/api/article'
 import { useRoute, useRouter } from 'vue-router'
-import { Star } from '@element-plus/icons-vue'
 const route = useRoute()
 const router = useRouter()
+import { useUserStore } from '@/stores'
+const userStore = useUserStore()
+// 创建一个响应式变量 user 来绑定到模板中
+const localUser = ref(userStore.user)
 // 创建一个响应式变量 user 来绑定到模板中
 //用户
 const user = ref({})
 //文章
 const article = ref({})
 //评论
-const comments = ref({})
+const comments = ref([])
+//评论
 const textarea = ref()
 const close = () => {
   //路由返回
   router.go(-1)
 }
 //加载数据
-const getUserInfo = async () => {
+const getData = async () => {
   //根据文章id,获取文章信息
   const res = await getArticleByIdService(route.params.id)
   article.value = res.data.data
-  //获取用户信息
-  const res1 = await getUserInfoByIdService(article.value.userId)
-  user.value = res1.data.data
-  console.log(res1)
-  console.log(res)
+  user.value = res.data.data.userInfo
+  comments.value = res.data.data.comments
+  console.log(article.value)
 }
-getUserInfo()
+getData()
 
+const sendComment = () => {}
 const url = requireImg('@/assets/icon/2.jpg')
 const srcList = [requireImg('@/assets/icon/2.jpg')]
 </script>
@@ -43,17 +45,24 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
         <el-icon><Close /></el-icon>
       </div>
       <div class="left">
-        <el-image
+        <!-- <el-image
           :preview-src-list="srcList"
           style="width: 100%; height: 100%; border-radius: 20px 0 0 20px"
           :src="url"
-        />
+        /> -->
+        <div class="media-container">
+          <el-carousel height="90vh" interval="3600" trigger="hover">
+            <el-carousel-item v-for="(image, index) in article.images" :key="index">
+              <el-image style="width: 100%; height: 100%" :src="image" fit="cover" />
+            </el-carousel-item>
+          </el-carousel>
+        </div>
       </div>
       <div class="right">
         <div class="header">
           <div class="avatar">
             <el-avatar :size="40" :src="user.avatar" />
-            <span style="padding-left: 5px">{{ user.nickname }}</span>
+            <span class="username">{{ user.nickname }}</span>
           </div>
           <div class="followButton">
             <span v-if="false">关注</span>
@@ -64,8 +73,20 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
         <div class="content">
           <div class="text">
             <p style="font-size: 25px; font-weight: bold; margin: 10px 0">{{ article.title }}</p>
-            <el-text size="large">{{ article.content }}</el-text>
-            <div class="time">{{ article.createTime }}</div>
+            <!-- <el-text size="large" v-html></el-text> -->
+            <p v-html="article.content"></p>
+            <div class="time" style="padding-top: 0">{{ article.createTime }}</div>
+            <el-divider style="margin: 0" />
+            <div class="time">共{{ article.commentCount }}条评论</div>
+
+            <div v-for="(comment, index) in article.comments" :key="index" class="commentStyle">
+              <div><el-avatar :size="38" :src="comment.avatar" /></div>
+              <div class="comment_container">
+                <div class="comment_name">{{ comment.nickname }}</div>
+                <div class="comment_content">{{ comment.comment }}</div>
+                <div class="time" style="">{{ comment.createTime }}</div>
+              </div>
+            </div>
           </div>
         </div>
         <el-divider style="margin: 0" />
@@ -73,31 +94,29 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
           <textarea
             class="input"
             v-model="textarea"
-            placeholder="Please input"
+            placeholder="说点什么..."
             rows="2"
             cols="50"
           ></textarea>
-          <!-- <el-input
-            class="input"
-            v-model="textarea"
-            autosize
-            type="textarea"
-            placeholder="Please input"
-          /> -->
 
           <el-popconfirm
             confirm-button-text="确认"
             cancel-button-text="取消"
             title="确认发送评论?"
             hide-icon="true"
+            confirm="sendComment"
           >
             <template #reference>
               <!-- <el-button></el-button> -->
               <el-icon size="large" class="inconPublish"><ArrowUp /></el-icon> </template
           ></el-popconfirm>
 
-          <el-icon size="large" class="icon"><Star />{{ article.liked }}test</el-icon>
-          <el-icon size="large" class="icon"><ChatRound />{{ comments.comment }}test</el-icon>
+          <el-icon class="icon"
+            ><Star /><span style="padding-left: 5px">{{ article.likedCount }}</span></el-icon
+          >
+          <el-icon class="icon"
+            ><ChatRound /><span style="padding-left: 5px">{{ article.commentCount }}</span></el-icon
+          >
         </div>
       </div>
     </div>
@@ -105,6 +124,13 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
 </template>
 
 <style scoped lang="less">
+.media-container {
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  border-radius: 20px 0 0 20px;
+  object-fit: contain;
+}
 .mask {
   display: flex;
   align-items: center;
@@ -143,7 +169,7 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
       // background-color: #f6f6f6;
     }
     .left {
-      width: 60%;
+      width: 50%;
       display: flex;
       align-items: center;
       flex-direction: column;
@@ -171,11 +197,14 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
       overflow: hidden;
       .header {
         // height: 10%;
-
         margin: 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        .username {
+          color: rgba(0, 0, 0, 0.5);
+          padding-left: 10px;
+        }
         .avatar {
           display: flex; /* 使得avatar和文本可以在同一行上 */
           align-items: center; /* 垂直居中文本和avatar */
@@ -209,12 +238,30 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
           height: 100%;
           overflow: auto; /* 允许内容滚动 */
           position: relative; /* 为了定位伪元素 */
+          .commentStyle {
+            display: flex;
+            flex-direction: row;
+            padding-top: 15px;
+            .comment_container {
+              display: flex;
+              flex-direction: column;
+              padding-left: 10px;
+              .comment_name {
+                color: rgba(0, 0, 0, 0.6);
+                // padding-left: 10px;
+                font-size: small;
+              }
+              .comment_content {
+                // padding: 10px;
+              }
+            }
+          }
         }
-
         .time {
-          font-size: smaller;
+          font-size: x-small;
           color: rgb(153, 153, 153);
           padding-top: 10px;
+          padding-bottom: 10px;
         }
       }
       @media (min-height: 800px) {
@@ -233,15 +280,17 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
         // justify-content: center; /* 如果需要，也可以水平居中子元素 */
         .input {
           width: 50%;
-          transition:
-            width 0.3s ease,
-            height 0.3s ease; /* 添加过渡效果到宽度和高度 */
+          // transition:
+          //   width 0.3s ease,
+          //   height 0.3s ease; /* 添加过渡效果到宽度和高度 */
+          // height: 40px;
           flex-grow: 1;
           font-size: larger;
           overflow: auto;
           border: 0;
           border-radius: 20px;
           background-color: #f6f6f6;
+          padding-top: 10px;
           padding-left: 10px;
           resize: none;
         }
@@ -253,8 +302,9 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
         }
 
         .icon {
-          flex-grow: 1;
-          border-radius: 20px;
+          flex-grow: 0.5;
+          // border-radius: 20px;
+          font-size: small;
         }
         // .inconPublish:hover {
         //   background-color: #f6f6f6;

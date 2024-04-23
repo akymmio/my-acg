@@ -54,74 +54,81 @@ const push = () => {
 </script>
 
 <template>
-  <el-container class="layout">
-    <el-header>
+  <div class="main">
+    <el-container class="layout">
+      <el-header>
+        <el-row>
+          <el-col :span="8" style="padding-left: 100px"></el-col>
+          <el-col :span="8" style="display: flex; justify-content: center; align-items: center">
+            <input class="inputSearch" v-model="input1" placeholder="搜索" />
+            <button class="inputIcon">
+              <el-icon size="large" class="searchIcon"><Search /></el-icon>
+            </button>
+          </el-col>
+          <el-col :span="8"></el-col>
+        </el-row>
+      </el-header>
       <el-row>
-        <el-col :span="8" style="padding-left: 100px"></el-col>
-        <el-col :span="8" style="display: flex; justify-content: center; align-items: center">
-          <input class="inputSearch" v-model="input1" placeholder="搜索" />
-          <button class="inputIcon">
-            <el-icon size="large" class="searchIcon"><Search /></el-icon>
-          </button>
+        <el-col :span="1"></el-col>
+        <el-col :span="3">
+          <div class="side">
+            <ui>
+              <li class="el-menu-item" @click="router.push('/explore')">
+                <el-icon><House /></el-icon>
+                <span> 探索</span>
+              </li>
+              <li class="el-menu-item" @click="routeTo('publish')">
+                <el-icon><Plus /></el-icon>
+                <span> 发布</span>
+              </li>
+              <li class="el-menu-item" @click="routeTo('notification')">
+                <el-icon><Bell /></el-icon>
+                <span>通知</span>
+              </li>
+              <li class="el-menu-item" v-if="userStore.token" @click="push">
+                <el-avatar :size="30" :src="user.avatar" style="margin-left: 0" />
+                <span>我</span>
+              </li>
+              <li v-else class="loginItem" @click="showLoginPage = true" style="color: white">
+                <span>登录</span>
+              </li>
+              <li>
+                <el-popover placement="bottom" :width="200" trigger="click">
+                  <template #reference>
+                    <el-button style="margin-right: 16px">
+                      <el-icon><Operation /></el-icon>
+                      <span> 更多</span>
+                    </el-button>
+                  </template>
+                  <button @click="logout">exit</button>
+                </el-popover>
+              </li>
+            </ui>
+          </div>
         </el-col>
-        <el-col :span="8"></el-col>
+        <!-- <el-col :span="1"></el-col> -->
+        <el-col :span="19">
+          <div class="router_view"><router-view></router-view></div>
+        </el-col>
       </el-row>
-    </el-header>
-    <el-row>
-      <el-col :span="1"></el-col>
-      <el-col :span="3">
-        <div class="side">
-          <ui>
-            <li class="el-menu-item" @click="router.push('/explore')">
-              <el-icon><House /></el-icon>
-              <span> 探索</span>
-            </li>
-            <li class="el-menu-item" @click="routeTo('publish')">
-              <el-icon><Plus /></el-icon>
-              <span> 发布</span>
-            </li>
-            <li class="el-menu-item" @click="routeTo('notification')">
-              <el-icon><Bell /></el-icon>
-              <span>通知</span>
-            </li>
-            <li class="el-menu-item" v-if="userStore.token" @click="push">
-              <el-avatar :size="30" :src="user.avatar" style="margin-left: 0" />
-              <span>我</span>
-            </li>
-            <li v-else class="loginItem" @click="showLoginPage = true" style="color: white">
-              <span>登录</span>
-            </li>
-            <li>
-              <el-popover placement="bottom" :width="200" trigger="click">
-                <template #reference>
-                  <el-button style="margin-right: 16px">
-                    <el-icon><Operation /></el-icon>
-                    <span> 更多</span>
-                  </el-button>
-                </template>
-                <button @click="logout">exit</button>
-              </el-popover>
-            </li>
-          </ui>
-        </div>
-      </el-col>
-      <!-- <el-col :span="1"></el-col> -->
-      <el-col :span="19">
-        <keep-alive>
-          <router-view></router-view>
-        </keep-alive>
-      </el-col>
-    </el-row>
-  </el-container>
+    </el-container>
+  </div>
+
   <loginPage v-show="showLoginPage" @toParent="toChild"></loginPage>
 </template>
 <style lang="less" scoped>
+.router_view {
+  padding-left: 30px;
+}
+
 .layout {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  // height: 100%;
+  height: 100vh;
+  overflow: hidden;
   .el-header {
     height: 80px;
     background: rgb(255, 255, 255);
@@ -153,6 +160,9 @@ const push = () => {
     }
   }
 }
+.layout::-webkit-scrollbar {
+  display: none;
+}
 .side {
   // padding-right: 20px;
   // margin-right: 20px;
@@ -170,9 +180,7 @@ const push = () => {
       margin-left: 10px;
     }
   }
-  .el-menu-item.is-active {
-    background-color: rgb(0, 0, 0) !important;
-  }
+
   .loginItem {
     padding-left: 0;
     border-radius: 40px;
@@ -189,6 +197,11 @@ const push = () => {
     font-size: large;
     font-weight: bold;
     vertical-align: middle;
+    padding-left: 20px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
   }
   .el-menu-item:hover {
     background: rgb(255, 234, 252);

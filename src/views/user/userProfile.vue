@@ -38,7 +38,7 @@ getUserInfo()
           <el-descriptions-item label="简介">{{ user.introduction }}</el-descriptions-item>
           <el-descriptions-item>
             <span style="margin-right: 10px">关注 {{ user.follow }}</span>
-            <span>获赞 {{ user.liked }}</span>
+            <span>获赞 {{ user.likedCount }}</span>
           </el-descriptions-item>
         </el-descriptions>
       </div>

@@ -1,41 +1,3 @@
-<template>
-  <div class="main">
-    <button @click="selectChannel(0)">推荐</button>
-    <button @click="selectChannel(1)">推荐</button>
-    <!-- 首页瀑布流 -->
-    <!-- <my-waterfall :cardList="cardList" style="overflow-y: hidden"></my-waterfall> -->
-    <Waterfall
-      :list="cardList"
-      :hasAroundGutter="false"
-      style="max-width: 1300px"
-      :width="240"
-      :gutter="20"
-    >
-      <template #item="{ item }">
-        <div>
-          <el-image :src="item.images" :fit="cover" class="lazyImg" @click="showContent(id)" />
-          <!-- <LazyImg :url="item.images" class="lazyImg" @click="showContent(id)" /> -->
-          <div class="item-body">
-            <div class="item-desc" @click="showContent(id)">
-              <span>{{ item.title }}</span>
-            </div>
-            <div class="item-footer">
-              <div class="footer-left">
-                <img :src="item.images" alt="" srcset="" @click="push(item.userId)" />
-                <div class="name">{{ item.username }}</div>
-              </div>
-              <div class="like">
-                <i class="bi bi-heart" @click="like"></i>
-                <div style="padding-left: 5px">{{ item.liked }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </template>
-    </Waterfall>
-  </div>
-  <contentPage v-if="show" @toParent="toChild"></contentPage>
-</template>
 <script setup>
 import { ref } from 'vue'
 import { requireImg } from '@/utils/requireImg'
@@ -58,7 +20,8 @@ const fetchData = async () => {
   })
   cardList.value = res.data.data.items
   console.log(res.data.data.items)
-  console.log(cardList.value)
+  // console.log(res.data.data.items)
+  // console.log(cardList.value)
 }
 fetchData()
 // const cardList = ref([
@@ -184,11 +147,10 @@ const selectChannel = async (channelId) => {
 }
 
 const show = ref(false)
-const user = ref({})
+// const user = ref({})
 //查看文章详情
-const showContent = () => {
-  user.value.id = '1'
-  router.push(`/explore/${user.value.id}`)
+const showContent = (param) => {
+  router.push(`/explore/${param}`)
 }
 //父子通讯
 const toChild = (param) => {
@@ -199,16 +161,64 @@ const push = (param) => {
   router.push(`/user/profile/${param}`)
 }
 </script>
+<template>
+  <div class="main">
+    <button @click="selectChannel(0)">推荐</button>
+    <button @click="selectChannel(1)">推荐</button>
+    <!-- 首页瀑布流 -->
+    <!-- <my-waterfall :cardList="cardList" style="overflow-y: hidden"></my-waterfall> -->
+
+    <div class="waterfall">
+      <Waterfall
+        :list="cardList"
+        :hasAroundGutter="false"
+        style="max-width: 1300px"
+        :width="240"
+        :gutter="20"
+        class="waterfall"
+      >
+        <template #item="{ item }">
+          <div>
+            <el-image
+              :src="item.images"
+              :fit="cover"
+              class="lazyImg"
+              @click="showContent(item.id)"
+            />
+            <!-- <LazyImg :url="item.images" class="lazyImg" @click="showContent(id)" /> -->
+            <div class="item-body">
+              <div class="item-desc" @click="showContent(item.id)">
+                <span>{{ item.title }}</span>
+              </div>
+              <div class="item-footer">
+                <div class="footer-left">
+                  <img :src="item.images" alt="" srcset="" @click="push(item.userId)" />
+                  <div class="name">{{ item.username }}</div>
+                </div>
+                <div class="like">
+                  <i class="bi bi-heart" @click="like"></i>
+                  <div style="padding-left: 5px">{{ item.likedCount }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </Waterfall>
+    </div>
+  </div>
+  <!-- <contentPage v-if="show" @toParent="toChild"></contentPage> -->
+</template>
 <style scoped lang="less">
 .main {
   overflow: auto;
   height: 100vh; /* 使用视口单位vh设置高度为视口高度的100% */
-  position: relative;
+  // position: relative;
 }
+
 .main::-webkit-scrollbar {
-  // display: none; /* 隐藏滚动条 */
   display: none;
 }
+
 .main button {
   border-radius: 40px;
   font-size: large;
@@ -244,6 +254,7 @@ button:focus {
   .item-footer {
     display: flex;
     justify-content: space-between;
+    padding-top: 10px;
 
     .footer-left {
       display: flex;
