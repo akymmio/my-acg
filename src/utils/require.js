@@ -48,11 +48,13 @@ instance.interceptors.response.use(
     if (error.response.status === 401) {
       // router.push('/login')
     }
-    ElNotification({
-      title: 'Error',
-      message: error.response.data.message || '服务异常',
-      type: 'error'
-    })
+    // ElNotification({
+    //   title: 'Error',
+    //   message: error.response.data.message || '服务异常',
+    //   type: 'error',
+    //   position: 'top-left'
+    // })
+    ElMessage.error('服务异常')
     console.log(error)
     // 超出 2xx 范围的状态码都会触发该函数。
     return Promise.reject(error)

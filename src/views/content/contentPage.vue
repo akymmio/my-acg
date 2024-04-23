@@ -3,7 +3,7 @@ import { Close, ChatRound, ArrowUp } from '@element-plus/icons-vue'
 import { requireImg } from '@/utils/requireImg'
 import { ref } from 'vue'
 import { getUserInfoByIdService } from '@/api/user'
-import { getArticleContentService } from '@/api/article'
+import { getArticleByIdService } from '@/api/article'
 import { useRoute, useRouter } from 'vue-router'
 import { Star } from '@element-plus/icons-vue'
 const route = useRoute()
@@ -23,7 +23,7 @@ const close = () => {
 //加载数据
 const getUserInfo = async () => {
   //根据文章id,获取文章信息
-  const res = await getArticleContentService(route.params.id)
+  const res = await getArticleByIdService(route.params.id)
   article.value = res.data.data
   //获取用户信息
   const res1 = await getUserInfoByIdService(article.value.userId)

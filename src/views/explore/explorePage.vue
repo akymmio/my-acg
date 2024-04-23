@@ -13,16 +13,20 @@
     >
       <template #item="{ item }">
         <div>
-          <LazyImg :url="item.src" class="lazyImg" @click="showContent(id)" />
+          <el-image :src="item.images" :fit="cover" class="lazyImg" @click="showContent(id)" />
+          <!-- <LazyImg :url="item.images" class="lazyImg" @click="showContent(id)" /> -->
           <div class="item-body">
-            <div class="item-desc">{{ item.title }}</div>
+            <div class="item-desc" @click="showContent(id)">
+              <span>{{ item.title }}</span>
+            </div>
             <div class="item-footer">
               <div class="footer-left">
-                <img :src="item.avatar" alt="" srcset="" />
-                <div class="name">{{ item.user }}</div>
+                <img :src="item.images" alt="" srcset="" @click="push(item.userId)" />
+                <div class="name">{{ item.username }}</div>
               </div>
               <div class="like">
-                <div class="like-total">{{ item.vote_num }}</div>
+                <i class="bi bi-heart" @click="like"></i>
+                <div style="padding-left: 5px">{{ item.liked }}</div>
               </div>
             </div>
           </div>
@@ -30,154 +34,149 @@
       </template>
     </Waterfall>
   </div>
-  <!-- <div class="mask" v-show="show">
-    <div class="login-container">
-      <div @click="show = false" class="close">
-        <el-icon><Close /></el-icon>
-      </div>
-      <div class="left">
-        <div class="block text-center">
-          <span class="demonstration">Motion blur the switch (default)</span>
-          <el-carousel height="200px" motion-blur>
-            <el-carousel-item v-for="item in 4" :key="item">
-              <h3 class="small justify-center" text="2xl">{{ item }}</h3>
-            </el-carousel-item>
-          </el-carousel>
-        </div>
-      </div>
-      <div class="right"></div>
-    </div>
-  </div> -->
   <contentPage v-if="show" @toParent="toChild"></contentPage>
 </template>
 <script setup>
 import { ref } from 'vue'
-// import myWaterfall from '@/views/waterFall/myWaterfall.vue'
 import { requireImg } from '@/utils/requireImg'
-// import { getArticleService } from '@/api/article'
 import { useRouter, useRoute } from 'vue-router'
 import { LazyImg, Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
 import contentPage from '@/views/content/contentPage.vue'
+import 'bootstrap-icons/font/bootstrap-icons.css'
+
+import { getArticleService } from '@/api/article'
 const router = useRouter()
 const route = useRoute()
+//获取文章数据
+const cardList = ref({})
+const fetchData = async () => {
+  const res = await getArticleService({
+    channelId: 0,
+    pageSize: 20,
+    pageNum: 1
+  })
+  cardList.value = res.data.data.items
+  console.log(res.data.data.items)
+  console.log(cardList.value)
+}
+fetchData()
+// const cardList = ref([
+//   {
+//     src: requireImg('@/assets/icon/1.jpg'),
+//     avatar: requireImg('@/assets/icon/1.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   },
+//   {
+//     src: requireImg('@/assets/icon/2.jpg'),
+//     avatar: requireImg('@/assets/icon/2.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   },
+//   {
+//     src: requireImg('@/assets/icon/3.jpg'),
+//     avatar: requireImg('@/assets/icon/3.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   },
+//   {
+//     src: requireImg('@/assets/icon/4.jpg'),
+//     avatar: requireImg('@/assets/icon/4.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   },
+//   {
+//     src: requireImg('@/assets/icon/5.jpg'),
+//     avatar: requireImg('@/assets/icon/5.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   },
+//   {
+//     src: requireImg('@/assets/icon/6.jpg'),
+//     avatar: requireImg('@/assets/icon/6.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   },
+//   {
+//     src: requireImg('@/assets/icon/2.jpg'),
+//     avatar: requireImg('@/assets/icon/2.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   },
+//   {
+//     src: requireImg('@/assets/icon/1.jpg'),
+//     avatar: requireImg('@/assets/icon/1.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   },
+//   {
+//     src: requireImg('@/assets/icon/4.jpg'),
+//     avatar: requireImg('@/assets/icon/4.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   },
+//   {
+//     src: requireImg('@/assets/icon/1.jpg'),
+//     avatar: requireImg('@/assets/icon/1.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   },
+//   {
+//     src: requireImg('@/assets/icon/6.jpg'),
+//     avatar: requireImg('@/assets/icon/6.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   },
+//   {
+//     src: requireImg('@/assets/icon/5.jpg'),
+//     avatar: requireImg('@/assets/icon/5.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   },
+//   {
+//     src: requireImg('@/assets/icon/2.jpg'),
+//     avatar: requireImg('@/assets/icon/2.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   },
+//   {
+//     src: requireImg('@/assets/icon/3.jpg'),
+//     avatar: requireImg('@/assets/icon/3.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   },
+//   {
+//     src: requireImg('@/assets/icon/4.jpg'),
+//     avatar: requireImg('@/assets/icon/4.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   },
+//   {
+//     src: requireImg('@/assets/icon/1.jpg'),
+//     avatar: requireImg('@/assets/icon/1.jpg'),
+//     user: 'Lewis',
+//     vote_num: 999,
+//     title: 'Noice cancelling is a secret weapon'
+//   }
 
-const cardList = ref([
-  {
-    src: requireImg('@/assets/icon/1.jpg'),
-    avatar: requireImg('@/assets/icon/1.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  },
-  {
-    src: requireImg('@/assets/icon/2.jpg'),
-    avatar: requireImg('@/assets/icon/2.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  },
-  {
-    src: requireImg('@/assets/icon/3.jpg'),
-    avatar: requireImg('@/assets/icon/3.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  },
-  {
-    src: requireImg('@/assets/icon/4.jpg'),
-    avatar: requireImg('@/assets/icon/4.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  },
-  {
-    src: requireImg('@/assets/icon/5.jpg'),
-    avatar: requireImg('@/assets/icon/5.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  },
-  {
-    src: requireImg('@/assets/icon/6.jpg'),
-    avatar: requireImg('@/assets/icon/6.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  },
-  {
-    src: requireImg('@/assets/icon/2.jpg'),
-    avatar: requireImg('@/assets/icon/2.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  },
-  {
-    src: requireImg('@/assets/icon/1.jpg'),
-    avatar: requireImg('@/assets/icon/1.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  },
-  {
-    src: requireImg('@/assets/icon/4.jpg'),
-    avatar: requireImg('@/assets/icon/4.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  },
-  {
-    src: requireImg('@/assets/icon/1.jpg'),
-    avatar: requireImg('@/assets/icon/1.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  },
-  {
-    src: requireImg('@/assets/icon/6.jpg'),
-    avatar: requireImg('@/assets/icon/6.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  },
-  {
-    src: requireImg('@/assets/icon/5.jpg'),
-    avatar: requireImg('@/assets/icon/5.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  },
-  {
-    src: requireImg('@/assets/icon/2.jpg'),
-    avatar: requireImg('@/assets/icon/2.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  },
-  {
-    src: requireImg('@/assets/icon/3.jpg'),
-    avatar: requireImg('@/assets/icon/3.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  },
-  {
-    src: requireImg('@/assets/icon/4.jpg'),
-    avatar: requireImg('@/assets/icon/4.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  },
-  {
-    src: requireImg('@/assets/icon/1.jpg'),
-    avatar: requireImg('@/assets/icon/1.jpg'),
-    user: 'Lewis',
-    vote_num: 999,
-    title: 'Noice cancelling is a secret weapon'
-  }
-
-  // ... 其他卡片数据
-])
+//   // ... 其他卡片数据
+// ])
 const selectChannel = async (channelId) => {
   router.push({ path: '/explore', query: { channel_id: channelId } })
   const queryWord = route.query.channel_id
@@ -186,92 +185,31 @@ const selectChannel = async (channelId) => {
 
 const show = ref(false)
 const user = ref({})
+//查看文章详情
 const showContent = () => {
   user.value.id = '1'
   router.push(`/explore/${user.value.id}`)
 }
+//父子通讯
 const toChild = (param) => {
   show.value = param
 }
+
+const push = (param) => {
+  router.push(`/user/profile/${param}`)
+}
 </script>
 <style scoped lang="less">
-.mask {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.25);
-  overflow-y: hidden;
-  // @media (max-width: 599px) {
-  //   .login-container {
-  //     // width: 60%;
-  //     // height: 80%;
-  //   }
-  // }
-
-  /* 当窗口宽度在600px到900px之间时应用的样式 */
-  // @media (min-width: 600px) and (max-width: 899px) {
-  //   .login-container {
-  //     width: 60%;
-  //     height: 80%;
-  //   }
-  // }
-
-  // /* 当窗口宽度大于900px时应用的样式 */
-  // @media (min-width: 900px) {
-  //   .login-container {
-  //     width: 60%;
-  //     height: 80%;
-  //   }
-  // }
-  .login-container {
-    display: flex;
-    background-color: #fff;
-    border-radius: 20px;
-    // position: relative; //?
-    box-sizing: border-box;
-    /* 当窗口宽度小于600px时应用的样式 */
-    width: 60%;
-    height: 90%;
-    .close {
-      position: absolute;
-      top: 5%;
-      right: 17%;
-      width: 30px;
-      height: 30px;
-      background: rgb(255, 255, 255);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .close:hover {
-      background-color: #f9f7f7;
-      border-radius: 50%;
-      // background-color: #f6f6f6;
-    }
-    .left {
-      width: 60%;
-      display: flex;
-      align-items: center;
-      flex-direction: column;
-      border-right: 1px solid rgba(0, 0, 0, 0.1);
-    }
-    .right {
-      width: 400px;
-      display: flex;
-      align-items: center;
-      flex-direction: column;
-      margin-top: 48px;
-    }
-  }
+.main {
+  overflow: auto;
+  height: 100vh; /* 使用视口单位vh设置高度为视口高度的100% */
+  position: relative;
 }
-button {
+.main::-webkit-scrollbar {
+  // display: none; /* 隐藏滚动条 */
+  display: none;
+}
+.main button {
   border-radius: 40px;
   font-size: large;
   background-color: white;
@@ -330,11 +268,11 @@ button:focus {
       align-items: center;
       justify-content: center;
       font-family: SF Pro Display;
-      font-style: normal;
-      font-weight: normal;
+      // font-style: normal;
+      // font-weight: bold;
       font-size: 12px;
       line-height: 14px;
-      color: rgba(0, 0, 0, 0.4);
+      color: rgba(0, 0, 0, 0.7);
 
       img {
         margin-right: 4px;
