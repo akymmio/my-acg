@@ -189,7 +189,6 @@ const user = ref({})
 const showContent = () => {
   user.value.id = '1'
   router.push(`/explore/${user.value.id}`)
-  // router.push(`/user/profile/${user.value.id}`)
 }
 const toChild = (param) => {
   show.value = param

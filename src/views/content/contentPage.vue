@@ -1,15 +1,21 @@
 <script setup>
-import { Close } from '@element-plus/icons-vue'
+import { Close, ChatRound, ArrowUp } from '@element-plus/icons-vue'
 import { requireImg } from '@/utils/requireImg'
 import { ref } from 'vue'
 import { getUserInfoByIdService } from '@/api/user'
 import { getArticleContentService } from '@/api/article'
 import { useRoute, useRouter } from 'vue-router'
+import { Star } from '@element-plus/icons-vue'
 const route = useRoute()
 const router = useRouter()
 // 创建一个响应式变量 user 来绑定到模板中
+//用户
 const user = ref({})
+//文章
 const article = ref({})
+//评论
+const comments = ref({})
+const textarea = ref()
 const close = () => {
   //路由返回
   router.go(-1)
@@ -54,13 +60,45 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
             <span v-else>取关</span>
           </div>
         </div>
-
+        <el-divider style="margin: 0" />
         <div class="content">
-          <h1>{{ article.title }}</h1>
-          <el-text class="text" size="large">{{ article.content }}</el-text>
-          <span class="time">{{ article.createTime }}</span>
+          <div class="text">
+            <p style="font-size: 25px; font-weight: bold; margin: 10px 0">{{ article.title }}</p>
+            <el-text size="large">{{ article.content }}</el-text>
+            <div class="time">{{ article.createTime }}</div>
+          </div>
         </div>
-        <div class="footer"></div>
+        <el-divider style="margin: 0" />
+        <div class="footer">
+          <textarea
+            class="input"
+            v-model="textarea"
+            placeholder="Please input"
+            rows="2"
+            cols="50"
+          ></textarea>
+          <!-- <el-input
+            class="input"
+            v-model="textarea"
+            autosize
+            type="textarea"
+            placeholder="Please input"
+          /> -->
+
+          <el-popconfirm
+            confirm-button-text="确认"
+            cancel-button-text="取消"
+            title="确认发送评论?"
+            hide-icon="true"
+          >
+            <template #reference>
+              <!-- <el-button></el-button> -->
+              <el-icon size="large" class="inconPublish"><ArrowUp /></el-icon> </template
+          ></el-popconfirm>
+
+          <el-icon size="large" class="icon"><Star />{{ article.liked }}test</el-icon>
+          <el-icon size="large" class="icon"><ChatRound />{{ comments.comment }}test</el-icon>
+        </div>
       </div>
     </div>
   </div>
@@ -84,7 +122,6 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
     background-color: #fff;
     border-radius: 20px;
     box-sizing: border-box;
-    /* 当窗口宽度小于600px时应用的样式 */
     width: 60%;
     height: 90%;
     .close {
@@ -130,13 +167,15 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
       }
     }
     .right {
-      padding: 20px;
       width: 50%;
+      overflow: hidden;
       .header {
+        // height: 10%;
+
+        margin: 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-
         .avatar {
           display: flex; /* 使得avatar和文本可以在同一行上 */
           align-items: center; /* 垂直居中文本和avatar */
@@ -156,16 +195,74 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
         }
       }
       .content {
+        height: 75%;
+        padding: 20px;
+        padding-top: 0;
+        padding-bottom: 0;
+        // padding: 0, 20px, 0, 20px;
         display: flex;
         flex-direction: column;
+
+        // background: aqua;
         .text {
           width: 100%;
+          height: 100%;
+          overflow: auto; /* 允许内容滚动 */
+          position: relative; /* 为了定位伪元素 */
         }
+
         .time {
           font-size: smaller;
           color: rgb(153, 153, 153);
           padding-top: 10px;
         }
+      }
+      @media (min-height: 800px) {
+        .content {
+          height: 80%;
+        }
+      }
+      .text::-webkit-scrollbar {
+        display: none; /* 隐藏滚动条 */
+      }
+      .footer {
+        width: 100%;
+        height: 10vh; /* 使用视窗单位 */
+        display: flex;
+        align-items: center; /* 垂直居中子元素 */
+        // justify-content: center; /* 如果需要，也可以水平居中子元素 */
+        .input {
+          width: 50%;
+          transition:
+            width 0.3s ease,
+            height 0.3s ease; /* 添加过渡效果到宽度和高度 */
+          flex-grow: 1;
+          font-size: larger;
+          overflow: auto;
+          border: 0;
+          border-radius: 20px;
+          background-color: #f6f6f6;
+          padding-left: 10px;
+          resize: none;
+        }
+        .input:focus {
+          outline: none;
+        }
+        .input::-webkit-scrollbar {
+          display: none; /* 隐藏滚动条 */
+        }
+
+        .icon {
+          flex-grow: 1;
+          border-radius: 20px;
+        }
+        // .inconPublish:hover {
+        //   background-color: #f6f6f6;
+        // }
+
+        // .input:focus {
+        //   width: 100%; /* 当输入框获得焦点时，宽度变为100% */
+        // }
       }
     }
   }
@@ -174,11 +271,18 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
       flex-direction: column;
       .left {
         width: 100%;
-        border-radius: 0;
+        overflow: scroll;
+        height: 100%;
+      }
+      .left::-webkit-scrollbar {
+        display: none; /* 隐藏滚动条 */
       }
       .right {
         width: 100%;
         padding-right: 10px;
+      }
+      .close {
+        right: 14%;
       }
     }
   }

@@ -41,24 +41,24 @@ const form = ref()
 const loading = ref(false)
 const publish = async () => {
   await form.value.validate()
-  // const formData = new FormData()
-  // for (let key in fileList.value.coverImg) {
-  //   formData.append(`images[]`, fileList.value.coverImg[key])
-  // }
+  const formData = new FormData()
+  for (let key in fileList.value.coverImg) {
+    formData.append(`images[]`, fileList.value.coverImg[key])
+  }
 
-  // // 添加其他表单字段到formData中
-  // formData.append('title', fileList.value.title)
-  // formData.append('content', fileList.value.content)
-  // formData.append('userId', user.value.id)
-  // formData.append('state', fileList.value.state)
-  // formData.append('channelId', 1)
-  // //调用发布文章接口
-  // const res = await publishArticleService(formData)
-  // // console.log(res)
-  // ElMessage({
-  //   message: res.data.message || '发布成功',
-  //   type: 'success'
-  // })
+  // 添加其他表单字段到formData中
+  formData.append('title', fileList.value.title)
+  formData.append('content', fileList.value.content)
+  formData.append('userId', user.value.id)
+  formData.append('state', fileList.value.state)
+  formData.append('channelId', 1)
+  //调用发布文章接口
+  const res = await publishArticleService(formData)
+  // console.log(res)
+  ElMessage({
+    message: res.data.message || '发布成功',
+    type: 'success'
+  })
   //显示加载图层
   loading.value = true
   setTimeout(() => {

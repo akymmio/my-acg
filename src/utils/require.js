@@ -46,13 +46,14 @@ instance.interceptors.response.use(
   function (error) {
     //权限不足
     if (error.response.status === 401) {
-      router.push('/login')
+      // router.push('/login')
     }
     ElNotification({
       title: 'Error',
-      message: error.response.data.message || '请重新登录',
+      message: error.response.data.message || '服务异常',
       type: 'error'
     })
+    console.log(error)
     // 超出 2xx 范围的状态码都会触发该函数。
     return Promise.reject(error)
   }
