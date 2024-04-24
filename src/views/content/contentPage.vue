@@ -2,7 +2,7 @@
 import { Close, ChatRound, ArrowUp, Star } from '@element-plus/icons-vue'
 import { requireImg } from '@/utils/requireImg'
 import { ref } from 'vue'
-import { getArticleByIdService } from '@/api/article'
+import { getArticleByIdService, addComment } from '@/api/article'
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
@@ -33,6 +33,21 @@ const getData = async () => {
   console.log(article.value)
 }
 getData()
+const sendComment = async () => {
+  let commentData = {
+    comment: textarea.value,
+    userId: localUser.value.id,
+    articleId: article.value.id
+  }
+  await addComment(commentData)
+  textarea.value = ''
+  comments.value.push({
+    comment: commentData.comment,
+    nickname: localUser.value.nickname,
+    avatar: localUser.value.avatar,
+    createTime: new Date().toLocaleString()
+  })
+}
 </script>
 <template>
   <div class="mask" v-show="true">
@@ -66,10 +81,12 @@ getData()
             <p style="font-size: 25px; font-weight: bold; margin: 10px 0">{{ article.title }}</p>
             <!-- <el-text size="large" v-html></el-text> -->
             <p v-html="article.content"></p>
-            <div class="time" style="padding-top: 0">{{ article.createTime }}</div>
+            <!-- <div class="time" style="padding-top: 0">{{ article.createTime }}</div> -->
+            <div class="text_bottom">
+              <div>{{ article.createTime }}</div>
+              <div>共{{ article.commentCount }}条评论</div>
+            </div>
             <el-divider style="margin: 0" />
-            <div class="time">共{{ article.commentCount }}条评论</div>
-
             <div v-for="(comment, index) in article.comments" :key="index" class="commentStyle">
               <div><el-avatar :size="38" :src="comment.avatar" /></div>
               <div class="comment_container">
@@ -82,32 +99,30 @@ getData()
         </div>
         <el-divider style="margin: 0" />
         <div class="footer">
-          <textarea
-            class="input"
-            v-model="textarea"
-            placeholder="说点什么..."
-            rows="2"
-            cols="50"
-          ></textarea>
+          <div class="footer_icon">
+            <el-icon class="icon" size="large"><Star /></el-icon>{{ article.likedCount }}
+            <el-icon class="icon" size="large"><ChatRound /></el-icon>{{ article.commentCount }}
+          </div>
+          <div class="footer_input">
+            <textarea
+              class="input"
+              v-model="textarea"
+              placeholder="说点什么..."
+              rows="2"
+              cols="50"
+            ></textarea>
 
-          <el-popconfirm
-            confirm-button-text="确认"
-            cancel-button-text="取消"
-            title="确认发送评论?"
-            hide-icon="true"
-            confirm="sendComment"
-          >
-            <template #reference>
-              <!-- <el-button></el-button> -->
-              <el-icon size="large" class="inconPublish"><ArrowUp /></el-icon> </template
-          ></el-popconfirm>
-
-          <el-icon class="icon"
-            ><Star /><span style="padding-left: 5px">{{ article.likedCount }}</span></el-icon
-          >
-          <el-icon class="icon"
-            ><ChatRound /><span style="padding-left: 5px">{{ article.commentCount }}</span></el-icon
-          >
+            <el-popconfirm
+              confirm-button-text="确认"
+              cancel-button-text="取消"
+              title="确认发送评论?"
+              hide-icon="true"
+              @confirm="sendComment"
+            >
+              <template #reference>
+                <el-icon size="large" class="iconPublish"><ArrowUp /></el-icon> </template
+            ></el-popconfirm>
+          </div>
         </div>
       </div>
     </div>
@@ -215,7 +230,7 @@ getData()
         }
       }
       .content {
-        height: 75%;
+        height: 70%;
         padding: 20px;
         padding-top: 0;
         padding-bottom: 0;
@@ -229,6 +244,14 @@ getData()
           height: 100%;
           overflow: auto; /* 允许内容滚动 */
           position: relative; /* 为了定位伪元素 */
+          .text_bottom {
+            display: flex;
+            justify-content: space-between;
+            font-size: small;
+            color: rgb(153, 153, 153);
+            padding-top: 10px;
+            padding-bottom: 10px;
+          }
           .commentStyle {
             display: flex;
             flex-direction: row;
@@ -244,6 +267,8 @@ getData()
               }
               .comment_content {
                 // padding: 10px;
+                padding-top: 5px;
+                font-size: small;
               }
             }
           }
@@ -251,7 +276,7 @@ getData()
         .time {
           font-size: x-small;
           color: rgb(153, 153, 153);
-          padding-top: 10px;
+          padding-top: 5px;
           padding-bottom: 10px;
         }
       }
@@ -265,45 +290,63 @@ getData()
       }
       .footer {
         width: 100%;
-        height: 10vh; /* 使用视窗单位 */
+        // height: 15vh; /* 使用视窗单位 */
+        // height: 20%;
+        padding-top: 5px;
         display: flex;
-        align-items: center; /* 垂直居中子元素 */
+        flex-direction: column;
+        // align-items: center; /* 垂直居中子元素 */
         // justify-content: center; /* 如果需要，也可以水平居中子元素 */
-        .input {
-          width: 50%;
-          // transition:
-          //   width 0.3s ease,
-          //   height 0.3s ease; /* 添加过渡效果到宽度和高度 */
-          // height: 40px;
-          // flex-grow: 1;
-          font-size: larger;
-          overflow: auto;
-          border: 0;
-          border-radius: 20px;
-          background-color: #f6f6f6;
-          padding-top: 10px;
-          padding-left: 10px;
-          resize: none;
+        .footer_icon {
+          display: flex;
+          align-items: center;
         }
-        .input:focus {
-          outline: none;
+        .footer_icon > div {
+          padding-right: 5px;
         }
-        .input::-webkit-scrollbar {
-          display: none; /* 隐藏滚动条 */
+        .footer_input {
+          padding-top: 5px;
+          display: flex;
+          align-items: center;
+          .iconPublish {
+            // vertical-align: middle;
+            // box-sizing: content-box;
+            // background: aqua;
+            height: 42px;
+            width: 41px;
+          }
+          .input {
+            width: 85%;
+            font-size: larger;
+            overflow: auto;
+            border: 0;
+            border-radius: 20px;
+            background-color: #f6f6f6;
+            padding-top: 10px;
+            padding-left: 10px;
+            resize: none;
+          }
+          .input:focus {
+            outline: none;
+          }
+          .input::-webkit-scrollbar {
+            display: none; /* 隐藏滚动条 */
+          }
         }
 
         .icon {
-          flex-grow: 0.5;
+          // flex-grow: 0.5;
           // border-radius: 20px;
           font-size: small;
+          padding-left: 10px;
         }
-        // .inconPublish:hover {
-        //   background-color: #f6f6f6;
-        // }
-
-        // .input:focus {
-        //   width: 100%; /* 当输入框获得焦点时，宽度变为100% */
-        // }
+      }
+    }
+  }
+  @media screen and (min-width: 1000px) {
+    .login-container {
+      .right {
+        width: 50%;
       }
     }
   }

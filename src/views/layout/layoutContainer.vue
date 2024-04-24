@@ -1,14 +1,11 @@
 <script setup>
 import { House, Bell, Search, Plus, Operation } from '@element-plus/icons-vue'
 import loginPage from '@/views/login/loginPage.vue'
-// import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-const router = useRouter()
-// const showCard = ref(false)
 import { useUserStore } from '@/stores'
 import { ref, h, watch } from 'vue'
+const router = useRouter()
 const userStore = useUserStore()
-// 创建一个响应式变量 user 来绑定到模板中
 const user = ref(userStore.user)
 
 //如果用户信息为空,查询用户信息
@@ -128,7 +125,7 @@ const push = () => {
   width: 100%;
   // height: 100%;
   height: 100vh;
-  overflow: hidden;
+  overflow: auto;
   .el-header {
     height: 80px;
     background: rgb(255, 255, 255);

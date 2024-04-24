@@ -1,10 +1,8 @@
 <script setup>
 import { ref } from 'vue'
-import { requireImg } from '@/utils/requireImg'
 import { useRouter, useRoute } from 'vue-router'
 import { LazyImg, Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
-import contentPage from '@/views/content/contentPage.vue'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import { getArticleService } from '@/api/article'
@@ -12,7 +10,7 @@ const router = useRouter()
 const route = useRoute()
 //获取文章数据
 const cardList = ref({})
-const fetchData = async () => {
+const fetchData = async (channelId) => {
   // let pageParam = {
   //   pageNum: 1,
   //   pageSize: 10,
@@ -21,7 +19,7 @@ const fetchData = async () => {
   const res = await getArticleService({
     pageNum: 1,
     pageSize: 20,
-    channelId: 0
+    channelId: channelId
   })
   cardList.value = res.data.data.items
   console.log(res.data.data.items)
@@ -146,6 +144,7 @@ fetchData()
 // ])
 const selectChannel = async (channelId) => {
   router.push({ path: '/explore', query: { channel_id: channelId } })
+  fetchData(channelId)
   const queryWord = route.query.channel_id
   console.log(queryWord)
 }
@@ -155,10 +154,6 @@ const show = ref(false)
 //查看文章详情
 const showContent = (param) => {
   router.push(`/explore/${param}`)
-}
-//父子通讯
-const toChild = (param) => {
-  show.value = param
 }
 
 const push = (param) => {
@@ -197,7 +192,7 @@ const push = (param) => {
               <div class="item-footer">
                 <div class="footer-left">
                   <img :src="item.avatar" alt="" srcset="" @click="push(item.userId)" />
-                  <div class="name">{{ item.username }}</div>
+                  <div class="name">{{ item.nickname }}</div>
                 </div>
                 <div class="like">
                   <i class="bi bi-heart" @click="like"></i>

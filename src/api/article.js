@@ -25,3 +25,8 @@ export const getArticleByChannelService = (channelId) => {
 export const getArticleByIdService = (articleId) => {
   return require.get(`/article/${articleId}`)
 }
+
+//添加评论
+export const addComment = (data) => {
+  return require.post('/comment/add', data)
+}
