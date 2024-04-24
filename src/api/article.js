@@ -10,6 +10,14 @@ export const getArticleService = (param) => {
   })
 }
 
+// export const getArticleService = (data) => {
+//   const params = new URLSearchParams()
+//   for (let key in data) {
+//     params.append(key, data[key])
+//   }
+//   return require.get('/article/list', params)
+// }
+
 export const getArticleByChannelService = (channelId) => {
   return require.get(`/article?channel_id=${channelId}`)
 }

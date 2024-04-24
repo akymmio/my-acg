@@ -13,15 +13,19 @@ const route = useRoute()
 //获取文章数据
 const cardList = ref({})
 const fetchData = async () => {
+  // let pageParam = {
+  //   pageNum: 1,
+  //   pageSize: 10,
+  //   channelId: 0
+  // }
   const res = await getArticleService({
-    channelId: 0,
+    pageNum: 1,
     pageSize: 20,
-    pageNum: 1
+    channelId: 0
   })
   cardList.value = res.data.data.items
   console.log(res.data.data.items)
-  // console.log(res.data.data.items)
-  // console.log(cardList.value)
+  console.log(cardList.value)
 }
 fetchData()
 // const cardList = ref([
@@ -192,7 +196,7 @@ const push = (param) => {
               </div>
               <div class="item-footer">
                 <div class="footer-left">
-                  <img :src="item.images" alt="" srcset="" @click="push(item.userId)" />
+                  <img :src="item.avatar" alt="" srcset="" @click="push(item.userId)" />
                   <div class="name">{{ item.username }}</div>
                 </div>
                 <div class="like">

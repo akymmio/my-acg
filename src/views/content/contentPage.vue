@@ -33,10 +33,6 @@ const getData = async () => {
   console.log(article.value)
 }
 getData()
-
-const sendComment = () => {}
-const url = requireImg('@/assets/icon/2.jpg')
-const srcList = [requireImg('@/assets/icon/2.jpg')]
 </script>
 <template>
   <div class="mask" v-show="true">
@@ -45,11 +41,6 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
         <el-icon><Close /></el-icon>
       </div>
       <div class="left">
-        <!-- <el-image
-          :preview-src-list="srcList"
-          style="width: 100%; height: 100%; border-radius: 20px 0 0 20px"
-          :src="url"
-        /> -->
         <div class="media-container">
           <el-carousel height="90vh" interval="3600" trigger="hover">
             <el-carousel-item v-for="(image, index) in article.images" :key="index">
@@ -169,16 +160,16 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
       // background-color: #f6f6f6;
     }
     .left {
-      width: 50%;
+      width: 60%;
       display: flex;
       align-items: center;
       flex-direction: column;
       border-right: 1px solid rgba(0, 0, 0, 0.1);
-      .left img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
+      // .left img {
+      //   width: 100%;
+      //   height: 100%;
+      //   object-fit: cover;
+      // }
       .carousel {
         width: 100%;
         height: 100%;
@@ -193,7 +184,7 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
       }
     }
     .right {
-      width: 50%;
+      width: 40%;
       overflow: hidden;
       .header {
         // height: 10%;
@@ -284,7 +275,7 @@ const srcList = [requireImg('@/assets/icon/2.jpg')]
           //   width 0.3s ease,
           //   height 0.3s ease; /* 添加过渡效果到宽度和高度 */
           // height: 40px;
-          flex-grow: 1;
+          // flex-grow: 1;
           font-size: larger;
           overflow: auto;
           border: 0;
