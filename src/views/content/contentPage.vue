@@ -1,5 +1,5 @@
 <script setup>
-import { Close, ChatRound, ArrowUp, StarFilled, Star } from '@element-plus/icons-vue'
+import { Close, ChatRound, ArrowUp } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { getArticleByIdService, addComment, addLikedCount, queryLiked } from '@/api/article'
 import { followService, queryFollowService } from '@/api/user'

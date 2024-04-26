@@ -165,14 +165,14 @@ const push = (param) => {
   router.push(`/user/profile/${param}`)
 }
 
-const like = async () => {
-  console.log(article.value.articleId)
-  await addLikedCount(article.value.articleId)
-  //查询当前用户是否点赞
-  // const res = await isLiked(article.value.articleId)
-  // article.value.likedCount += 1
-  // liked.value=
-}
+// const like = async () => {
+//   console.log(article.value.articleId)
+//   await addLikedCount(article.value.articleId)
+//   //查询当前用户是否点赞
+//   // const res = await isLiked(article.value.articleId)
+//   // article.value.likedCount += 1
+//   // liked.value=
+// }
 </script>
 <template>
   <div class="main">

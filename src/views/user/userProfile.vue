@@ -1,25 +1,38 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { Female, Male } from '@element-plus/icons-vue'
 import { getUserInfoByIdService } from '@/api/user'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores'
 const userStore = useUserStore()
 const route = useRoute()
+//本地用户信息
+const localUser = ref(userStore.user)
 const user = ref(userStore.user)
 //通过用户名查询账号信息
 const getUserInfo = async () => {
   //没有用户信息需要通过id查询
-  if (route.params.id !== user.value.id) {
+  if (route.params.id !== localUser.value.id) {
     const res = await getUserInfoByIdService(route.params.id)
     user.value = res.data.data
+  } else {
+    //说明是从另一个用户切回来
+    user.value = localUser.value
     console.log(user.value)
   }
 }
 getUserInfo()
-const follow=()=>{
-  
-}
+
+watch(
+  () => route.params.id,
+  (newId, oldId) => {
+    if (newId !== oldId) {
+      getUserInfo() // 当 userId 变化时，重新获取数据
+    }
+  },
+  { immediate: true } // 立即执行一次，以获取初始数据
+)
+const follow = () => {}
 </script>
 
 <template>
@@ -45,7 +58,7 @@ const follow=()=>{
           </el-descriptions-item>
         </el-descriptions>
       </div>
-      <div class="element" @click="follow">
+      <div class="element" @click="follow" v-if="route.params.id !== localUser.id">
         <button class="unFollowButton" v-if="user.followed">已关注</button>
         <button class="followButton" v-else>关注</button>
       </div>

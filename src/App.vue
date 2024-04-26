@@ -1,8 +1,6 @@
 <script setup></script>
 <template>
-  <keep-alive>
-    <router-view></router-view>
-  </keep-alive>
+  <router-view></router-view>
 </template>
 
 <style lang="less"></style>
