@@ -46,7 +46,7 @@ instance.interceptors.response.use(
   function (error) {
     //权限不足
     if (error.response.status === 401) {
-      router.push('/login')
+      // router.push('/login')
     }
     // ElNotification({
     //   title: 'Error',

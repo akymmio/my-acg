@@ -49,7 +49,7 @@ const router = createRouter({
     }
   }
 })
-//没有token，访问非登录页面，跳转到登录页面
+//没有token，访问非登录页面，跳转到首页
 router.beforeEach((to) => {
   const userStore = useUserStore()
   if (!userStore.token && !to.path.startsWith('/explore')) {

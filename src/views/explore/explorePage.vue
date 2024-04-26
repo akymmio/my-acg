@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
@@ -8,146 +8,30 @@ import 'bootstrap-icons/font/bootstrap-icons.css'
 import { getArticleService } from '@/api/article'
 const router = useRouter()
 const route = useRoute()
+//分页参数
+const page = ref({
+  pageNum: 1,
+  pageSize: 15,
+  channelId: 0
+})
 //获取文章数据
 const cardList = ref({})
+const total = ref(0)
 const fetchData = async (channelId) => {
-  // let pageParam = {
-  //   pageNum: 1,
-  //   pageSize: 10,
-  //   channelId: 0
-  // }
-  const res = await getArticleService({
-    pageNum: 1,
-    pageSize: 20,
-    channelId: channelId
-  })
+  // if (cardList.value) return
+  page.value.channelId = channelId
+  const res = await getArticleService(page.value)
   cardList.value = res.data.data.items
-  console.log(res.data.data.items)
-  console.log(cardList.value)
-}
-// fetchData()
-// if (!cardList.value) {
-//   await fetchData()
-// }
-if (typeof cardList.value === 'object') {
-  fetchData()
-}
-// const cardList = ref([
-//   {
-//     src: requireImg('@/assets/icon/1.jpg'),
-//     avatar: requireImg('@/assets/icon/1.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   },
-//   {
-//     src: requireImg('@/assets/icon/2.jpg'),
-//     avatar: requireImg('@/assets/icon/2.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   },
-//   {
-//     src: requireImg('@/assets/icon/3.jpg'),
-//     avatar: requireImg('@/assets/icon/3.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   },
-//   {
-//     src: requireImg('@/assets/icon/4.jpg'),
-//     avatar: requireImg('@/assets/icon/4.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   },
-//   {
-//     src: requireImg('@/assets/icon/5.jpg'),
-//     avatar: requireImg('@/assets/icon/5.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   },
-//   {
-//     src: requireImg('@/assets/icon/6.jpg'),
-//     avatar: requireImg('@/assets/icon/6.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   },
-//   {
-//     src: requireImg('@/assets/icon/2.jpg'),
-//     avatar: requireImg('@/assets/icon/2.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   },
-//   {
-//     src: requireImg('@/assets/icon/1.jpg'),
-//     avatar: requireImg('@/assets/icon/1.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   },
-//   {
-//     src: requireImg('@/assets/icon/4.jpg'),
-//     avatar: requireImg('@/assets/icon/4.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   },
-//   {
-//     src: requireImg('@/assets/icon/1.jpg'),
-//     avatar: requireImg('@/assets/icon/1.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   },
-//   {
-//     src: requireImg('@/assets/icon/6.jpg'),
-//     avatar: requireImg('@/assets/icon/6.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   },
-//   {
-//     src: requireImg('@/assets/icon/5.jpg'),
-//     avatar: requireImg('@/assets/icon/5.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   },
-//   {
-//     src: requireImg('@/assets/icon/2.jpg'),
-//     avatar: requireImg('@/assets/icon/2.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   },
-//   {
-//     src: requireImg('@/assets/icon/3.jpg'),
-//     avatar: requireImg('@/assets/icon/3.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   },
-//   {
-//     src: requireImg('@/assets/icon/4.jpg'),
-//     avatar: requireImg('@/assets/icon/4.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   },
-//   {
-//     src: requireImg('@/assets/icon/1.jpg'),
-//     avatar: requireImg('@/assets/icon/1.jpg'),
-//     user: 'Lewis',
-//     vote_num: 999,
-//     title: 'Noice cancelling is a secret weapon'
-//   }
+  page.value.pageNum++
 
-//   // ... 其他卡片数据
-// ])
+  console.log(res.data.data.items)
+  total.value = res.data.data.total
+}
+fetchData()
+// if (typeof cardList.value === 'object') {
+//   fetchData()
+// }
+
 const selectChannel = async (channelId) => {
   router.push({ path: '/explore', query: { channel_id: channelId } })
   fetchData(channelId)
@@ -164,23 +48,34 @@ const showContent = (param) => {
 const push = (param) => {
   router.push(`/user/profile/${param}`)
 }
-
-// const like = async () => {
-//   console.log(article.value.articleId)
-//   await addLikedCount(article.value.articleId)
-//   //查询当前用户是否点赞
-//   // const res = await isLiked(article.value.articleId)
-//   // article.value.likedCount += 1
-//   // liked.value=
+// const load = async () => {
+//   // await getArticleService(page.value).then((newData) => {
+//   //   console.log(newData.data.data.items)
+//   //   // cardList.value = [...cardList.value, ...newData.data.data.items]
+//   // })
+//   console.log(cnt.value++)
 // }
+const cnt = ref(0)
+const scrolling = async (e) => {
+  const clientHeight = e.target.clientHeight
+  const scrollHeight = e.target.scrollHeight
+  const scrollTop = e.target.scrollTop
+  if (scrollHeight - scrollTop - clientHeight <= 0.5) {
+    await getArticleService(page.value).then((newData) => {
+      console.log(newData.data.data.items)
+      cardList.value = [...cardList.value, ...newData.data.data.items]
+    })
+    console.log(cnt.value)
+  }
+}
 </script>
 <template>
-  <div class="main">
+  <div class="main" @scroll="scrolling">
     <button @click="selectChannel(0)">推荐</button>
     <button @click="selectChannel(1)">推荐</button>
     <!-- 首页瀑布流 -->
 
-    <div class="waterfall">
+    <div @scroll="scrolling">
       <Waterfall
         :list="cardList"
         :hasAroundGutter="false"
@@ -189,6 +84,7 @@ const push = (param) => {
         :gutter="20"
         class="waterfall"
       >
+        <!-- 底部 -->
         <template #item="{ item }">
           <div>
             <el-image :src="item.images" class="lazyImg" @click="showContent(item.articleId)" />
@@ -215,10 +111,9 @@ const push = (param) => {
 </template>
 <style scoped lang="less">
 .main {
-  overflow: auto;
+  overflow: scroll;
   height: 100vh; /* 使用视口单位vh设置高度为视口高度的100% */
-  // position: relative;
-  // height: 100%;
+  // height: 500px;
 }
 
 .main::-webkit-scrollbar {

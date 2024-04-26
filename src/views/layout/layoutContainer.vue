@@ -107,7 +107,7 @@ const push = () => {
         <el-col :span="19">
           <div class="router_view">
             <router-view v-slot="{ Component }">
-              <keep-alive exclude="contentPage,userProfile">
+              <keep-alive exclude="contentPage,userProfile,explore">
                 <component :is="Component" />
               </keep-alive>
             </router-view>
@@ -128,9 +128,8 @@ const push = () => {
   top: 0;
   left: 0;
   width: 100%;
-  // height: 100%;
   height: 100vh;
-  overflow: auto;
+  overflow: scroll;
   .el-header {
     height: 80px;
     background: rgb(255, 255, 255);
