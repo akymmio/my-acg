@@ -55,15 +55,16 @@ const publish = async () => {
   //调用发布文章接口
   const res = await publishArticleService(formData)
   // console.log(res)
-  ElMessage({
-    message: res.data.message || '发布成功',
-    type: 'success'
-  })
+
   //显示加载图层
   loading.value = true
   setTimeout(() => {
     router.go(0)
   }, 1000)
+  ElMessage({
+    message: res.data.message || '发布成功',
+    type: 'success'
+  })
   // 置空数据
   // watch(loading, () => {
   //   fileList.value = {

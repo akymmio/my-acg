@@ -17,6 +17,9 @@ const getUserInfo = async () => {
   }
 }
 getUserInfo()
+const follow=()=>{
+  
+}
 </script>
 
 <template>
@@ -42,7 +45,7 @@ getUserInfo()
           </el-descriptions-item>
         </el-descriptions>
       </div>
-      <div class="element">
+      <div class="element" @click="follow">
         <button class="unFollowButton" v-if="user.followed">已关注</button>
         <button class="followButton" v-else>关注</button>
       </div>

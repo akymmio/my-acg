@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { LazyImg, Waterfall } from 'vue-waterfall-plugin-next'
+import { Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
@@ -25,7 +25,13 @@ const fetchData = async (channelId) => {
   console.log(res.data.data.items)
   console.log(cardList.value)
 }
-fetchData()
+// fetchData()
+// if (!cardList.value) {
+//   await fetchData()
+// }
+if (typeof cardList.value === 'object') {
+  fetchData()
+}
 // const cardList = ref([
 //   {
 //     src: requireImg('@/assets/icon/1.jpg'),
@@ -149,7 +155,6 @@ const selectChannel = async (channelId) => {
   console.log(queryWord)
 }
 
-const show = ref(false)
 // const user = ref({})
 //查看文章详情
 const showContent = (param) => {
@@ -159,13 +164,21 @@ const showContent = (param) => {
 const push = (param) => {
   router.push(`/user/profile/${param}`)
 }
+
+const like = async () => {
+  console.log(article.value.articleId)
+  await addLikedCount(article.value.articleId)
+  //查询当前用户是否点赞
+  // const res = await isLiked(article.value.articleId)
+  // article.value.likedCount += 1
+  // liked.value=
+}
 </script>
 <template>
   <div class="main">
     <button @click="selectChannel(0)">推荐</button>
     <button @click="selectChannel(1)">推荐</button>
     <!-- 首页瀑布流 -->
-    <!-- <my-waterfall :cardList="cardList" style="overflow-y: hidden"></my-waterfall> -->
 
     <div class="waterfall">
       <Waterfall
@@ -178,15 +191,9 @@ const push = (param) => {
       >
         <template #item="{ item }">
           <div>
-            <el-image
-              :src="item.images"
-              :fit="cover"
-              class="lazyImg"
-              @click="showContent(item.id)"
-            />
-            <!-- <LazyImg :url="item.images" class="lazyImg" @click="showContent(id)" /> -->
+            <el-image :src="item.images" class="lazyImg" @click="showContent(item.articleId)" />
             <div class="item-body">
-              <div class="item-desc" @click="showContent(item.id)">
+              <div class="item-desc" @click="showContent(item.articleId)">
                 <span>{{ item.title }}</span>
               </div>
               <div class="item-footer">
@@ -205,13 +212,13 @@ const push = (param) => {
       </Waterfall>
     </div>
   </div>
-  <!-- <contentPage v-if="show" @toParent="toChild"></contentPage> -->
 </template>
 <style scoped lang="less">
 .main {
   overflow: auto;
   height: 100vh; /* 使用视口单位vh设置高度为视口高度的100% */
   // position: relative;
+  // height: 100%;
 }
 
 .main::-webkit-scrollbar {

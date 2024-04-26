@@ -1,8 +1,8 @@
 <script setup>
-import { Close, ChatRound, ArrowUp, Star } from '@element-plus/icons-vue'
-import { requireImg } from '@/utils/requireImg'
+import { Close, ChatRound, ArrowUp, StarFilled, Star } from '@element-plus/icons-vue'
 import { ref } from 'vue'
-import { getArticleByIdService, addComment } from '@/api/article'
+import { getArticleByIdService, addComment, addLikedCount, queryLiked } from '@/api/article'
+import { followService, queryFollowService } from '@/api/user'
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
@@ -19,11 +19,15 @@ const article = ref({})
 const comments = ref([])
 //评论
 const textarea = ref()
+
+//是否关注
+const follow = ref(false)
 const close = () => {
   //路由返回
   router.go(-1)
 }
 //加载数据
+const liked = ref(false)
 const getData = async () => {
   //根据文章id,获取文章信息
   const res = await getArticleByIdService(route.params.id)
@@ -31,22 +35,42 @@ const getData = async () => {
   user.value = res.data.data.userInfo
   comments.value = res.data.data.comments
   console.log(article.value)
+  //查询是否关注
+  const res2 = await queryFollowService(user.value.id)
+  follow.value = res2.data.data
+  //查询是否点赞
+  const res3 = await queryLiked(article.value.articleId)
+  liked.value = res3.data.data
+  console.log(liked.value)
 }
 getData()
 const sendComment = async () => {
   let commentData = {
     comment: textarea.value,
     userId: localUser.value.id,
-    articleId: article.value.id
+    articleId: article.value.articleId
   }
   await addComment(commentData)
-  textarea.value = ''
-  comments.value.push({
-    comment: commentData.comment,
+  article.value.commentCount += 1
+  comments.value.unshift({
+    comment: textarea.value,
     nickname: localUser.value.nickname,
     avatar: localUser.value.avatar,
     createTime: new Date().toLocaleString()
   })
+  textarea.value = ''
+}
+//点赞
+const like = async () => {
+  await addLikedCount(article.value.articleId)
+  liked.value = !liked.value
+  if (liked.value === true) article.value.likedCount += 1
+  else article.value.likedCount -= 1
+}
+//关注或取关
+const toFollow = async () => {
+  await followService(user.value.id, !follow.value)
+  follow.value = !follow.value
 }
 </script>
 <template>
@@ -70,9 +94,9 @@ const sendComment = async () => {
             <el-avatar :size="40" :src="user.avatar" />
             <span class="username">{{ user.nickname }}</span>
           </div>
-          <div class="followButton">
-            <span v-if="false">关注</span>
-            <span v-else>取关</span>
+          <div class="followButton" @click="toFollow()">
+            <span v-if="follow">取注</span>
+            <span v-else>关注</span>
           </div>
         </div>
         <el-divider style="margin: 0" />
@@ -100,8 +124,14 @@ const sendComment = async () => {
         <el-divider style="margin: 0" />
         <div class="footer">
           <div class="footer_icon">
-            <el-icon class="icon" size="large"><Star /></el-icon>{{ article.likedCount }}
-            <el-icon class="icon" size="large"><ChatRound /></el-icon>{{ article.commentCount }}
+            <i class="bi bi-heart-fill" v-if="liked" @click="like"></i>
+            <i class="bi bi-heart" v-else @click="like"></i>
+
+            <!-- <el-icon class="icon" size="large" @click="like"><Star /></el-icon
+            > -->
+            <span>{{ article.likedCount }} </span>
+            <el-icon class="icon" size="large"><ChatRound /></el-icon
+            ><span>{{ article.commentCount }}</span>
           </div>
           <div class="footer_input">
             <textarea
@@ -300,6 +330,7 @@ const sendComment = async () => {
         .footer_icon {
           display: flex;
           align-items: center;
+          font-size: small;
         }
         .footer_icon > div {
           padding-right: 5px;

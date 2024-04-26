@@ -105,12 +105,17 @@ const push = () => {
         </el-col>
         <!-- <el-col :span="1"></el-col> -->
         <el-col :span="19">
-          <div class="router_view"><router-view></router-view></div>
+          <div class="router_view">
+            <router-view v-slot="{ Component }">
+              <keep-alive exclude="contentPage,userProfile">
+                <component :is="Component" />
+              </keep-alive>
+            </router-view>
+          </div>
         </el-col>
       </el-row>
     </el-container>
   </div>
-
   <loginPage v-show="showLoginPage" @toParent="toChild"></loginPage>
 </template>
 <style lang="less" scoped>

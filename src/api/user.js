@@ -27,3 +27,11 @@ export const getUserInfoService = () => {
 export const getUserInfoByIdService = (userId) => {
   return require.get(`/user/profile?id=${userId}`)
 }
+
+export const followService = (id, ifFollow) => {
+  return require.post(`/follow/${id}/${ifFollow}`)
+}
+
+export const queryFollowService = (id) => {
+  return require.get(`/follow/${id}`)
+}

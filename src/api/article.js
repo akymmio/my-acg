@@ -10,20 +10,21 @@ export const getArticleService = (param) => {
   })
 }
 
-// export const getArticleService = (data) => {
-//   const params = new URLSearchParams()
-//   for (let key in data) {
-//     params.append(key, data[key])
-//   }
-//   return require.get('/article/list', params)
-// }
-
 export const getArticleByChannelService = (channelId) => {
   return require.get(`/article?channel_id=${channelId}`)
 }
 //根据id
 export const getArticleByIdService = (articleId) => {
   return require.get(`/article/${articleId}`)
+}
+
+//添加评论
+export const addLikedCount = (articleId) => {
+  return require.put(`/article/like/${articleId}`)
+}
+
+export const queryLiked = (articleId) => {
+  return require.get(`/article/likeOrNot/${articleId}`)
 }
 
 //添加评论

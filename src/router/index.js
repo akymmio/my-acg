@@ -34,13 +34,20 @@ const router = createRouter({
         //   component: () => import('@/views/explore/explorePage.vue')
         // }
       ]
+    },
+    {
+      path: '/login',
+      component: () => import('@/views/login/loginPage.vue')
     }
-    // ,
-    // {
-    //   path: '/login',
-    //   component: () => import('@/views/login/loginPage.vue')
-    // }
-  ]
+  ],
+  mode: 'history',
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { x: 0, y: 0 }
+    }
+  }
 })
 //没有token，访问非登录页面，跳转到登录页面
 router.beforeEach((to) => {
