@@ -1,36 +1,44 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
-
+import { requireImg } from '@/utils/requireImg'
+import { Plus } from '@element-plus/icons-vue'
 import { getArticleService } from '@/api/article'
 const router = useRouter()
 const route = useRoute()
+const imageUrl = requireImg('@/assets/icon/loading.gif')
 //分页参数
 const page = ref({
   pageNum: 1,
-  pageSize: 15,
+  pageSize: 10,
   channelId: 0
 })
 //获取文章数据
-const cardList = ref({})
-const total = ref(0)
+const cardList = ref([])
+//记录总数
+const currTotal = ref(0)
+const total = ref(page.value.pageSize)
+const showloading = ref(false)
 const fetchData = async (channelId) => {
   // if (cardList.value) return
   page.value.channelId = channelId
-  const res = await getArticleService(page.value)
-  cardList.value = res.data.data.items
-  page.value.pageNum++
 
-  console.log(res.data.data.items)
-  total.value = res.data.data.total
+  await getArticleService(page.value).then((newData) => {
+    // console.log(newData.data.data.items)
+    cardList.value = [...cardList.value, ...newData.data.data.items]
+    currTotal.value += newData.data.data.items.length
+    console.log(currTotal.value)
+    console.log(total.value)
+
+    page.value.pageNum++
+    console.log(newData.data.data.items)
+    total.value = newData.data.data.total
+  })
 }
 fetchData()
-// if (typeof cardList.value === 'object') {
-//   fetchData()
-// }
 
 const selectChannel = async (channelId) => {
   router.push({ path: '/explore', query: { channel_id: channelId } })
@@ -48,39 +56,41 @@ const showContent = (param) => {
 const push = (param) => {
   router.push(`/user/profile/${param}`)
 }
-// const load = async () => {
-//   // await getArticleService(page.value).then((newData) => {
-//   //   console.log(newData.data.data.items)
-//   //   // cardList.value = [...cardList.value, ...newData.data.data.items]
-//   // })
-//   console.log(cnt.value++)
-// }
-const cnt = ref(0)
+const showFinish = ref(false)
+const isFetching = ref(false)
 const scrolling = async (e) => {
   const clientHeight = e.target.clientHeight
   const scrollHeight = e.target.scrollHeight
   const scrollTop = e.target.scrollTop
-  if (scrollHeight - scrollTop - clientHeight <= 0.5) {
-    await getArticleService(page.value).then((newData) => {
-      console.log(newData.data.data.items)
-      cardList.value = [...cardList.value, ...newData.data.data.items]
-    })
-    console.log(cnt.value)
+  let position = scrollHeight - scrollTop - clientHeight
+  if (position < 200 && position > 190 && currTotal.value < total.value) {
+    isFetching.value = true // 设置标志，表示正在加载数据
+    try {
+      await fetchData(0)
+      // console.log(1)
+    } finally {
+      isFetching.value = false // 数据加载完成，清除标志
+    }
+  } else {
+    showFinish.value = true
+    showLoadMore.value = false
   }
+}
+const showLoadMore = ref(true)
+const loadMore = async () => {
+  await fetchData(0)
 }
 </script>
 <template>
   <div class="main" @scroll="scrolling">
-    <button @click="selectChannel(0)">推荐</button>
-    <button @click="selectChannel(1)">推荐</button>
+    <button @click="selectChannel(0)" class="button">推荐</button>
+    <button @click="selectChannel(1)" class="button">推荐</button>
     <!-- 首页瀑布流 -->
-
     <div @scroll="scrolling">
       <Waterfall
         :list="cardList"
         :hasAroundGutter="false"
-        style="max-width: 1300px"
-        :width="240"
+        :width="280"
         :gutter="20"
         class="waterfall"
       >
@@ -106,21 +116,54 @@ const scrolling = async (e) => {
           </div>
         </template>
       </Waterfall>
+      <div v-if="showFinish" class="finishLoading"><span>没有更多...</span></div>
+      <div class="loading" v-if="showloading">
+        <img :src="imageUrl" alt="Dynamic Image" style="width: 60px" />
+      </div>
+      <div>
+        <el-icon @click="loadMore" class="loadButton" v-if="showLoadMore"><Plus /></el-icon>
+      </div>
     </div>
   </div>
 </template>
 <style scoped lang="less">
+.loadButton {
+  float: right;
+  position: relative;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  border: 0;
+}
+.finishLoading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  color: #b7b7b7;
+}
+.loadButton:hover {
+  background: #f7f7f7;
+}
+.loading {
+  width: 60px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  // background: #000000;
+}
 .main {
   overflow: scroll;
   height: 100vh; /* 使用视口单位vh设置高度为视口高度的100% */
-  // height: 500px;
 }
 
 .main::-webkit-scrollbar {
   display: none;
 }
 
-.main button {
+.button {
   border-radius: 40px;
   font-size: large;
   background-color: white;

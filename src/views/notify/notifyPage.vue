@@ -4,6 +4,8 @@
 // const load = () => {
 //   count.value += 2
 // }
+import { requireImg } from '@/utils/requireImg'
+const imageUrl = requireImg('@/assets/icon/loading.gif')
 </script>
 
 <template>
@@ -13,6 +15,7 @@
       <button>赞和收藏</button>
       <button>新增关注</button>
     </div>
+
     <!-- <div>
       <ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto">
         <li v-for="i in count" :key="i" class="infinite-list-item">{{ i }}</li>
@@ -22,6 +25,11 @@
 </template>
 
 <style scoped lang="less">
+.loading {
+  width: 70px;
+  display: flex;
+  justify-content: center; /* 水平居中 */
+}
 button {
   border-radius: 40px;
   font-size: 18px;

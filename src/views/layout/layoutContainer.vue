@@ -205,7 +205,7 @@ const push = () => {
     margin-bottom: 8px;
   }
   .el-menu-item:hover {
-    background: rgb(255, 234, 252);
+    background: #f7f7f7;
   }
   // .el-menu-item:focus {
   //   background: rgb(16, 16, 16) !important;
