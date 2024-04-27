@@ -1,6 +1,8 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { Female, Male } from '@element-plus/icons-vue'
+import { Waterfall } from 'vue-waterfall-plugin-next'
+import 'vue-waterfall-plugin-next/dist/style.css'
 import { getUserInfoByIdService } from '@/api/user'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores'
@@ -32,12 +34,34 @@ watch(
   },
   { immediate: true } // 立即执行一次，以获取初始数据
 )
-const follow = () => {}
+import { getArticleByUserIdService, getArticleLikedService } from '@/api/article'
+
+const notes = ref([])
+const fetchData = async (param = 'note') => {
+  let res
+  if (param === undefined || param == 'note') {
+    res = await getArticleByUserIdService(user.value.id)
+  } else if (param == 'like') {
+    res = await getArticleLikedService(user.value.id)
+  }
+  notes.value = res.data.data
+  console.log(res.data.data)
+}
+fetchData()
+const showUser = ref(true)
+const scrolling = async (e) => {
+  const scrollTop = e.target.scrollTop
+  if (scrollTop == 0) {
+    showUser.value = true
+  } else {
+    showUser.value = false
+  }
+}
 </script>
 
 <template>
   <div style="text-align: center">
-    <div class="header">
+    <div class="header" v-show="showUser">
       <div class="element">
         <el-avatar :size="180" :src="user.avatar" :fit="cover" />
       </div>
@@ -48,7 +72,6 @@ const follow = () => {}
             <el-icon v-if="user.sex === '0'"><Female /></el-icon>
             <el-icon v-else><Male /></el-icon>
             <!-- 当 sex 为 1 时显示 Male 图标 -->
-            <!-- <el-icon v-else><Male /></el-icon> -->
           </el-descriptions-item>
           <!-- <el-descriptions-item label="昵称">{{ userInfo.nickname }}</el-descriptions-item> -->
           <el-descriptions-item label="简介">{{ user.introduction }}</el-descriptions-item>
@@ -65,19 +88,57 @@ const follow = () => {}
       <!-- {{ userInfo.username }} -->
     </div>
     <div>
-      <button class="button">笔记</button>
-      <button class="button">收藏</button>
-      <button class="button">点赞</button>
+      <button class="button" @click="fetchData('note')">笔记</button>
+      <button class="button" @click="fetchData('like')">喜欢</button>
     </div>
-    <div>test</div>
+  </div>
+  <div class="note_style" @scroll="scrolling">
+    <Waterfall :list="notes" :hasAroundGutter="false" :width="280" :gutter="20">
+      <!-- 底部 -->
+      <template #item="{ item }">
+        <div>
+          <el-image :src="item.images" class="lazyImg" @click="showContent(item.articleId)" />
+          <div class="item-body">
+            <div class="item-desc" @click="showContent(item.articleId)">
+              <span>{{ item.title }}</span>
+            </div>
+            <div class="item-footer">
+              <div class="footer-left">
+                <img :src="item.avatar" alt="" srcset="" @click="push(item.userId)" />
+                <div class="name">{{ item.nickname }}</div>
+              </div>
+              <div class="like">
+                <i class="bi bi-heart" @click="like"></i>
+                <div style="padding-left: 5px">{{ item.likedCount }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </Waterfall>
+    <div class="finishLoading"><span>没有更多...</span></div>
   </div>
 </template>
 
 <style scoped lang="less">
+.finishLoading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  color: #b7b7b7;
+}
+.note_style{
+  // height: 550px;
+  height: calc(100vh - 135px);
+  overflow: auto;
+}
+.note_style::-webkit-scrollbar{
+  display: none;
+}
 .header {
   display: flex;
   justify-content: center; /* 水平居中 */
-
   .element {
     margin: 30px 40px;
   }
@@ -131,5 +192,63 @@ const follow = () => {}
 }
 .unFollowButton:hover{
   background: #f6f6f6;
+}
+
+
+.lazyImg {
+  border-radius: 20px;
+}
+.item-body {
+  margin: 10px;
+
+  .item-desc {
+    text-align: left;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 16px;
+    color: #000000;
+  }
+
+  .item-footer {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      font-family: SF Pro Display;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 12px;
+      line-height: 14px;
+      color: rgba(0, 0, 0, 0.6);
+
+      img {
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        margin-right: 4px;
+      }
+    }
+
+    .like {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: SF Pro Display;
+      // font-style: normal;
+      // font-weight: bold;
+      font-size: 12px;
+      line-height: 14px;
+      color: rgba(0, 0, 0, 0.7);
+
+      img {
+        margin-right: 4px;
+      }
+    }
+  }
 }
 </style>

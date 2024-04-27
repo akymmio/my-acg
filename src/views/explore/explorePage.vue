@@ -13,7 +13,7 @@ const imageUrl = requireImg('@/assets/icon/loading.gif')
 //分页参数
 const page = ref({
   pageNum: 1,
-  pageSize: 10,
+  pageSize: 20,
   channelId: 0
 })
 //获取文章数据
@@ -42,7 +42,7 @@ fetchData()
 
 const selectChannel = async (channelId) => {
   router.push({ path: '/explore', query: { channel_id: channelId } })
-  fetchData(channelId)
+  await fetchData(channelId)
   const queryWord = route.query.channel_id
   console.log(queryWord)
 }
@@ -63,7 +63,7 @@ const scrolling = async (e) => {
   const scrollHeight = e.target.scrollHeight
   const scrollTop = e.target.scrollTop
   let position = scrollHeight - scrollTop - clientHeight
-  if (position < 200 && position > 190 && currTotal.value < total.value) {
+  if (position < 300 && position > 290 && currTotal.value < total.value) {
     isFetching.value = true // 设置标志，表示正在加载数据
     try {
       await fetchData(0)
@@ -115,13 +115,16 @@ const loadMore = async () => {
             </div>
           </div>
         </template>
+        <div style="height: 50px; background: black"></div>
       </Waterfall>
       <div v-if="showFinish" class="finishLoading"><span>没有更多...</span></div>
       <div class="loading" v-if="showloading">
         <img :src="imageUrl" alt="Dynamic Image" style="width: 60px" />
       </div>
       <div>
-        <el-icon @click="loadMore" class="loadButton" v-if="showLoadMore"><Plus /></el-icon>
+        <el-tooltip content="加载更多" effect="light">
+          <el-icon @click="loadMore" class="loadButton" v-if="showLoadMore"><Plus /></el-icon>
+        </el-tooltip>
       </div>
     </div>
   </div>
@@ -156,7 +159,7 @@ const loadMore = async () => {
 }
 .main {
   overflow: scroll;
-  height: 100vh; /* 使用视口单位vh设置高度为视口高度的100% */
+  height: calc(100vh - 80px); /* 视口高度减去顶部开始的位置 */
 }
 
 .main::-webkit-scrollbar {
