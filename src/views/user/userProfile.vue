@@ -34,8 +34,8 @@ watch(
   },
   { immediate: true } // 立即执行一次，以获取初始数据
 )
-import { getArticleByUserIdService, getArticleLikedService } from '@/api/article'
-
+import { getArticleByUserIdService } from '@/api/article'
+import { getArticleLikedService } from '@/api/liked'
 const notes = ref([])
 const fetchData = async (param = 'note') => {
   let res
@@ -97,7 +97,7 @@ const scrolling = async (e) => {
       <!-- 底部 -->
       <template #item="{ item }">
         <div>
-          <el-image :src="item.images" class="lazyImg" @click="showContent(item.articleId)" />
+          <el-image :src="item.cover" class="lazyImg" @click="showContent(item.articleId)" />
           <div class="item-body">
             <div class="item-desc" @click="showContent(item.articleId)">
               <span>{{ item.title }}</span>

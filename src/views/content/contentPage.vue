@@ -1,7 +1,8 @@
 <script setup>
 import { Close, ChatRound, ArrowUp } from '@element-plus/icons-vue'
 import { ref } from 'vue'
-import { getArticleByIdService, addComment, addLikedCount, queryLiked } from '@/api/article'
+import { getArticleByIdService, addComment } from '@/api/article'
+import { addLikedCount, queryLiked } from '@/api/liked'
 import { followService, queryFollowService } from '@/api/user'
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
@@ -83,7 +84,7 @@ const toFollow = async () => {
         <div class="media-container">
           <el-carousel height="90vh" interval="3600" trigger="hover">
             <el-carousel-item v-for="(image, index) in article.images" :key="index">
-              <el-image style="width: 100%; height: 100%" :src="image" fit="cover" />
+              <el-image style="width: 100%" :src="image" fit="contain" class="carousel" />
             </el-carousel-item>
           </el-carousel>
         </div>
@@ -160,6 +161,9 @@ const toFollow = async () => {
 </template>
 
 <style scoped lang="less">
+.carousel {
+  background: white !important;
+}
 .media-container {
   width: 100%;
   height: auto;
@@ -374,13 +378,13 @@ const toFollow = async () => {
       }
     }
   }
-  @media screen and (min-width: 1000px) {
-    .login-container {
-      .right {
-        width: 50%;
-      }
-    }
-  }
+  // @media screen and (min-width: 1000px) {
+  //   .login-container {
+  //     .right {
+  //       width: 50%;
+  //     }
+  //   }
+  // }
   @media screen and (max-width: 1000px) {
     .login-container {
       flex-direction: column;

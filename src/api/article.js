@@ -10,7 +10,6 @@ export const getArticleService = (param) => {
     params: param // 直接传递params对象
   })
 }
-
 export const getArticleByChannelService = (channelId) => {
   return require.get(`/article?channel_id=${channelId}`)
 }
@@ -18,25 +17,23 @@ export const getArticleByChannelService = (channelId) => {
 export const getArticleByIdService = (articleId) => {
   return require.get(`/article/${articleId}`)
 }
-//点赞
-export const addLikedCount = (articleId) => {
-  return require.put(`/article/like/${articleId}`)
-}
-//查询是否点赞
-export const queryLiked = (articleId) => {
-  return require.get(`/article/likeOrNot/${articleId}`)
-}
-
 //添加评论
 export const addComment = (data) => {
   return require.post('/comment/add', data)
 }
-
 //根据用户id获取文章
 export const getArticleByUserIdService = (userId) => {
   return require.get(`/article/myArticle/${userId}`)
 }
-//查询用户点赞过的所有文章
-export const getArticleLikedService = (userId) => {
-  return require.get(`/article/userLiked/${userId}`)
-}
+// //查询用户点赞过的所有文章
+// export const getArticleLikedService = (userId) => {
+//   return require.get(`/article/userLiked/${userId}`)
+// }
+// //点赞
+// export const addLikedCount = (articleId) => {
+//   return require.put(`/article/like/${articleId}`)
+// }
+// //查询是否点赞
+// export const queryLiked = (articleId) => {
+//   return require.get(`/article/likeOrNot/${articleId}`)
+// }

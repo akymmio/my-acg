@@ -67,8 +67,8 @@ const push = () => {
       </el-header>
       <el-row>
         <el-col :span="1"></el-col>
-        <el-col :span="3">
-          <div class="side">
+        <el-col :span="3" class="side">
+          <div>
             <ui>
               <li class="el-menu-item" @click="router.push('/explore')">
                 <el-icon><House /></el-icon>
@@ -86,24 +86,26 @@ const push = () => {
                 <el-avatar :size="30" :src="user.avatar" style="margin-left: 0" />
                 <span>我</span>
               </li>
-              <li v-else class="loginItem" @click="showLoginPage = true" style="color: white">
+              <li v-else class="loginItem" @click="showLoginPage = true">
                 <span>登录</span>
               </li>
-              <li>
+              <li class="more">
                 <el-popover placement="bottom" :width="200" trigger="click">
                   <template #reference>
-                    <el-button style="margin-right: 16px">
-                      <el-icon><Operation /></el-icon>
-                      <span> 更多</span>
-                    </el-button>
+                    <button class="moreButton">
+                      <el-icon><Operation /></el-icon> <span>更多</span>
+                    </button>
                   </template>
-                  <button @click="logout">exit</button>
+                  <template #default>
+                    <div class="popoverContainer">
+                      <button @click="logout" class="exitButton">exit</button>
+                    </div>
+                  </template>
                 </el-popover>
               </li>
             </ui>
           </div>
         </el-col>
-        <!-- <el-col :span="1"></el-col> -->
         <el-col :span="19">
           <div class="router_view">
             <router-view v-slot="{ Component }">
@@ -164,12 +166,14 @@ const push = () => {
 .layout::-webkit-scrollbar {
   display: none;
 }
+.exitButton {
+  border: 0;
+  background-color: white;
+}
 .side {
-  // padding-right: 20px;
-  // margin-right: 20px;
+  position: relative;
   ul {
     list-style-type: none;
-    // padding-left: 100px;
   }
   li {
     padding-left: 20px;
@@ -180,8 +184,28 @@ const push = () => {
     span {
       margin-left: 10px;
     }
-  }
 
+  }
+  .more {
+    display: flex;
+    // justify-content: center;
+    align-items: center;
+    color: white;
+
+    .moreButton{
+      border: 0;
+      background: rgb(255, 255, 255);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .popoverContainer{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
   .loginItem {
     padding-left: 0;
     border-radius: 40px;
@@ -191,6 +215,7 @@ const push = () => {
     display: flex;
     justify-content: center;
     align-items: center;
+    color: white
     // text-align: center;
   }
   .el-menu-item {
@@ -214,7 +239,7 @@ const push = () => {
 /* 响应式布局 - 当屏幕小于 700 像素宽时，让两列堆叠而不是并排 */
 @media screen and (max-width: 800px) {
   .side {
-    display: none;
+    display:none
   }
 }
 .inner-header {

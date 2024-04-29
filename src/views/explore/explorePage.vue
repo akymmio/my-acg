@@ -63,7 +63,10 @@ const scrolling = async (e) => {
   const scrollHeight = e.target.scrollHeight
   const scrollTop = e.target.scrollTop
   let position = scrollHeight - scrollTop - clientHeight
-  if (position < 300 && position > 290 && currTotal.value < total.value) {
+  if (
+    ((position < 300 && position > 290) || (position < 350 && position > 320)) &&
+    currTotal.value < total.value
+  ) {
     isFetching.value = true // 设置标志，表示正在加载数据
     try {
       await fetchData(0)
@@ -84,7 +87,7 @@ const loadMore = async () => {
 <template>
   <div class="main" @scroll="scrolling">
     <button @click="selectChannel(0)" class="button">推荐</button>
-    <button @click="selectChannel(1)" class="button">推荐</button>
+    <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
     <!-- 首页瀑布流 -->
     <div @scroll="scrolling">
       <Waterfall
@@ -97,7 +100,7 @@ const loadMore = async () => {
         <!-- 底部 -->
         <template #item="{ item }">
           <div>
-            <el-image :src="item.images" class="lazyImg" @click="showContent(item.articleId)" />
+            <el-image :src="item.cover" class="lazyImg" @click="showContent(item.articleId)" />
             <div class="item-body">
               <div class="item-desc" @click="showContent(item.articleId)">
                 <span>{{ item.title }}</span>
@@ -121,9 +124,9 @@ const loadMore = async () => {
       <div class="loading" v-if="showloading">
         <img :src="imageUrl" alt="Dynamic Image" style="width: 60px" />
       </div>
-      <div>
+      <div v-if="showLoadMore">
         <el-tooltip content="加载更多" effect="light">
-          <el-icon @click="loadMore" class="loadButton" v-if="showLoadMore"><Plus /></el-icon>
+          <el-icon @click="loadMore" class="loadButton"><Plus /></el-icon>
         </el-tooltip>
       </div>
     </div>

@@ -89,7 +89,7 @@ const rules = ref({
 <template>
   <div class="container">
     <div>
-      <div style="background: #f6f6f6">
+      <div style="background: #f6f6f6" class="upload">
         <el-upload
           multiple="true"
           v-model:file-list="fileList.images"
@@ -116,18 +116,17 @@ const rules = ref({
               <el-input v-model="fileList.title" placeholder="请输入标题" />
             </el-form-item>
 
-            <quill-editor
-              ref="quill"
-              style="height: 200px"
-              theme="snow"
-              v-model:content="fileList.content"
-              content-type="html"
-            ></quill-editor>
-
-            <!-- <el-form-item label="权限">
-            <input type="radio" name="exampleGroup" value="option1" />公开
-            <input type="radio" name="exampleGroup" value="option1" />私人
-          </el-form-item> -->
+            <el-form-item>
+              <div>
+                <quill-editor
+                  ref="quill"
+                  style="height: 200px; width: 500px"
+                  theme="snow"
+                  v-model:content="fileList.content"
+                  content-type="html"
+                ></quill-editor>
+              </div>
+            </el-form-item>
             <el-form-item>
               <button type="button" @click="cancel">取消</button>
               <button
@@ -152,16 +151,29 @@ const rules = ref({
 </template>
 
 <style lang="less" scoped>
-// .showImg {
-//   // width: 100%; /* 或者其他你需要的宽度，比如特定的像素值 */
-//   /* 可以添加其他样式，比如 padding、margin 或 border */
-// }
+.container {
+}
+.upload {
+  width: 100%;
+  height: 150px;
+  overflow-y: scroll;
+}
+.upload::-webkit-scrollbar {
+  // display: none;
+}
 .showImg img {
   max-width: 100%; /* 图片最大宽度为容器宽度 */
   // height: auto; /* 高度自动调整，保持原始宽高比 */
   // display: block; /* 消除图片下方的空白间隙（如果图片是行内元素的话） */
 }
-
+.el-row {
+  padding-top: 10px;
+  width: 100%;
+  // background-color: aqua;
+  .el-form {
+    width: 500px;
+  }
+}
 // .el-form-item {
 //   padding-bottom: 5px;
 //   padding-top: 5px;
