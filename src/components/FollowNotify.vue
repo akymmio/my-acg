@@ -8,16 +8,21 @@ const showComment = async () => {
   console.log(res.data.data)
 }
 showComment()
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const push = (id) => {
+  router.push(`/user/profile/${id}`)
+}
 </script>
 <template>
   <div class="content">
-    <div class="commentStyle" v-for="(t, index) in LikedList" :key="index">
-      <div><el-avatar :size="50" :src="t.avatar" /></div>
+    <div class="commentStyle" v-for="(item, index) in LikedList" :key="index">
+      <div @click="push(item.userId)"><el-avatar :size="50" :src="item.avatar" /></div>
       <div class="comment_container">
-        <div class="comment_name">{{ t.nickname }}</div>
+        <div class="comment_name">{{ item.nickname }}</div>
         <div class="comment_font">
-          <span>关注着你</span>
-          <span style="padding-left: 10px">{{ t.createTime }}</span>
+          <span>关注着你🥰</span>
+          <span style="padding-left: 10px">{{ item.createTime }}</span>
         </div>
       </div>
     </div>

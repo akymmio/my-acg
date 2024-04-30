@@ -10,16 +10,24 @@ const showComment = async () => {
   }
 }
 showComment()
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const push = (id) => {
+  router.push(`/user/profile/${id}`)
+}
+const showArticle = (id) => {
+  router.push(`/explore/${id}`)
+}
 </script>
 <template>
   <div class="content">
     <div>
       <div class="commentStyle" v-for="(item, index) in commentList" :key="index">
-        <div><el-avatar :size="50" :src="item.avatar" /></div>
+        <div @click="push(item.userId)"><el-avatar :size="50" :src="item.avatar" /></div>
         <div class="comment_container">
           <div class="comment_name">{{ item.nickname }}</div>
           <div class="comment_font">
-            <span>评论了你的文章</span>
+            <span>评论了你的文章💬</span>
             <span style="padding-left: 10px">{{ item.createTime }}</span>
           </div>
           <div class="comment_content">

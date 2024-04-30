@@ -30,11 +30,11 @@ const fetchData = async (channelId) => {
     // console.log(newData.data.data.items)
     cardList.value = [...cardList.value, ...newData.data.data.items]
     currTotal.value += newData.data.data.items.length
-    console.log(currTotal.value)
-    console.log(total.value)
-
+    // console.log(currTotal.value)
+    // console.log(total.value)
+    console.log(cardList.value)
     page.value.pageNum++
-    console.log(newData.data.data.items)
+    // console.log(newData.data.data.items)
     total.value = newData.data.data.total
   })
 }
@@ -83,6 +83,16 @@ const showLoadMore = ref(true)
 const loadMore = async () => {
   await fetchData(0)
 }
+//点赞
+const liked = ref(false)
+import { addLikedCount } from '@/api/liked'
+const like = async (id, index) => {
+  console.log(id)
+  await addLikedCount(id)
+  liked.value = !liked.value
+  if (liked.value === true) cardList.value[index].likedCount += 1
+  else cardList.value[index].likedCount -= 1
+}
 </script>
 <template>
   <div class="main" @scroll="scrolling">
@@ -98,7 +108,7 @@ const loadMore = async () => {
         class="waterfall"
       >
         <!-- 底部 -->
-        <template #item="{ item }">
+        <template #item="{ item, index }">
           <div>
             <el-image :src="item.cover" class="lazyImg" @click="showContent(item.articleId)" />
             <div class="item-body">
@@ -111,7 +121,7 @@ const loadMore = async () => {
                   <div class="name">{{ item.nickname }}</div>
                 </div>
                 <div class="like">
-                  <i class="bi bi-heart" @click="like"></i>
+                  <i class="bi bi-heart" @click="like(item.articleId, index)"></i>
                   <div style="padding-left: 5px">{{ item.likedCount }}</div>
                 </div>
               </div>

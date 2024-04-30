@@ -11,7 +11,6 @@ import { useUserStore } from '@/stores'
 const userStore = useUserStore()
 // 创建一个响应式变量 user 来绑定到模板中
 const localUser = ref(userStore.user)
-// 创建一个响应式变量 user 来绑定到模板中
 //用户
 const user = ref({})
 //文章
@@ -96,7 +95,7 @@ const toFollow = async () => {
             <span class="username">{{ user.nickname }}</span>
           </div>
           <div class="followButton" @click="toFollow()">
-            <span v-if="follow">取注</span>
+            <span v-if="follow">取关</span>
             <span v-else>关注</span>
           </div>
         </div>

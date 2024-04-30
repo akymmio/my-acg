@@ -19,7 +19,7 @@ watch(
 //图片数据对象
 const fileList = ref({
   //存储多张图片
-  coverImg: [],
+  images: [],
   title: '',
   content: ''
 })
@@ -34,7 +34,7 @@ const handlePictureCardPreview = function (uploadFile) {
 }
 //存储图片
 const selectFiles = (uploadFile) => {
-  fileList.value.coverImg.push(uploadFile.raw)
+  fileList.value.images.push(uploadFile.raw)
   // console.log(uploadFile.raw)
 }
 const form = ref()
@@ -42,8 +42,8 @@ const loading = ref(false)
 const publish = async () => {
   await form.value.validate()
   const formData = new FormData()
-  for (let key in fileList.value.coverImg) {
-    formData.append(`images[]`, fileList.value.coverImg[key])
+  for (let key in fileList.value.images) {
+    formData.append(`images[]`, fileList.value.images[key])
   }
 
   // 添加其他表单字段到formData中
@@ -55,7 +55,6 @@ const publish = async () => {
   //调用发布文章接口
   const res = await publishArticleService(formData)
   // console.log(res)
-
   //显示加载图层
   loading.value = true
   setTimeout(() => {
@@ -65,21 +64,18 @@ const publish = async () => {
     message: res.data.message || '发布成功',
     type: 'success'
   })
-  // 置空数据
-  // watch(loading, () => {
-  //   fileList.value = {
-  //     coverImg: [],
-  //     title: '',
-  //     content: ''
-  //   }
-  // })
 }
 const cancel = () => {
   router.go(0)
 }
 //删除图片
-const removeImage = () => {
-  console.log('removeImage')
+const removeImage = (uploadFile) => {
+  console.log(uploadFile)
+  const index = fileList.value.images.indexOf(uploadFile.raw)
+  if (index !== -1) {
+    fileList.value.images.splice(index, 1)
+  }
+  console.log(fileList.value.images)
 }
 //校验规则
 const rules = ref({
@@ -128,12 +124,13 @@ const rules = ref({
               </div>
             </el-form-item>
             <el-form-item>
-              <button type="button" @click="cancel">取消</button>
+              <button type="button" @click="cancel" class="button">取消</button>
               <button
                 v-loading.fullscreen.lock="loading"
                 element-loading-text="发布中"
                 type="button"
                 @click="publish()"
+                class="button"
               >
                 发布
               </button>
@@ -174,19 +171,21 @@ const rules = ref({
     width: 500px;
   }
 }
-// .el-form-item {
-//   padding-bottom: 5px;
-//   padding-top: 5px;
+
+.button {
+  border-radius: 40px;
+  font-size: large;
+  background-color: #f6f6f6;
+  border: 0;
+  width: 80px;
+  height: 40px;
+  margin-bottom: 15px;
+}
+// button:hover {
+//   background-color: #f6f6f6;
 // }
-// .el-upload--picture-card {
-//   width: 100px;
-//   height: 100px;
-//   line-height: 100px;
-// }
-// .el-upload-list--picture-card .el-upload-list__item {
-//   width: 100px;
-//   height: 100px;
-// }
-// .el-upload-list--picture-card .el-upload-list__item-actions {
+// button:focus {
+//   background-color: #f6f6f6;
+//   font-weight: bold;
 // }
 </style>
