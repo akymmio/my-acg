@@ -27,12 +27,12 @@ const showArticle = (id) => {
         <div class="comment_container">
           <div class="comment_name">{{ item.nickname }}</div>
           <div class="comment_font">
-            <span>评论了你的文章💬</span>
+            <span>评论了你的文章 ✏️</span>
             <span style="padding-left: 10px">{{ item.createTime }}</span>
           </div>
           <div class="comment_content">
             <el-divider direction="vertical" />
-            <span>{{ item.comment }}</span>
+            <span style="background: #f6f6f6">{{ item.comment }}</span>
           </div>
         </div>
         <div style="margin-left: auto" @click="showArticle(item.articleId)">

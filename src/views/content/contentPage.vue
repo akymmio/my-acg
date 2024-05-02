@@ -1,10 +1,11 @@
 <script setup>
-import { Close, ChatRound, ArrowUp } from '@element-plus/icons-vue'
+import { Close, ArrowUp } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { getArticleByIdService, addComment } from '@/api/article'
 import { addLikedCount, queryLiked } from '@/api/liked'
 import { followService, queryFollowService } from '@/api/user'
 import { useRoute, useRouter } from 'vue-router'
+import { Like as like, Comment as comment } from '@icon-park/vue-next'
 const route = useRoute()
 const router = useRouter()
 import { useUserStore } from '@/stores'
@@ -18,7 +19,7 @@ const article = ref({})
 //评论
 const comments = ref([])
 //评论
-const textarea = ref()
+const textarea = ref('')
 
 //是否关注
 const follow = ref(false)
@@ -45,6 +46,7 @@ const getData = async () => {
 }
 getData()
 const sendComment = async () => {
+  if (textarea.value === '') return
   let commentData = {
     comment: textarea.value,
     userId: localUser.value.id,
@@ -61,7 +63,7 @@ const sendComment = async () => {
   textarea.value = ''
 }
 //点赞
-const like = async () => {
+const toLike = async () => {
   await addLikedCount(article.value.articleId)
   liked.value = !liked.value
   if (liked.value === true) article.value.likedCount += 1
@@ -94,8 +96,8 @@ const toFollow = async () => {
             <el-avatar :size="40" :src="user.avatar" />
             <span class="username">{{ user.nickname }}</span>
           </div>
-          <div class="followButton" @click="toFollow()">
-            <span v-if="follow">取关</span>
+          <div class="followButton" @click="toFollow()" :class="{ active: follow }">
+            <span v-if="follow">已关注</span>
             <span v-else>关注</span>
           </div>
         </div>
@@ -124,20 +126,27 @@ const toFollow = async () => {
         <el-divider style="margin: 0" />
         <div class="footer">
           <div class="footer_icon">
-            <i class="bi bi-heart-fill" v-if="liked" @click="like"></i>
-            <i class="bi bi-heart" v-else @click="like"></i>
+            <!-- <i class="bi bi-heart-fill" v-if="liked" @click="like"></i>
+            <i class="bi bi-heart" v-else @click="like"></i> -->
+            <like
+              theme="two-tone"
+              size="20"
+              :fill="['#ff4242', '#ff4242']"
+              @click="toLike"
+              v-if="liked"
+            />
+            <like theme="outline" size="20" fill="#333" @click="toLike" v-else />
 
-            <!-- <el-icon class="icon" size="large" @click="like"><Star /></el-icon
-            > -->
             <span>{{ article.likedCount }} </span>
-            <el-icon class="icon" size="large"><ChatRound /></el-icon
-            ><span>{{ article.commentCount }}</span>
+            <!-- <el-icon class="icon" size="large"><ChatRound /></el-icon> -->
+            <comment theme="filled" size="20" fill="#4f83ff" style="padding-left: 10px" />
+            <span style="padding-left: 5px">{{ article.commentCount }}</span>
           </div>
           <div class="footer_input">
             <textarea
               class="input"
               v-model="textarea"
-              placeholder="说点什么..."
+              placeholder="留下你的想法吧"
               rows="2"
               cols="50"
             ></textarea>
@@ -261,6 +270,11 @@ const toFollow = async () => {
           width: 80px;
           height: 40px;
         }
+        .followButton.active {
+          background-color: #f6f6f6;
+          border: 2px, solid;
+          color: rgba(0, 0, 0, 0.7);
+        }
       }
       .content {
         height: 70%;
@@ -334,6 +348,7 @@ const toFollow = async () => {
           display: flex;
           align-items: center;
           font-size: small;
+          padding-left: 10px;
         }
         .footer_icon > div {
           padding-right: 5px;

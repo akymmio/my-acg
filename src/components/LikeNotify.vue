@@ -32,7 +32,7 @@ const showArticle = (id) => {
         <div class="comment_container">
           <div class="comment_name">{{ item.nickname }}</div>
           <div class="comment_font">
-            <span>点赞了你的文章🥰</span>
+            <span>点赞了你的文章 🥰</span>
             <span style="padding-left: 10px">{{ item.createTime }}</span>
           </div>
         </div>

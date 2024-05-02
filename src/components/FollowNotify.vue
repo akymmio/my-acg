@@ -21,7 +21,7 @@ const push = (id) => {
       <div class="comment_container">
         <div class="comment_name">{{ item.nickname }}</div>
         <div class="comment_font">
-          <span>关注着你🥰</span>
+          <span>关注着你 ♥️</span>
           <span style="padding-left: 10px">{{ item.createTime }}</span>
         </div>
       </div>

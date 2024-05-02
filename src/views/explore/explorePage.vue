@@ -3,10 +3,10 @@ import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
-import 'bootstrap-icons/font/bootstrap-icons.css'
 import { requireImg } from '@/utils/requireImg'
 import { Plus } from '@element-plus/icons-vue'
 import { getArticleService } from '@/api/article'
+import { Like as like } from '@icon-park/vue-next'
 const router = useRouter()
 const route = useRoute()
 const imageUrl = requireImg('@/assets/icon/loading.gif')
@@ -86,7 +86,7 @@ const loadMore = async () => {
 //点赞
 const liked = ref(false)
 import { addLikedCount } from '@/api/liked'
-const like = async (id, index) => {
+const toLike = async (id, index) => {
   console.log(id)
   await addLikedCount(id)
   liked.value = !liked.value
@@ -121,7 +121,19 @@ const like = async (id, index) => {
                   <div class="name">{{ item.nickname }}</div>
                 </div>
                 <div class="like">
-                  <i class="bi bi-heart" @click="like(item.articleId, index)"></i>
+                  <!-- <like
+                    theme="two-tone"
+                    size="20"
+                    :fill="['#ff4242', '#ff4242']"
+                    @click="toLike(item.articleId, index)"
+                  /> -->
+                  <like
+                    theme="outline"
+                    size="20"
+                    fill="#333"
+                    @click="toLike(item.articleId, index)"
+                  />
+                  <!-- <i class="bi bi-heart" @click="toLike(item.articleId, index)"></i> -->
                   <div style="padding-left: 5px">{{ item.likedCount }}</div>
                 </div>
               </div>

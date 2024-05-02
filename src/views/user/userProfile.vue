@@ -1,13 +1,14 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { Female, Male } from '@element-plus/icons-vue'
+// import { Female, Male } from '@element-plus/icons-vue'
 import { Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
 import { getUserInfoByIdService } from '@/api/user'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores'
 const userStore = useUserStore()
 const route = useRoute()
+const router = useRouter()
 //本地用户信息
 const localUser = ref(userStore.user)
 const user = ref(userStore.user)
@@ -57,6 +58,10 @@ const scrolling = async (e) => {
     showUser.value = false
   }
 }
+import { Male as male, Female as female } from '@icon-park/vue-next'
+const showContent = (param) => {
+  router.push(`/explore/${param}`)
+}
 </script>
 
 <template>
@@ -69,8 +74,15 @@ const scrolling = async (e) => {
         <el-descriptions class="margin-top" :title="user.nickname" :column="1" :style="blockMargin">
           <el-descriptions-item label="账号">{{ user.username }}</el-descriptions-item>
           <el-descriptions-item>
-            <el-icon v-if="user.sex === '0'"><Female /></el-icon>
-            <el-icon v-else><Male /></el-icon>
+            <female
+              v-if="user.sex === '0'"
+              theme="two-tone"
+              size="16"
+              :fill="['#18aaff', '#ffffff']"
+            />
+            <!-- <el-icon v-if="user.sex === '0'"><Female /></el-icon> -->
+            <male theme="two-tone" size="16" :fill="['#18aaff', '#ffffff']" v-else />
+            <!-- <el-icon v-else><Male /></el-icon> -->
             <!-- 当 sex 为 1 时显示 Male 图标 -->
           </el-descriptions-item>
           <!-- <el-descriptions-item label="昵称">{{ userInfo.nickname }}</el-descriptions-item> -->

@@ -140,7 +140,6 @@ const close = () => {
           </el-form-item>
           <el-link @click="isRegister = !isRegister">返回</el-link>
         </el-form>
-        <div style="position: absolute; bottom: 30px">asdfa</div>
       </div>
     </div>
   </div>

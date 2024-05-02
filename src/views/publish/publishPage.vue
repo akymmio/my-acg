@@ -33,8 +33,10 @@ const handlePictureCardPreview = function (uploadFile) {
   dialogVisible.value = true
 }
 //存储图片
+const showButton = ref(false)
 const selectFiles = (uploadFile) => {
   fileList.value.images.push(uploadFile.raw)
+  showButton.value = true
   // console.log(uploadFile.raw)
 }
 const form = ref()
@@ -123,7 +125,7 @@ const rules = ref({
                 ></quill-editor>
               </div>
             </el-form-item>
-            <el-form-item>
+            <el-form-item v-if="showButton">
               <button type="button" @click="cancel" class="button">取消</button>
               <button
                 v-loading.fullscreen.lock="loading"
@@ -180,6 +182,7 @@ const rules = ref({
   width: 80px;
   height: 40px;
   margin-bottom: 15px;
+  margin-right: 10px;
 }
 // button:hover {
 //   background-color: #f6f6f6;

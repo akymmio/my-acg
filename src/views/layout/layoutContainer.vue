@@ -12,17 +12,18 @@ const user = ref(userStore.user)
 const logout = () => {
   userStore.removeToken()
   userStore.removeUser()
-  ElNotification({
-    title: 'Success',
-    message: '退出登录成功',
-    type: 'success'
-  })
+  // ElNotification({
+  //   title: 'Success',
+  //   message: '退出登录成功',
+  //   type: 'success'
+  // })
   router.go('/')
 }
 //接收登录页面串参数
 const showLoginPage = ref(false)
 const toChild = (param) => {
   showLoginPage.value = param
+  showUserInfo.value = param
 }
 
 watch(
@@ -48,6 +49,7 @@ const routeTo = (path) => {
 const push = () => {
   router.push(`/user/profile/${user.value.id}`)
 }
+const showUserInfo = ref(false)
 </script>
 
 <template>
@@ -57,7 +59,7 @@ const push = () => {
         <el-row>
           <el-col :span="8" style="padding-left: 100px"></el-col>
           <el-col :span="8" style="display: flex; justify-content: center; align-items: center">
-            <input class="inputSearch" v-model="input1" placeholder="搜索" />
+            <input class="inputSearch" v-model="input1" placeholder="搜索" readonly />
             <button class="inputIcon">
               <el-icon size="large" class="searchIcon"><Search /></el-icon>
             </button>
@@ -93,12 +95,15 @@ const push = () => {
                 <el-popover placement="bottom" :width="200" trigger="click">
                   <template #reference>
                     <button class="moreButton">
-                      <el-icon><Operation /></el-icon> <span>更多</span>
+                      <el-icon><Operation /></el-icon><span>更多</span>
                     </button>
                   </template>
                   <template #default>
                     <div class="popoverContainer">
-                      <button @click="logout" class="exitButton">exit</button>
+                      <button @click="showUserInfo = true" class="exitButton">修改信息</button>
+                      <button v-if="userStore.token" @click="logout" class="exitButton">
+                        exit
+                      </button>
                     </div>
                   </template>
                 </el-popover>
@@ -119,6 +124,7 @@ const push = () => {
     </el-container>
   </div>
   <loginPage v-show="showLoginPage" @toParent="toChild"></loginPage>
+  <UpdateUserInfo v-show="showUserInfo" @toParent="toChild"></UpdateUserInfo>
 </template>
 <style lang="less" scoped>
 .router_view {
@@ -167,8 +173,21 @@ const push = () => {
   display: none;
 }
 .exitButton {
+  // width: 80px;
+  margin: 10px;
+  padding: 5px;
   border: 0;
+  border-radius: 20px;
   background-color: white;
+}
+.exitButton:hover {
+  background-color: #f6f6f6;
+}
+.popoverContainer{
+  display: flex;
+  // justify-content:center;
+  flex-direction: column;
+  // align-items: center;
 }
 .side {
   position: relative;
@@ -176,7 +195,6 @@ const push = () => {
     list-style-type: none;
   }
   li {
-    padding-left: 20px;
     height: 48px;
     display: flex;
     align-items: center;
@@ -187,23 +205,26 @@ const push = () => {
 
   }
   .more {
-    display: flex;
     // justify-content: center;
-    align-items: center;
-    color: white;
-
+    // align-items: center;
+    border-radius: 40px;
+    background: rgb(255, 255, 255);
+    margin-top: calc(60vh);
     .moreButton{
       border: 0;
       background: rgb(255, 255, 255);
       display: flex;
+      padding-left: 20px;
       justify-content: center;
       align-items: center;
+      border-radius: 40px;
     }
 
-    .popoverContainer{
-      display: flex;
-      justify-content: center;
-      align-items: center;
+  }
+  .more:hover{
+    background: #f7f7f7;
+    .moreButton{
+      background: #f7f7f7;
     }
   }
   .loginItem {

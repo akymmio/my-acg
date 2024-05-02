@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import Comment from '@/components/CommentNotify.vue'
 import Like from '@/components/LikeNotify.vue'
 import Follow from '@/components/FollowNotify.vue'
 // 响应式数据，用于跟踪当前激活的标签

@@ -39,3 +39,11 @@ export const followService = (id, ifFollow) => {
 export const queryFollowService = (id) => {
   return require.get(`/follow/${id}`)
 }
+
+export const updateUserInfoService = (param) => {
+  return require.put('/user/update', param)
+}
+
+export const updateUserAvatarService = (param) => {
+  return require.put('/user/updateAvatar', param)
+}
