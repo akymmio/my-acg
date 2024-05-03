@@ -4,6 +4,11 @@ import require from '@/utils/require'
 export const publishArticleService = (data) => {
   return require.post('/article/publish', data)
 }
+
+//发布文章
+export const updateArticleService = (data) => {
+  return require.put('/article/update', data)
+}
 //获取文章
 export const getArticleService = (param) => {
   return require.get('/article/list', {
@@ -17,6 +22,11 @@ export const getArticleByChannelService = (channelId) => {
 export const getArticleByIdService = (articleId) => {
   return require.get(`/article/${articleId}`)
 }
+//根据文章id查询文章简单数据
+export const queryArticleByIdService = (articleId) => {
+  return require.get(`/article/simple/${articleId}`)
+}
+
 //添加评论
 export const addComment = (data) => {
   return require.post('/comment/add', data)

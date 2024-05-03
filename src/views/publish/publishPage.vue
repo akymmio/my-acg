@@ -4,9 +4,10 @@ import { Plus } from '@element-plus/icons-vue'
 //文本编辑器quill
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-import { publishArticleService } from '@/api/article'
-import { useRouter } from 'vue-router'
+import { publishArticleService, queryArticleByIdService, updateArticleService } from '@/api/article'
+import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
+const route = useRoute()
 import { useUserStore } from '@/stores'
 const userStore = useUserStore()
 const user = ref(userStore.user)
@@ -18,14 +19,17 @@ watch(
 )
 //图片数据对象
 const fileList = ref({
-  //存储多张图片
-  images: [],
+  images: [], //图片数据
   title: '',
-  content: ''
+  content: '',
+  imagesList: [] //图片url
+})
+//存入展示的图片
+const imagesList = ref({
+  imagesList: []
 })
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
-
 //预览
 const handlePictureCardPreview = function (uploadFile) {
   dialogImageUrl.value = uploadFile.url
@@ -35,7 +39,11 @@ const handlePictureCardPreview = function (uploadFile) {
 //存储图片
 const showButton = ref(false)
 const selectFiles = (uploadFile) => {
+  //展示的图片
+  imagesList.value.imagesList.push(URL.createObjectURL(uploadFile.raw))
+  //上传的图片
   fileList.value.images.push(uploadFile.raw)
+  console.log(fileList.value.images)
   showButton.value = true
   // console.log(uploadFile.raw)
 }
@@ -53,7 +61,7 @@ const publish = async () => {
   formData.append('content', fileList.value.content)
   formData.append('userId', user.value.id)
   formData.append('state', fileList.value.state)
-  formData.append('channelId', 1)
+  formData.append('channelId', 0)
   //调用发布文章接口
   const res = await publishArticleService(formData)
   // console.log(res)
@@ -67,22 +75,83 @@ const publish = async () => {
     type: 'success'
   })
 }
+
+const update = async () => {
+  await form.value.validate()
+  const formData = new FormData()
+  for (let key in fileList.value.images) {
+    formData.append(`images[]`, fileList.value.images[key])
+  }
+
+  // 添加其他表单字段到formData中
+  formData.append('title', fileList.value.title)
+  formData.append('content', fileList.value.content)
+  formData.append('userId', user.value.id)
+  formData.append('state', fileList.value.state)
+  formData.append('channelId', 1)
+  formData.append('imagesList', fileList.value.imagesList)
+  //添加文章id
+  formData.append('id', route.query.id)
+  //调用发布文章接口
+  const res = await updateArticleService(formData)
+  // console.log(res)
+  //显示加载图层
+  loading.value = true
+  setTimeout(() => {
+    router.go(0)
+  }, 1000)
+  ElMessage({
+    message: res.data.message || '发布成功',
+    type: 'success'
+  })
+}
+
 const cancel = () => {
   router.go(0)
 }
 //删除图片
 const removeImage = (uploadFile) => {
-  console.log(uploadFile)
-  const index = fileList.value.images.indexOf(uploadFile.raw)
-  if (index !== -1) {
-    fileList.value.images.splice(index, 1)
+  //两种类型，raw类型和url类型
+  if (uploadFile.raw) {
+    const index = fileList.value.images.indexOf(uploadFile.raw)
+    if (index !== -1) {
+      fileList.value.images.splice(index, 1)
+      console.log(fileList.value.images)
+    }
   }
-  console.log(fileList.value.images)
+  if (uploadFile.url) {
+    const index = fileList.value.imagesList.indexOf(uploadFile.url)
+    if (index !== -1) {
+      fileList.value.imagesList.splice(index, 1)
+      console.log(fileList.value.imagesList)
+    }
+  }
 }
 //校验规则
 const rules = ref({
   title: [{ required: true, message: '请输入标题', trigger: 'blur' }]
 })
+//获取文章数据
+const showUpdateButton = ref(false)
+const queryArticle = async () => {
+  if (route.query.id && route.query.id !== '') {
+    // 当 route.query.id 存在且不为空字符串时执行代码
+    showUpdateButton.value = true
+    const result = await queryArticleByIdService(route.query.id)
+    const res = result.data.data
+    fileList.value.title = res.title
+    fileList.value.content = res.content
+    fileList.value.imagesList = res.images
+    //展示数据需要的是array对象数组，转换一下
+    imagesList.value.imagesList = res.images.map((url) => {
+      return { url }
+    })
+  } else {
+    // 没有参数或参数为空字符串时执行代码
+    return
+  }
+}
+queryArticle()
 </script>
 <template>
   <div class="container">
@@ -90,7 +159,7 @@ const rules = ref({
       <div style="background: #f6f6f6" class="upload">
         <el-upload
           multiple="true"
-          v-model:file-list="fileList.images"
+          v-model:file-list="imagesList.imagesList"
           :auto-upload="false"
           list-type="picture-card"
           :on-preview="handlePictureCardPreview"
@@ -127,6 +196,7 @@ const rules = ref({
             </el-form-item>
             <el-form-item v-if="showButton">
               <button type="button" @click="cancel" class="button">取消</button>
+
               <button
                 v-loading.fullscreen.lock="loading"
                 element-loading-text="发布中"
@@ -135,6 +205,18 @@ const rules = ref({
                 class="button"
               >
                 发布
+              </button>
+            </el-form-item>
+            <el-form-item v-if="showUpdateButton">
+              <button type="button" @click="cancel" class="button">取消</button>
+              <button
+                v-loading.fullscreen.lock="loading"
+                element-loading-text="发布中"
+                type="button"
+                class="button"
+                @click="update()"
+              >
+                更新
               </button>
             </el-form-item>
           </el-form></el-col
@@ -157,9 +239,7 @@ const rules = ref({
   height: 150px;
   overflow-y: scroll;
 }
-.upload::-webkit-scrollbar {
-  // display: none;
-}
+
 .showImg img {
   max-width: 100%; /* 图片最大宽度为容器宽度 */
   // height: auto; /* 高度自动调整，保持原始宽高比 */

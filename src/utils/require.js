@@ -1,7 +1,5 @@
 import axios from 'axios'
-
 import { useUserStore } from '@/stores'
-import router from '@/router'
 
 //基础地址
 // const baseURL = 'https://big-event-vue-api-t.itheima.net'

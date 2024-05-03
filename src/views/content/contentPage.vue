@@ -42,7 +42,7 @@ const getData = async () => {
   //查询是否点赞
   const res3 = await queryLiked(article.value.articleId)
   liked.value = res3.data.data
-  console.log(liked.value)
+  // console.log(liked.value)
 }
 getData()
 const sendComment = async () => {
@@ -96,9 +96,18 @@ const toFollow = async () => {
             <el-avatar :size="40" :src="user.avatar" />
             <span class="username">{{ user.nickname }}</span>
           </div>
-          <div class="followButton" @click="toFollow()" :class="{ active: follow }">
-            <span v-if="follow">已关注</span>
-            <span v-else>关注</span>
+          <div v-show="user.id === localUser.id" class="editButton">
+            <span @click="router.push({ path: '/publish', query: { id: article.articleId } })">
+              编辑
+            </span>
+          </div>
+          <div
+            v-show="user.id !== localUser.id"
+            @click="toFollow()"
+            :class="{ active: follow }"
+            class="followButton"
+          >
+            <span v-show="follow">已关注</span> <span v-show="!follow">关注</span>
           </div>
         </div>
         <el-divider style="margin: 0" />
@@ -137,7 +146,7 @@ const toFollow = async () => {
             />
             <like theme="outline" size="20" fill="#333" @click="toLike" v-else />
 
-            <span>{{ article.likedCount }} </span>
+            <span style="padding-left: 5px">{{ article.likedCount }} </span>
             <!-- <el-icon class="icon" size="large"><ChatRound /></el-icon> -->
             <comment theme="filled" size="20" fill="#4f83ff" style="padding-left: 10px" />
             <span style="padding-left: 5px">{{ article.commentCount }}</span>
@@ -257,6 +266,19 @@ const toFollow = async () => {
           display: flex; /* 使得avatar和文本可以在同一行上 */
           align-items: center; /* 垂直居中文本和avatar */
         }
+        .editButton {
+          display: flex; /* 使得关注文本可以垂直居中 */
+          align-items: center; /* 垂直居中关注文本 */
+          justify-content: center; /* 水平居中关注文本 */
+          color: rgba(0, 0, 0, 0.7);
+          border: 0;
+          border-radius: 40px;
+          font-size: large;
+          font-weight: bold;
+          background-color: #f6f6f6;
+          width: 80px;
+          height: 40px;
+        }
         .followButton {
           display: flex; /* 使得关注文本可以垂直居中 */
           align-items: center; /* 垂直居中关注文本 */
@@ -354,6 +376,7 @@ const toFollow = async () => {
           padding-right: 5px;
         }
         .footer_input {
+          padding-left: 10px;
           padding-top: 5px;
           display: flex;
           align-items: center;

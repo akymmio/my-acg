@@ -1,11 +1,11 @@
 <script setup>
 import { ref, watch } from 'vue'
-// import { Female, Male } from '@element-plus/icons-vue'
 import { Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
 import { getUserInfoByIdService } from '@/api/user'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores'
+import { Like as like } from '@icon-park/vue-next'
 const userStore = useUserStore()
 const route = useRoute()
 const router = useRouter()
@@ -105,7 +105,7 @@ const showContent = (param) => {
     </div>
   </div>
   <div class="note_style" @scroll="scrolling">
-    <Waterfall :list="notes" :hasAroundGutter="false" :width="280" :gutter="20">
+    <Waterfall :list="notes" :hasAroundGutter="false" :align="center" :width="280" :gutter="20">
       <!-- 底部 -->
       <template #item="{ item }">
         <div>
@@ -120,7 +120,8 @@ const showContent = (param) => {
                 <div class="name">{{ item.nickname }}</div>
               </div>
               <div class="like">
-                <i class="bi bi-heart" @click="like"></i>
+                <!-- <i class="bi bi-heart" @click="like"></i> -->
+                <like theme="outline" size="20" fill="#333" />
                 <div style="padding-left: 5px">{{ item.likedCount }}</div>
               </div>
             </div>

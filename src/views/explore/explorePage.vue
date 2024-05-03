@@ -105,6 +105,7 @@ const toLike = async (id, index) => {
         :hasAroundGutter="false"
         :width="280"
         :gutter="20"
+        :align="center"
         class="waterfall"
       >
         <!-- 底部 -->

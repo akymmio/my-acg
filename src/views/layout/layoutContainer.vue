@@ -113,11 +113,12 @@ const showUserInfo = ref(false)
         </el-col>
         <el-col :span="19">
           <div class="router_view">
-            <router-view v-slot="{ Component }">
+            <router-view></router-view>
+            <!-- <router-view v-slot="{ Component }">
               <keep-alive exclude="contentPage,userProfile,explore">
                 <component :is="Component" />
               </keep-alive>
-            </router-view>
+            </router-view> -->
           </div>
         </el-col>
       </el-row>
