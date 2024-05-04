@@ -3,13 +3,13 @@ import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
-import { requireImg } from '@/utils/requireImg'
+import { require } from '@/utils/require'
 import { Plus } from '@element-plus/icons-vue'
 import { getArticleService } from '@/api/article'
 import { Like as like } from '@icon-park/vue-next'
 const router = useRouter()
 const route = useRoute()
-const imageUrl = requireImg('@/assets/icon/loading.gif')
+const imageUrl = require('@/assets/icon/loading.gif')
 //分页参数
 const page = ref({
   pageNum: 1,
@@ -25,7 +25,6 @@ const showloading = ref(false)
 const fetchData = async (channelId) => {
   // if (cardList.value) return
   page.value.channelId = channelId
-
   await getArticleService(page.value).then((newData) => {
     // console.log(newData.data.data.items)
     cardList.value = [...cardList.value, ...newData.data.data.items]
@@ -37,6 +36,7 @@ const fetchData = async (channelId) => {
     // console.log(newData.data.data.items)
     total.value = newData.data.data.total
   })
+  console.log(currTotal.value, total.value)
 }
 fetchData()
 
@@ -58,19 +58,28 @@ const push = (param) => {
 }
 const showFinish = ref(false)
 const isFetching = ref(false)
-const scrolling = async (e) => {
+function debounce(func, wait) {
+  let timeout
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout)
+      func(...args)
+    }
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait)
+  }
+}
+const scrolling = debounce(async (e) => {
   const clientHeight = e.target.clientHeight
   const scrollHeight = e.target.scrollHeight
   const scrollTop = e.target.scrollTop
-  let position = scrollHeight - scrollTop - clientHeight
-  if (
-    ((position < 300 && position > 290) || (position < 350 && position > 320)) &&
-    currTotal.value < total.value
-  ) {
+
+  const threshold = 0.4 * scrollHeight
+  if (scrollTop + clientHeight >= threshold && currTotal.value < total.value && !isFetching.value) {
+    // console.log(currTotal.value, total.value)
     isFetching.value = true // 设置标志，表示正在加载数据
     try {
       await fetchData(0)
-      // console.log(1)
     } finally {
       isFetching.value = false // 数据加载完成，清除标志
     }
@@ -78,7 +87,8 @@ const scrolling = async (e) => {
     showFinish.value = true
     showLoadMore.value = false
   }
-}
+}, 100)
+
 const showLoadMore = ref(true)
 const loadMore = async () => {
   await fetchData(0)

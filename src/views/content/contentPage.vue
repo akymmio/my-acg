@@ -13,7 +13,7 @@ const userStore = useUserStore()
 // 创建一个响应式变量 user 来绑定到模板中
 const localUser = ref(userStore.user)
 //用户
-const user = ref({})
+const user = ref(null)
 //文章
 const article = ref({})
 //评论
@@ -31,17 +31,22 @@ const close = () => {
 const liked = ref(false)
 const getData = async () => {
   //根据文章id,获取文章信息
+  console.log(route.params.id)
   const res = await getArticleByIdService(route.params.id)
   article.value = res.data.data
   user.value = res.data.data.userInfo
   comments.value = res.data.data.comments
   console.log(article.value)
-  //查询是否关注
-  const res2 = await queryFollowService(user.value.id)
-  follow.value = res2.data.data
-  //查询是否点赞
-  const res3 = await queryLiked(article.value.articleId)
-  liked.value = res3.data.data
+  if (Object.keys(user.value).length === 0) {
+    //查询是否关注
+    const res2 = await queryFollowService(user.value.id)
+    follow.value = res2.data.data
+    //查询是否点赞
+
+    const res3 = await queryLiked(article.value.articleId)
+    liked.value = res3.data.data
+  }
+
   // console.log(liked.value)
 }
 getData()
