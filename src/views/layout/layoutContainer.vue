@@ -50,6 +50,12 @@ const push = () => {
   router.push(`/user/profile/${user.value.id}`)
 }
 const showUserInfo = ref(false)
+const searchData = ref()
+const search = () => {
+  console.log(searchData.value)
+  router.push({ path: '/explore', query: { key_word: searchData.value } })
+  searchData.value = ''
+}
 </script>
 
 <template>
@@ -58,9 +64,13 @@ const showUserInfo = ref(false)
       <el-header>
         <el-row>
           <el-col :span="8" style="padding-left: 100px"></el-col>
-          <el-col :span="8" style="display: flex; justify-content: center; align-items: center">
-            <input class="inputSearch" v-model="input1" placeholder="搜索" readonly />
-            <button class="inputIcon">
+          <el-col
+            :span="8"
+            style="display: flex; justify-content: center; align-items: center"
+            @keyup.enter="search"
+          >
+            <input class="inputSearch" placeholder="搜索" v-model="searchData" />
+            <button class="inputIcon" @click="search">
               <el-icon size="large" class="searchIcon"><Search /></el-icon>
             </button>
           </el-col>
@@ -94,9 +104,9 @@ const showUserInfo = ref(false)
               <li class="more">
                 <el-popover placement="bottom" :width="200" trigger="click">
                   <template #reference>
-                    <button class="moreButton">
+                    <div class="moreButton">
                       <el-icon><Operation /></el-icon><span>更多</span>
-                    </button>
+                    </div>
                   </template>
                   <template #default>
                     <div class="popoverContainer">
@@ -113,12 +123,12 @@ const showUserInfo = ref(false)
         </el-col>
         <el-col :span="19">
           <div class="router_view">
-            <router-view></router-view>
-            <!-- <router-view v-slot="{ Component }">
-              <keep-alive exclude="contentPage,userProfile,explore">
+            <!-- <router-view></router-view> -->
+            <router-view v-slot="{ Component }">
+              <keep-alive>
                 <component :is="Component" />
               </keep-alive>
-            </router-view> -->
+            </router-view>
           </div>
         </el-col>
       </el-row>
@@ -206,17 +216,14 @@ const showUserInfo = ref(false)
 
   }
   .more {
-    // justify-content: center;
-    // align-items: center;
     border-radius: 40px;
-    background: rgb(255, 255, 255);
-    margin-top: calc(60vh);
+
+    margin-top: calc(100vh - 370px);
     .moreButton{
       border: 0;
-      background: rgb(255, 255, 255);
+
       display: flex;
       padding-left: 20px;
-      justify-content: center;
       align-items: center;
       border-radius: 40px;
     }
@@ -224,9 +231,9 @@ const showUserInfo = ref(false)
   }
   .more:hover{
     background: #f7f7f7;
-    .moreButton{
-      background: #f7f7f7;
-    }
+    // .moreButton{
+    //   background: #f7f7f7;
+    // }
   }
   .loginItem {
     padding-left: 0;

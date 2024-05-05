@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
@@ -14,7 +14,8 @@ const imageUrl = require('@/assets/icon/loading.gif')
 const page = ref({
   pageNum: 1,
   pageSize: 20,
-  channelId: 0
+  channelId: '',
+  keyword: ''
 })
 //获取文章数据
 const cardList = ref([])
@@ -22,29 +23,59 @@ const cardList = ref([])
 const currTotal = ref(0)
 const total = ref(page.value.pageSize)
 const showloading = ref(false)
+
 const fetchData = async (channelId) => {
   // if (cardList.value) return
-  page.value.channelId = channelId
+  if (route.query.key_word) {
+    console.log(route.query.key_word)
+    page.value.keyword = route.query.key_word
+    const res = await getArticleService(page.value)
+    cardList.value = res.data.data.items
+    currTotal.value = res.data.data.items.length
+    total.value = res.data.data.total
+    page.value.pageNum++
+    console.log(cardList.value)
+    page.value.keyword = ''
+    return
+  }
+  if (page.value.channelId !== channelId) {
+    page.value.pageNum = 0
+    page.value.channelId = channelId
+    const res = await getArticleService(page.value)
+    cardList.value = res.data.data.items
+    currTotal.value = res.data.data.items.length
+    total.value = res.data.data.total
+    page.value.pageNum++
+    console.log(cardList.value)
+    return
+  }
   await getArticleService(page.value).then((newData) => {
-    // console.log(newData.data.data.items)
     cardList.value = [...cardList.value, ...newData.data.data.items]
     currTotal.value += newData.data.data.items.length
-    // console.log(currTotal.value)
-    // console.log(total.value)
     console.log(cardList.value)
     page.value.pageNum++
-    // console.log(newData.data.data.items)
     total.value = newData.data.data.total
   })
   console.log(currTotal.value, total.value)
 }
 fetchData()
+const savedPosition = ref(null)
+onMounted(() => {
+  if (savedPosition.value) {
+    window.scrollTo(0, savedPosition.value)
+    // 清除保存的滚动位置，因为我们已经使用了它
+    savedPosition.value = null
+  }
+})
+onBeforeUnmount(() => {
+  savedPosition.value = window.scrollY || window.pageYOffset || document.documentElement.scrollTop
+  console.log('位置' + savedPosition.value)
+})
 
 const selectChannel = async (channelId) => {
   router.push({ path: '/explore', query: { channel_id: channelId } })
   await fetchData(channelId)
-  const queryWord = route.query.channel_id
-  console.log(queryWord)
+  console.log(route.query.channel_id)
 }
 
 // const user = ref({})
@@ -87,26 +118,30 @@ const scrolling = debounce(async (e) => {
     showFinish.value = true
     showLoadMore.value = false
   }
-}, 100)
+}, 200)
 
 const showLoadMore = ref(true)
 const loadMore = async () => {
   await fetchData(0)
 }
 //点赞
-const liked = ref(false)
 import { addLikedCount } from '@/api/liked'
 const toLike = async (id, index) => {
   console.log(id)
   await addLikedCount(id)
-  liked.value = !liked.value
-  if (liked.value === true) cardList.value[index].likedCount += 1
-  else cardList.value[index].likedCount -= 1
+  if (cardList.value[index].liked === false) {
+    cardList.value[index].likedCount += 1
+    cardList.value[index].liked = true
+  } else {
+    cardList.value[index].likedCount -= 1
+    cardList.value[index].liked = false
+  }
 }
 </script>
 <template>
   <div class="main" @scroll="scrolling">
     <button @click="selectChannel(0)" class="button">推荐</button>
+    <button @click="selectChannel(1)" class="button">推荐</button>
     <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
     <!-- 首页瀑布流 -->
     <div @scroll="scrolling">
@@ -115,13 +150,14 @@ const toLike = async (id, index) => {
         :hasAroundGutter="false"
         :width="280"
         :gutter="20"
-        :align="center"
         class="waterfall"
       >
         <!-- 底部 -->
         <template #item="{ item, index }">
           <div>
-            <el-image :src="item.cover" class="lazyImg" @click="showContent(item.articleId)" />
+            <div class="mask">
+              <el-image :src="item.cover" class="img" @click="showContent(item.articleId)" />
+            </div>
             <div class="item-body">
               <div class="item-desc" @click="showContent(item.articleId)">
                 <span>{{ item.title }}</span>
@@ -132,18 +168,21 @@ const toLike = async (id, index) => {
                   <div class="name">{{ item.nickname }}</div>
                 </div>
                 <div class="like">
-                  <!-- <like
+                  <like
+                    v-if="item.liked"
                     theme="two-tone"
                     size="20"
                     :fill="['#ff4242', '#ff4242']"
                     @click="toLike(item.articleId, index)"
-                  /> -->
+                  />
                   <like
+                    v-else
                     theme="outline"
                     size="20"
                     fill="#333"
                     @click="toLike(item.articleId, index)"
                   />
+                  <!-- {{ item.liked }} -->
                   <!-- <i class="bi bi-heart" @click="toLike(item.articleId, index)"></i> -->
                   <div style="padding-left: 5px">{{ item.likedCount }}</div>
                 </div>
@@ -218,12 +257,19 @@ button:focus {
   background-color: #f6f6f6;
   font-weight: bold;
 }
-.lazyImg {
+.img {
   border-radius: 20px;
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  // height: auto;
+  // transition: filter 0.5s ease-in-out; /* 添加过渡效果 */
 }
+.img:hover {
+  filter: brightness(0.8);
+}
+
 .item-body {
   margin: 10px;
-
   .item-desc {
     text-align: left;
     font-family: Roboto;

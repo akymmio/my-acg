@@ -1,6 +1,6 @@
 <script setup>
 import { Close, ArrowUp } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { getArticleByIdService, addComment } from '@/api/article'
 import { addLikedCount, queryLiked } from '@/api/liked'
 import { followService, queryFollowService } from '@/api/user'
@@ -13,7 +13,7 @@ const userStore = useUserStore()
 // 创建一个响应式变量 user 来绑定到模板中
 const localUser = ref(userStore.user)
 //用户
-const user = ref(null)
+const user = ref({})
 //文章
 const article = ref({})
 //评论
@@ -35,21 +35,23 @@ const getData = async () => {
   const res = await getArticleByIdService(route.params.id)
   article.value = res.data.data
   user.value = res.data.data.userInfo
+  console.log('头像', user.value.avatar)
   comments.value = res.data.data.comments
   console.log(article.value)
-  if (Object.keys(user.value).length === 0) {
+  if (Object.keys(localUser.value).length !== 0) {
+    console.log('登录', user.value)
     //查询是否关注
     const res2 = await queryFollowService(user.value.id)
     follow.value = res2.data.data
     //查询是否点赞
-
     const res3 = await queryLiked(article.value.articleId)
     liked.value = res3.data.data
   }
-
-  // console.log(liked.value)
 }
 getData()
+// onMounted(() => {
+//   getData
+// })
 const sendComment = async () => {
   if (textarea.value === '') return
   let commentData = {
