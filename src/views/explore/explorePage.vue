@@ -1,11 +1,12 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { onBeforeUnmount, onMounted, ref, onActivated } from 'vue'
+import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
 import { Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
 import { require } from '@/utils/require'
 import { Plus } from '@element-plus/icons-vue'
 import { getArticleService } from '@/api/article'
+import { addLikedCount } from '@/api/liked'
 import { Like as like } from '@icon-park/vue-next'
 const router = useRouter()
 const route = useRoute()
@@ -14,7 +15,7 @@ const imageUrl = require('@/assets/icon/loading.gif')
 const page = ref({
   pageNum: 1,
   pageSize: 20,
-  channelId: '',
+  channelId: 0,
   keyword: ''
 })
 //获取文章数据
@@ -36,18 +37,21 @@ const fetchData = async (channelId) => {
     page.value.pageNum++
     console.log(cardList.value)
     page.value.keyword = ''
+    console.log('查找')
     return
   }
   if (page.value.channelId !== channelId) {
-    page.value.pageNum = 0
-    page.value.channelId = channelId
-    const res = await getArticleService(page.value)
-    cardList.value = res.data.data.items
-    currTotal.value = res.data.data.items.length
-    total.value = res.data.data.total
-    page.value.pageNum++
-    console.log(cardList.value)
-    return
+    console.log(page.value.channelId)
+    console.log(channelId)
+    //   page.value.pageNum = 0
+    //   page.value.channelId = channelId
+    //   const res = await getArticleService(page.value)
+    //   cardList.value = res.data.data.items
+    //   currTotal.value = res.data.data.items.length
+    //   total.value = res.data.data.total
+    //   page.value.pageNum++
+    //   console.log(cardList.value)
+    //   return
   }
   await getArticleService(page.value).then((newData) => {
     cardList.value = [...cardList.value, ...newData.data.data.items]
@@ -58,19 +62,7 @@ const fetchData = async (channelId) => {
   })
   console.log(currTotal.value, total.value)
 }
-fetchData()
-const savedPosition = ref(null)
-onMounted(() => {
-  if (savedPosition.value) {
-    window.scrollTo(0, savedPosition.value)
-    // 清除保存的滚动位置，因为我们已经使用了它
-    savedPosition.value = null
-  }
-})
-onBeforeUnmount(() => {
-  savedPosition.value = window.scrollY || window.pageYOffset || document.documentElement.scrollTop
-  console.log('位置' + savedPosition.value)
-})
+fetchData(0)
 
 const selectChannel = async (channelId) => {
   router.push({ path: '/explore', query: { channel_id: channelId } })
@@ -80,8 +72,11 @@ const selectChannel = async (channelId) => {
 
 // const user = ref({})
 //查看文章详情
+const id = ref()
 const showContent = (param) => {
-  router.push(`/explore/${param}`)
+  isModalVisible.value = !isModalVisible.value
+  id.value = param
+  // router.push(`/explore/${param}`)
 }
 
 const push = (param) => {
@@ -89,22 +84,24 @@ const push = (param) => {
 }
 const showFinish = ref(false)
 const isFetching = ref(false)
-function debounce(func, wait) {
-  let timeout
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout)
-      func(...args)
-    }
-    clearTimeout(timeout)
-    timeout = setTimeout(later, wait)
-  }
-}
-const scrolling = debounce(async (e) => {
+// function debounce(func, wait) {
+//   let timeout
+//   return function executedFunction(...args) {
+//     const later = () => {
+//       clearTimeout(timeout)
+//       func(...args)
+//     }
+//     clearTimeout(timeout)
+//     timeout = setTimeout(later, wait)
+//   }
+// }
+const rememberScroll = ref(0)
+const scrolling = async (e) => {
   const clientHeight = e.target.clientHeight
   const scrollHeight = e.target.scrollHeight
   const scrollTop = e.target.scrollTop
-
+  rememberScroll.value = e.target.scrollTop
+  console.log(rememberScroll.value, clientHeight, scrollHeight)
   const threshold = 0.4 * scrollHeight
   if (scrollTop + clientHeight >= threshold && currTotal.value < total.value && !isFetching.value) {
     // console.log(currTotal.value, total.value)
@@ -118,14 +115,16 @@ const scrolling = debounce(async (e) => {
     showFinish.value = true
     showLoadMore.value = false
   }
-}, 200)
+}
 
 const showLoadMore = ref(true)
 const loadMore = async () => {
   await fetchData(0)
 }
 //点赞
-import { addLikedCount } from '@/api/liked'
+// import { addLikedCount } from '@/api/liked'
+
+import ContentPage from '../content/contentPage.vue'
 const toLike = async (id, index) => {
   console.log(id)
   await addLikedCount(id)
@@ -137,25 +136,54 @@ const toLike = async (id, index) => {
     cardList.value[index].liked = false
   }
 }
+const isModalVisible = ref(false)
+
+//定义变量
+const placeScroll = ref(0) // 初始化滚动位置为0
+onBeforeRouteLeave((to, from, next) => {
+  //在路由跳转之前，对当前浏览位置进行保存
+
+  next()
+})
+//组件激活
+const myElement = ref(null)
+onActivated(() => {
+  console.log('active')
+  console.log(rememberScroll.value)
+  // document.documentElement.scrollTop = rememberScroll.value
+  // document.body.scrollTop = rememberScroll.value
+  // let element = document.getElementById('waterfall')
+  // element.scrollTop = 100 // 滚动到该元素内部100px的位置
+  console.log(myElement.value)
+  window.scrollTo({
+    top: 100,
+    behavior: 'smooth' // 平滑滚动
+  })
+})
+const toChild = (param) => {
+  isModalVisible.value = param
+}
 </script>
 <template>
+  <transition name="Fade">
+    <ContentPage v-if="isModalVisible" :id="id" @toParent="toChild" class="modal" />
+  </transition>
   <div class="main" @scroll="scrolling">
     <button @click="selectChannel(0)" class="button">推荐</button>
     <button @click="selectChannel(1)" class="button">推荐</button>
     <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
     <!-- 首页瀑布流 -->
-    <div @scroll="scrolling">
+    <div @scroll="scrolling" ref="myElement">
       <Waterfall
         :list="cardList"
         :hasAroundGutter="false"
         :width="280"
         :gutter="20"
-        class="waterfall"
+        :lazyload="true"
       >
-        <!-- 底部 -->
         <template #item="{ item, index }">
           <div>
-            <div class="mask">
+            <div>
               <el-image :src="item.cover" class="img" @click="showContent(item.articleId)" />
             </div>
             <div class="item-body">

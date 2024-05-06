@@ -1,9 +1,9 @@
 <script setup>
 import { House, Bell, Search, Plus, Operation } from '@element-plus/icons-vue'
 import loginPage from '@/views/login/loginPage.vue'
-import { useRouter } from 'vue-router'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useUserStore } from '@/stores'
-import { ref, h, watch } from 'vue'
+import { ref, h, watch, onActivated } from 'vue'
 const router = useRouter()
 const userStore = useUserStore()
 const user = ref(userStore.user)
@@ -56,6 +56,24 @@ const search = () => {
   router.push({ path: '/explore', query: { key_word: searchData.value } })
   searchData.value = ''
 }
+
+//定义变量
+const placeScroll = ref()
+onBeforeRouteLeave((to, from, next) => {
+  //在路由跳转之前，对当前浏览位置进行保存
+  placeScroll.value = document.documentElement.scrollTop
+  console.log(placeScroll.value)
+  next()
+})
+//组件激活
+onActivated(() => {
+  if (placeScroll.value != null && placeScroll.value > 0) {
+    //组件激活后进行浏览位置的赋值
+    document.documentElement.scrollTop = placeScroll.value
+    document.body.scrollTop = placeScroll.value
+    console.log(placeScroll.value)
+  }
+})
 </script>
 
 <template>
@@ -125,7 +143,7 @@ const search = () => {
           <div class="router_view">
             <!-- <router-view></router-view> -->
             <router-view v-slot="{ Component }">
-              <keep-alive>
+              <keep-alive exclude="contentPage,userProfile">
                 <component :is="Component" />
               </keep-alive>
             </router-view>

@@ -32,7 +32,7 @@ const showArticle = (id) => {
           </div>
           <div class="comment_content">
             <el-divider direction="vertical" />
-            <span style="background: #f6f6f6">{{ item.comment }}</span>
+            <span>{{ item.comment }}</span>
           </div>
         </div>
         <div style="margin-left: auto" @click="showArticle(item.articleId)">
@@ -67,7 +67,8 @@ const showArticle = (id) => {
       padding-top: 5px;
 
       flex: 0 0 auto; /* 不增长、不缩小、基础大小为auto */
-      color: rgba(0, 0, 0, 0.7);
+      // color: rgba(0, 0, 0, 0.7);
+      font-size: small;
     }
     .comment_font {
       color: rgba(0, 0, 0, 0.5);

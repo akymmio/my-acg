@@ -10,12 +10,15 @@ const router = createRouter({
       children: [
         {
           path: '/explore',
-          component: () => import('@/views/explore/explorePage.vue')
+          component: () => import('@/views/explore/explorePage.vue'),
+          meta: { keepAlive: true } // 表明这个组件应该被缓存
         },
         {
           path: '/explore/:id',
-          component: () => import('@/views/content/contentPage.vue')
+          component: () => import('@/views/content/contentPage.vue'),
+          meta: { keepAlive: true } // 表明这个组件应该被缓存
         },
+
         {
           path: '/user/profile/:id',
           component: () => import('@/views/user/userProfile.vue')
@@ -43,9 +46,9 @@ const router = createRouter({
   // mode: 'history',
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
-      return savedPosition
+      return savedPosition // 如果 savedPosition 存在，则滚动到该位置
     } else {
-      return { left: 0, top: 0 }
+      return { left: 0, top: 0 } // 否则，滚动到页面顶部
     }
   }
 })

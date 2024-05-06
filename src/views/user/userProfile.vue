@@ -11,30 +11,8 @@ const route = useRoute()
 const router = useRouter()
 //本地用户信息
 const localUser = ref(userStore.user)
-const user = ref(userStore.user)
-//通过用户名查询账号信息
-const getUserInfo = async () => {
-  //没有用户信息需要通过id查询
-  if (route.params.id !== localUser.value.id) {
-    const res = await getUserInfoByIdService(route.params.id)
-    user.value = res.data.data
-  } else {
-    //说明是从另一个用户切回来
-    user.value = localUser.value
-    console.log(user.value)
-  }
-}
-getUserInfo()
+const user = ref({})
 
-watch(
-  () => route.params.id,
-  (newId, oldId) => {
-    if (newId !== oldId) {
-      getUserInfo() // 当 userId 变化时，重新获取数据
-    }
-  },
-  { immediate: true } // 立即执行一次，以获取初始数据
-)
 import { getArticleByUserIdService } from '@/api/article'
 import { getArticleLikedService } from '@/api/liked'
 const notes = ref([])
@@ -48,7 +26,32 @@ const fetchData = async (param = 'note') => {
   notes.value = res.data.data
   console.log(res.data.data)
 }
-fetchData()
+//通过用户名查询账号信息
+const getUserInfo = async () => {
+  //没有用户信息需要通过id查询
+  if (route.params.id !== localUser.value.id) {
+    const res = await getUserInfoByIdService(route.params.id)
+    user.value = res.data.data
+  } else {
+    //说明是从另一个用户切回来
+    user.value = localUser.value
+    console.log(user.value)
+  }
+  fetchData()
+}
+// getUserInfo()
+watch(
+  () => route.params.id,
+  (newId, oldId) => {
+    if (newId !== oldId) {
+      getUserInfo() // 当 userId 变化时，重新获取数据
+    }
+  },
+  { immediate: true } // 立即执行一次，以获取初始数据
+)
+
+// fetchData()
+
 const showUser = ref(true)
 const scrolling = async (e) => {
   const scrollTop = e.target.scrollTop

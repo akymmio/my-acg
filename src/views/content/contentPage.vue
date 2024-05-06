@@ -1,6 +1,6 @@
 <script setup>
 import { Close, ArrowUp } from '@element-plus/icons-vue'
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { getArticleByIdService, addComment } from '@/api/article'
 import { addLikedCount, queryLiked } from '@/api/liked'
 import { followService, queryFollowService } from '@/api/user'
@@ -25,14 +25,22 @@ const textarea = ref('')
 const follow = ref(false)
 const close = () => {
   //路由返回
+  if (props.id) {
+    console.log(1)
+    emit('toParent', false)
+    return
+  }
   router.go(-1)
 }
+
+//传递父组件
+const emit = defineEmits(['toParent'])
 //加载数据
 const liked = ref(false)
 const getData = async () => {
   //根据文章id,获取文章信息
   console.log(route.params.id)
-  const res = await getArticleByIdService(route.params.id)
+  const res = await getArticleByIdService(props.id || route.params.id)
   article.value = res.data.data
   user.value = res.data.data.userInfo
   console.log('头像', user.value.avatar)
@@ -48,10 +56,11 @@ const getData = async () => {
     liked.value = res3.data.data
   }
 }
+const props = defineProps({
+  id: String
+})
 getData()
-// onMounted(() => {
-//   getData
-// })
+
 const sendComment = async () => {
   if (textarea.value === '') return
   let commentData = {
@@ -196,6 +205,7 @@ const toFollow = async () => {
   object-fit: contain;
 }
 .mask {
+  z-index: 9999; /* 高的 z-index 值 */
   display: flex;
   align-items: center;
   justify-content: center;
