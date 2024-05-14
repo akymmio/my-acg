@@ -1,6 +1,6 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref, onActivated } from 'vue'
-import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
+import { ref, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
 import { require } from '@/utils/require'
@@ -10,6 +10,10 @@ import { addLikedCount } from '@/api/liked'
 import { Like as like } from '@icon-park/vue-next'
 const router = useRouter()
 const route = useRoute()
+import { useUserStore } from '@/stores'
+const userStore = useUserStore()
+const user = computed(() => userStore.user)
+
 const imageUrl = require('@/assets/icon/loading.gif')
 //分页参数
 const page = ref({
@@ -23,23 +27,9 @@ const cardList = ref([])
 //记录总数
 const currTotal = ref(0)
 const total = ref(page.value.pageSize)
-const showloading = ref(false)
+const showLoading = ref(false)
 
 const fetchData = async (channelId) => {
-  // if (cardList.value) return
-  if (route.query.key_word) {
-    console.log(route.query.key_word)
-    page.value.keyword = route.query.key_word
-    const res = await getArticleService(page.value)
-    cardList.value = res.data.data.items
-    currTotal.value = res.data.data.items.length
-    total.value = res.data.data.total
-    page.value.pageNum++
-    console.log(cardList.value)
-    page.value.keyword = ''
-    console.log('查找')
-    return
-  }
   if (page.value.channelId !== channelId) {
     console.log(page.value.channelId)
     console.log(channelId)
@@ -63,20 +53,27 @@ const fetchData = async (channelId) => {
   console.log(currTotal.value, total.value)
 }
 fetchData(0)
-
+//监视是否搜索
+watch(
+  () => route.query.key_word,
+  async (newVal, oldVal) => {
+    if (newVal !== oldVal && newVal) {
+      page.value.keyword = route.query.key_word
+      page.value.pageNum = 1
+      const res = await getArticleService(page.value)
+      cardList.value = res.data.data.items
+      currTotal.value = res.data.data.items.length
+      total.value = res.data.data.total
+      page.value.pageNum++
+      page.value.keyword = ''
+      console.log('查找')
+    }
+  }
+)
 const selectChannel = async (channelId) => {
   router.push({ path: '/explore', query: { channel_id: channelId } })
   await fetchData(channelId)
   console.log(route.query.channel_id)
-}
-
-// const user = ref({})
-//查看文章详情
-const id = ref()
-const showContent = (param) => {
-  isModalVisible.value = !isModalVisible.value
-  id.value = param
-  // router.push(`/explore/${param}`)
 }
 
 const push = (param) => {
@@ -84,24 +81,10 @@ const push = (param) => {
 }
 const showFinish = ref(false)
 const isFetching = ref(false)
-// function debounce(func, wait) {
-//   let timeout
-//   return function executedFunction(...args) {
-//     const later = () => {
-//       clearTimeout(timeout)
-//       func(...args)
-//     }
-//     clearTimeout(timeout)
-//     timeout = setTimeout(later, wait)
-//   }
-// }
-const rememberScroll = ref(0)
 const scrolling = async (e) => {
   const clientHeight = e.target.clientHeight
   const scrollHeight = e.target.scrollHeight
   const scrollTop = e.target.scrollTop
-  rememberScroll.value = e.target.scrollTop
-  console.log(rememberScroll.value, clientHeight, scrollHeight)
   const threshold = 0.4 * scrollHeight
   if (scrollTop + clientHeight >= threshold && currTotal.value < total.value && !isFetching.value) {
     // console.log(currTotal.value, total.value)
@@ -121,13 +104,13 @@ const showLoadMore = ref(true)
 const loadMore = async () => {
   await fetchData(0)
 }
-//点赞
-// import { addLikedCount } from '@/api/liked'
 
 import ContentPage from '../content/contentPage.vue'
-const toLike = async (id, index) => {
-  console.log(id)
-  await addLikedCount(id)
+const toLike = (id, index) => {
+  if (Object.keys(user.value).length === 0) {
+    return
+  }
+  addLikedCount(id)
   if (cardList.value[index].liked === false) {
     cardList.value[index].likedCount += 1
     cardList.value[index].liked = true
@@ -137,37 +120,18 @@ const toLike = async (id, index) => {
   }
 }
 const isModalVisible = ref(false)
-
-//定义变量
-const placeScroll = ref(0) // 初始化滚动位置为0
-onBeforeRouteLeave((to, from, next) => {
-  //在路由跳转之前，对当前浏览位置进行保存
-
-  next()
-})
-//组件激活
-const myElement = ref(null)
-onActivated(() => {
-  console.log('active')
-  console.log(rememberScroll.value)
-  // document.documentElement.scrollTop = rememberScroll.value
-  // document.body.scrollTop = rememberScroll.value
-  // let element = document.getElementById('waterfall')
-  // element.scrollTop = 100 // 滚动到该元素内部100px的位置
-  console.log(myElement.value)
-  window.scrollTo({
-    top: 100,
-    behavior: 'smooth' // 平滑滚动
-  })
-})
 const toChild = (param) => {
   isModalVisible.value = param
 }
+//查看文章详情
+const id = ref()
+const showContent = (param) => {
+  isModalVisible.value = !isModalVisible.value
+  id.value = param
+  // router.push(`/explore/${param}`)
+}
 </script>
 <template>
-  <transition name="Fade">
-    <ContentPage v-if="isModalVisible" :id="id" @toParent="toChild" class="modal" />
-  </transition>
   <div class="main" @scroll="scrolling">
     <button @click="selectChannel(0)" class="button">推荐</button>
     <button @click="selectChannel(1)" class="button">推荐</button>
@@ -221,7 +185,7 @@ const toChild = (param) => {
         <div style="height: 50px; background: black"></div>
       </Waterfall>
       <div v-if="showFinish" class="finishLoading"><span>没有更多...</span></div>
-      <div class="loading" v-if="showloading">
+      <div class="loading" v-if="showLoading">
         <img :src="imageUrl" alt="Dynamic Image" style="width: 60px" />
       </div>
       <div v-if="showLoadMore">
@@ -231,6 +195,9 @@ const toChild = (param) => {
       </div>
     </div>
   </div>
+  <transition name="Fade">
+    <ContentPage v-if="isModalVisible" :id="id" @toParent="toChild" class="modal" />
+  </transition>
 </template>
 <style scoped lang="less">
 .loadButton {

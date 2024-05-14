@@ -35,15 +35,3 @@ export const addComment = (data) => {
 export const getArticleByUserIdService = (userId) => {
   return request.get(`/article/myArticle/${userId}`)
 }
-// //查询用户点赞过的所有文章
-// export const getArticleLikedService = (userId) => {
-//   return request.get(`/article/userLiked/${userId}`)
-// }
-// //点赞
-// export const addLikedCount = (articleId) => {
-//   return request.put(`/article/like/${articleId}`)
-// }
-// //查询是否点赞
-// export const queryLiked = (articleId) => {
-//   return request.get(`/article/likeOrNot/${articleId}`)
-// }

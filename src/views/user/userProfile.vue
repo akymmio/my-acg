@@ -16,9 +16,24 @@ const user = ref({})
 import { getArticleByUserIdService } from '@/api/article'
 import { getArticleLikedService } from '@/api/liked'
 const notes = ref([])
+const getUserInfo = async () => {
+  //没有用户信息需要通过id查询
+  if (route.params.id !== localUser.value.id) {
+    console.log('route_id', route.params.id)
+    const res = await getUserInfoByIdService(route.params.id)
+    user.value = res.data.data
+  } else {
+    //说明是从另一个用户切回来
+    user.value = localUser.value
+    // console.log(user.value)
+  }
+  // fetchData()
+}
+getUserInfo()
 const fetchData = async (param = 'note') => {
   let res
   if (param === undefined || param == 'note') {
+    // console.log('user_id', user.value.id)
     res = await getArticleByUserIdService(user.value.id)
   } else if (param == 'like') {
     res = await getArticleLikedService(user.value.id)
@@ -26,20 +41,9 @@ const fetchData = async (param = 'note') => {
   notes.value = res.data.data
   console.log(res.data.data)
 }
+fetchData()
 //通过用户名查询账号信息
-const getUserInfo = async () => {
-  //没有用户信息需要通过id查询
-  if (route.params.id !== localUser.value.id) {
-    const res = await getUserInfoByIdService(route.params.id)
-    user.value = res.data.data
-  } else {
-    //说明是从另一个用户切回来
-    user.value = localUser.value
-    console.log(user.value)
-  }
-  fetchData()
-}
-// getUserInfo()
+
 watch(
   () => route.params.id,
   (newId, oldId) => {

@@ -1,9 +1,9 @@
 <script setup>
-import { Close, ArrowUp } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { Close } from '@element-plus/icons-vue'
+import { ref, computed } from 'vue'
 import { getArticleByIdService, addComment } from '@/api/article'
-import { addLikedCount, queryLiked } from '@/api/liked'
-import { followService, queryFollowService } from '@/api/user'
+import { addLikedCount } from '@/api/liked'
+import { followService } from '@/api/user'
 import { useRoute, useRouter } from 'vue-router'
 import { Like as like, Comment as comment } from '@icon-park/vue-next'
 const route = useRoute()
@@ -11,7 +11,7 @@ const router = useRouter()
 import { useUserStore } from '@/stores'
 const userStore = useUserStore()
 // 创建一个响应式变量 user 来绑定到模板中
-const localUser = ref(userStore.user)
+const localUser = computed(() => userStore.user)
 //用户
 const user = ref({})
 //文章
@@ -21,8 +21,6 @@ const comments = ref([])
 //评论
 const textarea = ref('')
 
-//是否关注
-const follow = ref(false)
 const close = () => {
   //路由返回
   if (props.id) {
@@ -35,26 +33,22 @@ const close = () => {
 
 //传递父组件
 const emit = defineEmits(['toParent'])
-//加载数据
+
+//是否关注
+const follow = ref(false)
+//是否点赞
 const liked = ref(false)
+//加载数据
 const getData = async () => {
   //根据文章id,获取文章信息
-  console.log(route.params.id)
+  // console.log(route.params.id)
   const res = await getArticleByIdService(props.id || route.params.id)
   article.value = res.data.data
+  liked.value = res.data.data.liked
+  follow.value = res.data.data.follow
   user.value = res.data.data.userInfo
-  console.log('头像', user.value.avatar)
   comments.value = res.data.data.comments
   console.log(article.value)
-  if (Object.keys(localUser.value).length !== 0) {
-    console.log('登录', user.value)
-    //查询是否关注
-    const res2 = await queryFollowService(user.value.id)
-    follow.value = res2.data.data
-    //查询是否点赞
-    const res3 = await queryLiked(article.value.articleId)
-    liked.value = res3.data.data
-  }
 }
 const props = defineProps({
   id: String
@@ -62,6 +56,7 @@ const props = defineProps({
 getData()
 
 const sendComment = async () => {
+  if (!check()) return
   if (textarea.value === '') return
   let commentData = {
     comment: textarea.value,
@@ -79,19 +74,35 @@ const sendComment = async () => {
   textarea.value = ''
 }
 //点赞
-const toLike = async () => {
-  await addLikedCount(article.value.articleId)
+const toLike = () => {
+  if (!check()) return
+  addLikedCount(article.value.articleId)
   liked.value = !liked.value
   if (liked.value === true) article.value.likedCount += 1
   else article.value.likedCount -= 1
 }
 //关注或取关
 const toFollow = async () => {
+  if (!check()) return
   await followService(user.value.id, !follow.value)
   follow.value = !follow.value
 }
+
+//登录检查
+const showLoginPage = ref(false)
+const check = () => {
+  if (Object.keys(localUser.value).length === 0) {
+    showLoginPage.value = true
+    return false
+  } else return true
+}
+import loginPage from '../login/loginPage.vue'
+const toChild = (param) => {
+  showLoginPage.value = param
+}
 </script>
 <template>
+  <loginPage v-show="showLoginPage" @toParent="toChild" style="z-index: 2"></loginPage>
   <div class="mask" v-show="true">
     <div class="login-container">
       <div @click="close" class="close">
@@ -112,13 +123,13 @@ const toFollow = async () => {
             <el-avatar :size="40" :src="user.avatar" />
             <span class="username">{{ user.nickname }}</span>
           </div>
-          <div v-show="user.id === localUser.id" class="editButton">
+          <div v-if="user.id === localUser.id" class="editButton">
             <span @click="router.push({ path: '/publish', query: { id: article.articleId } })">
               编辑
             </span>
           </div>
           <div
-            v-show="user.id !== localUser.id"
+            v-else-if="user.id !== localUser.id"
             @click="toFollow()"
             :class="{ active: follow }"
             class="followButton"
@@ -131,18 +142,20 @@ const toFollow = async () => {
           <div class="text">
             <p style="font-size: 25px; font-weight: bold; margin: 10px 0">{{ article.title }}</p>
             <!-- <el-text size="large" v-html></el-text> -->
-            <p v-html="article.content"></p>
+            <div v-html="article.content" style="width: 100%"></div>
             <!-- <div class="time" style="padding-top: 0">{{ article.createTime }}</div> -->
             <div class="text_bottom">
               <div>{{ article.createTime }}</div>
               <div>共{{ article.commentCount }}条评论</div>
             </div>
             <el-divider style="margin: 0" />
+            <el-empty v-if="article.commentCount == 0" description="空空如也" />
             <div v-for="(comment, index) in article.comments" :key="index" class="commentStyle">
               <div><el-avatar :size="38" :src="comment.avatar" /></div>
               <div class="comment_container">
                 <div class="comment_name">{{ comment.nickname }}</div>
-                <div class="comment_content">{{ comment.comment }}</div>
+
+                <div class="comment_content" v-html="comment.nickname"></div>
                 <div class="time" style="">{{ comment.createTime }}</div>
               </div>
             </div>
@@ -151,8 +164,6 @@ const toFollow = async () => {
         <el-divider style="margin: 0" />
         <div class="footer">
           <div class="footer_icon">
-            <!-- <i class="bi bi-heart-fill" v-if="liked" @click="like"></i>
-            <i class="bi bi-heart" v-else @click="like"></i> -->
             <like
               theme="two-tone"
               size="20"
@@ -175,17 +186,7 @@ const toFollow = async () => {
               rows="2"
               cols="50"
             ></textarea>
-
-            <el-popconfirm
-              confirm-button-text="确认"
-              cancel-button-text="取消"
-              title="确认发送评论?"
-              hide-icon="true"
-              @confirm="sendComment"
-            >
-              <template #reference>
-                <el-icon size="large" class="iconPublish"><ArrowUp /></el-icon> </template
-            ></el-popconfirm>
+            <span class="iconPublish" @click="sendComment">发送</span>
           </div>
         </div>
       </div>
@@ -205,7 +206,7 @@ const toFollow = async () => {
   object-fit: contain;
 }
 .mask {
-  z-index: 9999; /* 高的 z-index 值 */
+  // z-index: 9999; /* 高的 z-index 值 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -223,13 +224,13 @@ const toFollow = async () => {
     border-radius: 20px;
     box-sizing: border-box;
     width: 60%;
-    height: 90%;
+    height: 95%;
     .close {
       position: absolute;
-      top: 5%;
-      right: 17%;
-      width: 30px;
-      height: 30px;
+      top: 3%;
+      right: 3%;
+      width: 40px;
+      height: 40px;
       background: rgb(255, 255, 255);
       border-radius: 50%;
       display: flex;
@@ -270,7 +271,6 @@ const toFollow = async () => {
       width: 40%;
       overflow: hidden;
       .header {
-        // height: 10%;
         margin: 20px;
         display: flex;
         justify-content: space-between;
@@ -375,14 +375,12 @@ const toFollow = async () => {
         display: none; /* 隐藏滚动条 */
       }
       .footer {
+        // bottom: 10px;
+        position: relative;
         width: 100%;
-        // height: 15vh; /* 使用视窗单位 */
-        // height: 20%;
-        padding-top: 5px;
+        margin-top: 5px;
         display: flex;
         flex-direction: column;
-        // align-items: center; /* 垂直居中子元素 */
-        // justify-content: center; /* 如果需要，也可以水平居中子元素 */
         .footer_icon {
           display: flex;
           align-items: center;
@@ -397,19 +395,31 @@ const toFollow = async () => {
           padding-top: 5px;
           display: flex;
           align-items: center;
+          // justify-content: center;
           .iconPublish {
-            // vertical-align: middle;
-            // box-sizing: content-box;
-            // background: aqua;
-            height: 42px;
-            width: 41px;
+            // width: 100px;
+            cursor: pointer;
+            border: 0;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            // padding-left: 10px;
+            // background-color: #fd6b6b;
+            // width: 10%;
+            // height: 50px;
+            // padding-left: 10px;
+            background-color: #98c7fd;
+            height: 30px;
+            width: 10%;
+            color: white;
           }
           .input {
             width: 85%;
             font-size: larger;
             overflow: auto;
             border: 0;
-            border-radius: 20px;
+            border-radius: 10px;
             background-color: #f6f6f6;
             padding-top: 10px;
             padding-left: 10px;
@@ -420,6 +430,16 @@ const toFollow = async () => {
           }
           .input::-webkit-scrollbar {
             display: none; /* 隐藏滚动条 */
+          }
+          .button {
+            cursor: pointer;
+            border-radius: 40px;
+            font-size: large;
+            // background-color: rgb(95, 194, 255);
+            border: 0;
+            // width: 80px;
+            // height: 40px;
+            margin-bottom: 15px;
           }
         }
 
@@ -432,16 +452,16 @@ const toFollow = async () => {
       }
     }
   }
-  // @media screen and (min-width: 1000px) {
-  //   .login-container {
-  //     .right {
-  //       width: 50%;
-  //     }
-  //   }
-  // }
-  @media screen and (max-width: 1000px) {
+  @media screen and (max-width: 1500px) {
+    .login-container {
+      width: 70%;
+      // background-color: aqua;
+    }
+  }
+  @media screen and (max-width: 1200px) {
     .login-container {
       flex-direction: column;
+
       .left {
         width: 100%;
         overflow: scroll;
@@ -454,9 +474,9 @@ const toFollow = async () => {
         width: 100%;
         padding-right: 10px;
       }
-      .close {
-        right: 14%;
-      }
+      // .footer {
+      //   position: fixed;
+      // }
     }
   }
 }

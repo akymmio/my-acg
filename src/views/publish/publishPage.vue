@@ -44,7 +44,7 @@ const selectFiles = (uploadFile) => {
   //上传的图片
   fileList.value.images.push(uploadFile.raw)
   console.log(fileList.value.images)
-  showButton.value = true
+  if (showUpdateButton.value === false) showButton.value = true
   // console.log(uploadFile.raw)
 }
 const form = ref()
@@ -88,7 +88,7 @@ const update = async () => {
   formData.append('content', fileList.value.content)
   formData.append('userId', user.value.id)
   formData.append('state', fileList.value.state)
-  formData.append('channelId', 1)
+  formData.append('channelId', 0)
   formData.append('imagesList', fileList.value.imagesList)
   //添加文章id
   formData.append('id', route.query.id)

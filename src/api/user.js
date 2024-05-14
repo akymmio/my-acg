@@ -18,6 +18,10 @@ export const userLoginService = (loginData) => {
   }
   return request.post('/user/login', params)
 }
+//退出登录
+export const userLogoutService = () => {
+  return request.get('/user/logout')
+}
 
 export const logOutService = () => {
   return request.put('/user/logout')

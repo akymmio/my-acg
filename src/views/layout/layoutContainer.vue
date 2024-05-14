@@ -3,13 +3,15 @@ import { House, Bell, Search, Plus, Operation } from '@element-plus/icons-vue'
 import loginPage from '@/views/login/loginPage.vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useUserStore } from '@/stores'
-import { ref, h, watch, onActivated } from 'vue'
+import { userLogoutService } from '@/api/user'
+import { ref, watch, onActivated } from 'vue'
 const router = useRouter()
 const userStore = useUserStore()
 const user = ref(userStore.user)
 
 //如果用户信息为空,查询用户信息
-const logout = () => {
+const logout = async () => {
+  userLogoutService()
   userStore.removeToken()
   userStore.removeUser()
   // ElNotification({
@@ -17,6 +19,7 @@ const logout = () => {
   //   message: '退出登录成功',
   //   type: 'success'
   // })
+
   router.go('/')
 }
 //接收登录页面串参数
@@ -35,8 +38,13 @@ watch(
 const routeTo = (path) => {
   if (!userStore.token) {
     showLoginPage.value = true
+    // ElNotification({
+    //   message: h('i', { style: 'color: red' }, '请先登录')
+    // })
     ElNotification({
-      message: h('i', { style: 'color: black' }, '请先登录')
+      title: '请先登录',
+      type: 'error',
+      duration: 1000
     })
     return
   }
@@ -130,7 +138,7 @@ onActivated(() => {
                     <div class="popoverContainer">
                       <button @click="showUserInfo = true" class="exitButton">修改信息</button>
                       <button v-if="userStore.token" @click="logout" class="exitButton">
-                        exit
+                        退出登录
                       </button>
                     </div>
                   </template>
@@ -139,11 +147,12 @@ onActivated(() => {
             </ui>
           </div>
         </el-col>
+
         <el-col :span="19">
-          <div class="router_view">
+          <div>
             <!-- <router-view></router-view> -->
             <router-view v-slot="{ Component }">
-              <keep-alive exclude="contentPage,userProfile">
+              <keep-alive exclude="contentPage,userProfile,publishPage">
                 <component :is="Component" />
               </keep-alive>
             </router-view>
@@ -156,9 +165,6 @@ onActivated(() => {
   <UpdateUserInfo v-show="showUserInfo" @toParent="toChild"></UpdateUserInfo>
 </template>
 <style lang="less" scoped>
-.router_view {
-  padding-left: 30px;
-}
 
 .layout {
   position: absolute;
@@ -220,6 +226,7 @@ onActivated(() => {
 }
 .side {
   position: relative;
+  margin-right: 20px;
   ul {
     list-style-type: none;
   }
@@ -283,7 +290,7 @@ onActivated(() => {
   //   background: rgb(16, 16, 16) !important;
   // }
 }
-/* 响应式布局 - 当屏幕小于 700 像素宽时，让两列堆叠而不是并排 */
+/* 响应式布局 让两列堆叠而不是并排 */
 @media screen and (max-width: 800px) {
   .side {
     display:none

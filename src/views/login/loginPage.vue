@@ -2,9 +2,7 @@
 import { ref, watch } from 'vue'
 import { userRegisterService, userLoginService } from '@/api/user'
 import { Close } from '@element-plus/icons-vue'
-// import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/index'
-// const router = useRouter()
 const isRegister = ref(true)
 //表单数据
 const userform = ref({
@@ -41,17 +39,15 @@ const login = async () => {
   await form.value.validate()
   const res = await userLoginService(userform.value)
   ElNotification({
-    title: 'Success',
-    message: '登录成功',
-    type: 'success'
+    title: '登录成功',
+    type: 'success',
+    duration: 1000
   })
   //存储token
   userStore.setToken(res.data.data)
   //获取用户信息
-  const tmp = userStore.getUser()
-  console.log(tmp)
+  await userStore.getUser()
   //跳转首页
-  // router.push('/explore')
   close()
 }
 

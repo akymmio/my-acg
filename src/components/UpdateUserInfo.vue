@@ -53,7 +53,7 @@ const submitForm = async () => {
     formData.append(key, passwordForm.value[key])
   })
   const res = await updateUserInfoService(formData)
-  // await updateUserAvatarService(formData)
+  // updateUserAvatarService(formData)
   console.log(res.data.data)
   passwordForm.value.oldPassword = ''
   passwordForm.value.password = ''
@@ -65,8 +65,8 @@ const submitForm = async () => {
 const selectFiles = (uploadFile) => {
   console.log(uploadFile)
   //实现本地预览
-  // form.value.avatar = URL.createObjectURL(uploadFile.raw)
-  // avatar.value = uploadFile.raw
+  form.value.avatar = URL.createObjectURL(uploadFile.raw)
+  avatar.value = uploadFile.raw
 }
 //删除图片
 const removeImage = (uploadFile) => {
