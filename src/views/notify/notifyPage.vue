@@ -18,68 +18,77 @@ const currentComponent = computed(() => {
 </script>
 
 <template>
-  <div class="main">
+  <div class="title">
     <div>
       <button class="button" @click="currentTab = 'Comment'">评论</button>
       <button class="button" @click="currentTab = 'Like'">赞和收藏</button>
       <button class="button" @click="currentTab = 'Follow'">新增关注</button>
+      <!-- <button class="button">评论</button>
+      <button class="button">赞和收藏</button>
+      <button class="button">新增关注</button> -->
     </div>
-    <el-divider style="margin: 0" />
+    <el-divider style="margin: 5px; width: 70%" />
     <!-- <div v-for="(comment, index) in article.comments" :key="index" class="commentStyle"> -->
     <component :is="currentComponent" v-if="currentComponent"></component>
   </div>
 </template>
 
 <style scoped lang="less">
-.finishLoading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-  color: #b7b7b7;
+.title {
+  // display: flex;
+  // justify-content: center;
+  padding-left: 20%;
 }
-.content {
-  width: 60%;
-  height: calc(100vh - 200px);
-  overflow: scroll;
-  // background-color: bisque;
-  .commentStyle {
-    display: flex;
-    justify-content: row;
-    padding: 20px 0;
-  }
-  .comment_container {
-    display: flex;
-    flex-direction: column;
-    padding-left: 10px;
-    .comment_name {
-      // padding-left: 10px;
-      font-size: small;
-      font-weight: bold;
-      flex: 0 0 auto; /* 不增长、不缩小、基础大小为auto */
-    }
-    .comment_content {
-      // padding: 10px;
-      padding-top: 5px;
 
-      flex: 0 0 auto; /* 不增长、不缩小、基础大小为auto */
-      color: rgba(0, 0, 0, 0.7);
-    }
-    .comment_font {
-      color: rgba(0, 0, 0, 0.5);
-      // padding-left: 10px;
-      font-size: small;
-    }
-  }
-}
-.content::-webkit-scrollbar {
-  display: none;
-}
-.loading {
-  width: 70px;
-  display: flex;
-  justify-content: center; /* 水平居中 */
-}
+// .finishLoading {
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   margin-bottom: 20px;
+//   color: #b7b7b7;
+// }
+// .content {
+//   width: 60%;
+//   height: calc(100vh - 200px);
+//   overflow: scroll;
+//   // background-color: bisque;
+//   .commentStyle {
+//     display: flex;
+//     justify-content: row;
+//     padding: 20px 0;
+//   }
+//   .comment_container {
+//     display: flex;
+//     flex-direction: column;
+//     padding-left: 10px;
+//     .comment_name {
+//       // padding-left: 10px;
+//       font-size: small;
+//       font-weight: bold;
+//       flex: 0 0 auto; /* 不增长、不缩小、基础大小为auto */
+//     }
+//     .comment_content {
+//       // padding: 10px;
+//       padding-top: 5px;
+
+//       flex: 0 0 auto; /* 不增长、不缩小、基础大小为auto */
+//       color: rgba(0, 0, 0, 0.7);
+//     }
+//     .comment_font {
+//       color: rgba(0, 0, 0, 0.5);
+//       // padding-left: 10px;
+//       font-size: small;
+//     }
+//   }
+// }
+// .content::-webkit-scrollbar {
+//   display: none;
+// }
+// .loading {
+//   width: 70px;
+//   display: flex;
+//   justify-content: center; /* 水平居中 */
+// }
 .button {
   border-radius: 40px;
   font-size: 18px;

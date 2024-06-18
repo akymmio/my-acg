@@ -77,6 +77,7 @@ const selectChannel = async (channelId) => {
 }
 
 const push = (param) => {
+  console.log('ex', param)
   router.push(`/user/profile/${param}`)
 }
 const showFinish = ref(false)
@@ -134,7 +135,7 @@ const showContent = (param) => {
 <template>
   <div class="main" @scroll="scrolling">
     <button @click="selectChannel(0)" class="button">推荐</button>
-    <button @click="selectChannel(1)" class="button">推荐</button>
+    <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
     <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
     <!-- 首页瀑布流 -->
     <div @scroll="scrolling" ref="myElement">
@@ -156,7 +157,7 @@ const showContent = (param) => {
               </div>
               <div class="item-footer">
                 <div class="footer-left">
-                  <img :src="item.avatar" alt="" srcset="" @click="push(item.userId)" />
+                  <img :src="item.avatar" @click="push(item.userId)" />
                   <div class="name">{{ item.nickname }}</div>
                 </div>
                 <div class="like">
@@ -176,7 +177,7 @@ const showContent = (param) => {
                   />
                   <!-- {{ item.liked }} -->
                   <!-- <i class="bi bi-heart" @click="toLike(item.articleId, index)"></i> -->
-                  <div style="padding-left: 5px">{{ item.likedCount }}</div>
+                  <div style="padding-left: 2px">{{ item.likedCount }}</div>
                 </div>
               </div>
             </div>
@@ -195,11 +196,19 @@ const showContent = (param) => {
       </div>
     </div>
   </div>
-  <transition name="Fade">
-    <ContentPage v-if="isModalVisible" :id="id" @toParent="toChild" class="modal" />
+  <transition name="fade">
+    <ContentPage v-if="isModalVisible" :id="id" @toParent="toChild" />
   </transition>
 </template>
 <style scoped lang="less">
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s;
+}
+.fade-enter,
+.fade-leave-to {
+  transition: opacity 1s;
+}
 .loadButton {
   float: right;
   position: relative;

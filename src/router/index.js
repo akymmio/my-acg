@@ -21,7 +21,8 @@ const router = createRouter({
 
         {
           path: '/user/profile/:id',
-          component: () => import('@/views/user/userProfile.vue')
+          component: () => import('@/views/user/userProfile.vue'),
+          meta: { keepAlive: true } // 表明这个组件应该被缓存
         },
         {
           path: '/notification',
@@ -53,6 +54,7 @@ const router = createRouter({
   }
 })
 //没有token，访问非登录页面，跳转到首页
+//导航守卫
 router.beforeEach((to) => {
   const userStore = useUserStore()
   if (!userStore.token && !to.path.startsWith('/explore')) {

@@ -47,11 +47,15 @@ const submitForm = async () => {
   Object.keys(form.value).forEach((key) => {
     formData.append(key, form.value[key])
   })
+  // form.value.images.forEach((file) => {
+  //   formData.append(`images[]`, file)
+  // })
 
   // 将 passwordForm.value 中的数据添加到 FormData
   Object.keys(passwordForm.value).forEach((key) => {
     formData.append(key, passwordForm.value[key])
   })
+
   const res = await updateUserInfoService(formData)
   // updateUserAvatarService(formData)
   console.log(res.data.data)

@@ -24,7 +24,7 @@ const fileList = ref({
   content: '',
   imagesList: [] //图片url
 })
-//存入展示的图片
+//存入照片墙展示的图片
 const imagesList = ref({
   imagesList: []
 })
@@ -41,6 +41,7 @@ const showButton = ref(false)
 const selectFiles = (uploadFile) => {
   //展示的图片
   imagesList.value.imagesList.push(URL.createObjectURL(uploadFile.raw))
+  console.log(imagesList.value.imagesList)
   //上传的图片
   fileList.value.images.push(uploadFile.raw)
   console.log(fileList.value.images)
@@ -49,31 +50,42 @@ const selectFiles = (uploadFile) => {
 }
 const form = ref()
 const loading = ref(false)
+//发布文章
 const publish = async () => {
   await form.value.validate()
   const formData = new FormData()
   for (let key in fileList.value.images) {
     formData.append(`images[]`, fileList.value.images[key])
   }
-
+  // fileList.value.images.forEach((file) => {
+  //   formData.append(`images[]`, file)
+  // })
   // 添加其他表单字段到formData中
   formData.append('title', fileList.value.title)
   formData.append('content', fileList.value.content)
-  formData.append('userId', user.value.id)
   formData.append('state', fileList.value.state)
   formData.append('channelId', 0)
+  formData.append('userId', user.value.id)
   //调用发布文章接口
-  const res = await publishArticleService(formData)
-  // console.log(res)
-  //显示加载图层
   loading.value = true
-  setTimeout(() => {
-    router.go(0)
-  }, 1000)
+  await publishArticleService(formData)
+  loading.value = false
+  //显示加载图层
   ElMessage({
-    message: res.data.message || '发布成功',
-    type: 'success'
+    message: '发布成功',
+    type: 'success',
+    duration: 2000
   })
+  // 清空fileList的数据
+  fileList.value = {
+    images: [], // 图片数据清空
+    title: '', // 标题清空
+    content: '', // 内容清空
+    imagesList: [] // 图片url清空
+  }
+  // 清空imagesList的数据
+  imagesList.value.imagesList = [] // 清空imagesList数组
+  showButton.value = false
 }
 
 const update = async () => {
@@ -82,7 +94,6 @@ const update = async () => {
   for (let key in fileList.value.images) {
     formData.append(`images[]`, fileList.value.images[key])
   }
-
   // 添加其他表单字段到formData中
   formData.append('title', fileList.value.title)
   formData.append('content', fileList.value.content)
@@ -92,17 +103,14 @@ const update = async () => {
   formData.append('imagesList', fileList.value.imagesList)
   //添加文章id
   formData.append('id', route.query.id)
-  //调用发布文章接口
-  const res = await updateArticleService(formData)
-  // console.log(res)
-  //显示加载图层
+  //调用更新文章接口
   loading.value = true
-  setTimeout(() => {
-    router.go(0)
-  }, 1000)
+  await updateArticleService(formData)
+  loading.value = false
   ElMessage({
-    message: res.data.message || '发布成功',
-    type: 'success'
+    message: '更新成功',
+    type: 'success',
+    duration: 1500
   })
 }
 
@@ -133,6 +141,7 @@ const rules = ref({
 })
 //获取文章数据
 const showUpdateButton = ref(false)
+
 const queryArticle = async () => {
   if (route.query.id && route.query.id !== '') {
     // 当 route.query.id 存在且不为空字符串时执行代码
@@ -142,7 +151,7 @@ const queryArticle = async () => {
     fileList.value.title = res.title
     fileList.value.content = res.content
     fileList.value.imagesList = res.images
-    //展示数据需要的是array对象数组，转换一下
+    //展示数据需要的是array对象数组，转换一下!!
     imagesList.value.imagesList = res.images.map((url) => {
       return { url }
     })
@@ -154,7 +163,7 @@ const queryArticle = async () => {
 queryArticle()
 </script>
 <template>
-  <div class="container">
+  <div>
     <div>
       <div style="background: #f6f6f6" class="upload">
         <el-upload
@@ -169,60 +178,61 @@ queryArticle()
           <el-icon><Plus /></el-icon>
         </el-upload>
       </div>
+      <div class="container">
+        <el-row>
+          <el-col :span="10">
+            <el-form
+              :rules="rules"
+              :model="fileList"
+              label-width="auto"
+              size="default"
+              label-position="left"
+            >
+              <el-form-item prop="title" ref="form">
+                <el-input v-model="fileList.title" placeholder="请输入标题" />
+              </el-form-item>
 
-      <el-row>
-        <el-col :span="10">
-          <el-form
-            :rules="rules"
-            :model="fileList"
-            label-width="auto"
-            size="default"
-            label-position="left"
+              <el-form-item>
+                <div>
+                  <quill-editor
+                    ref="quill"
+                    style="height: 200px; width: 500px"
+                    theme="snow"
+                    v-model:content="fileList.content"
+                    content-type="html"
+                  ></quill-editor>
+                </div>
+              </el-form-item>
+              <el-form-item v-if="showButton">
+                <button type="button" @click="cancel" class="button">取消</button>
+
+                <button
+                  v-loading.fullscreen.lock="loading"
+                  element-loading-text="发布中"
+                  type="button"
+                  @click="publish()"
+                  class="button"
+                >
+                  发布
+                </button>
+              </el-form-item>
+              <el-form-item v-if="showUpdateButton">
+                <button type="button" @click="cancel" class="button">取消</button>
+                <button
+                  v-loading.fullscreen.lock="loading"
+                  element-loading-text="发布中"
+                  type="button"
+                  class="button"
+                  @click="update()"
+                >
+                  更新
+                </button>
+              </el-form-item>
+            </el-form></el-col
           >
-            <el-form-item prop="title" ref="form">
-              <el-input v-model="fileList.title" placeholder="请输入标题" />
-            </el-form-item>
-
-            <el-form-item>
-              <div>
-                <quill-editor
-                  ref="quill"
-                  style="height: 200px; width: 500px"
-                  theme="snow"
-                  v-model:content="fileList.content"
-                  content-type="html"
-                ></quill-editor>
-              </div>
-            </el-form-item>
-            <el-form-item v-if="showButton">
-              <button type="button" @click="cancel" class="button">取消</button>
-
-              <button
-                v-loading.fullscreen.lock="loading"
-                element-loading-text="发布中"
-                type="button"
-                @click="publish()"
-                class="button"
-              >
-                发布
-              </button>
-            </el-form-item>
-            <el-form-item v-if="showUpdateButton">
-              <button type="button" @click="cancel" class="button">取消</button>
-              <button
-                v-loading.fullscreen.lock="loading"
-                element-loading-text="发布中"
-                type="button"
-                class="button"
-                @click="update()"
-              >
-                更新
-              </button>
-            </el-form-item>
-          </el-form></el-col
-        >
-        <el-col :span="14"></el-col>
-      </el-row>
+          <el-col :span="14"></el-col>
+        </el-row>
+      </div>
     </div>
   </div>
 
@@ -233,6 +243,12 @@ queryArticle()
 
 <style lang="less" scoped>
 .container {
+  padding-left: 20%;
+}
+@media screen and (min-width: 1300px) {
+  .container {
+    padding-left: 25%;
+  }
 }
 .upload {
   width: 100%;

@@ -35,3 +35,7 @@ export const addComment = (data) => {
 export const getArticleByUserIdService = (userId) => {
   return request.get(`/article/myArticle/${userId}`)
 }
+
+export const deleteArticleService = (articleId) => {
+  return request.delete(`/article/${articleId}`)
+}

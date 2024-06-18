@@ -45,7 +45,7 @@ const showArticle = (id) => {
 </template>
 <style lang="less" scoped>
 .content {
-  width: 60%;
+  width: 70%;
   height: calc(100vh - 200px);
   overflow: scroll;
   .commentStyle {
@@ -60,13 +60,12 @@ const showArticle = (id) => {
     .comment_name {
       font-size: small;
       font-weight: bold;
-      flex: 0 0 auto; /* 不增长、不缩小、基础大小为auto */
+      // flex: 0 0 auto; /* 不增长、不缩小、基础大小为auto */
       padding-bottom: 10px;
     }
     .comment_content {
       padding-top: 5px;
-
-      flex: 0 0 auto; /* 不增长、不缩小、基础大小为auto */
+      // flex: 0 0 auto; /* 不增长、不缩小、基础大小为auto */
       // color: rgba(0, 0, 0, 0.7);
       font-size: small;
     }
@@ -74,6 +73,11 @@ const showArticle = (id) => {
       color: rgba(0, 0, 0, 0.5);
       font-size: small;
     }
+  }
+}
+@media screen and (max-width: 1300px) {
+  .content {
+    width: 80%;
   }
 }
 .content::-webkit-scrollbar {

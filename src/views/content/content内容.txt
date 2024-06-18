@@ -1,11 +1,13 @@
+//多层评论的实现
 <script setup>
 import { Close } from '@element-plus/icons-vue'
 import { ref, computed } from 'vue'
 import { getArticleByIdService, addComment } from '@/api/article'
+import { getCommentService } from '@/api/comment'
 import { addLikedCount } from '@/api/liked'
 import { followService } from '@/api/user'
 import { useRoute, useRouter } from 'vue-router'
-import { Like as like, Comment as comment } from '@icon-park/vue-next'
+import { Like, Comment } from '@icon-park/vue-next'
 const route = useRoute()
 const router = useRouter()
 import { useUserStore } from '@/stores'
@@ -40,37 +42,70 @@ const follow = ref(false)
 const liked = ref(false)
 //加载数据
 const getData = async () => {
-  //根据文章id,获取文章信息
-  // console.log(route.params.id)
-  const res = await getArticleByIdService(props.id || route.params.id)
-  article.value = res.data.data
-  liked.value = res.data.data.liked
-  follow.value = res.data.data.follow
-  user.value = res.data.data.userInfo
-  comments.value = res.data.data.comments
-  console.log(comments.value)
+  // 根据文章id同时获取文章信息和评论
+  const [articleRes, commentsRes] = await Promise.all([
+    getArticleByIdService(props.id || route.params.id),
+    getCommentService(props.id || route.params.id)
+  ])
+
+  // 分别处理响应数据
+  if (articleRes && articleRes.data && commentsRes && commentsRes.data) {
+    article.value = articleRes.data.data
+    liked.value = article.value.liked
+    follow.value = article.value.follow
+    user.value = article.value.userInfo
+
+    // 将评论数据赋值给comments
+    comments.value = commentsRes.data.data
+    console.log(comments.value)
+  }
 }
 const props = defineProps({
   id: String
 })
 getData()
 
+//根评论的id
+const parentCommentId = ref(null)
+//根评论的索引
+const commentIndex = ref(-1)
 const sendComment = async () => {
   if (!check()) return
   if (textarea.value === '') return
+
   let commentData = {
     comment: textarea.value,
     userId: localUser.value.id,
-    articleId: article.value.articleId
+    articleId: article.value.articleId,
+    ...(parentCommentId.value !== null ? { parentCommentId: parentCommentId.value } : {})
   }
+
   await addComment(commentData)
   article.value.commentCount += 1
-  comments.value.unshift({
-    comment: textarea.value,
-    nickname: localUser.value.nickname,
-    avatar: localUser.value.avatar,
-    createTime: new Date().toLocaleString()
-  })
+
+  // 根据parentCommentId的值决定如何添加评论
+  if (parentCommentId.value !== null) {
+    // 添加为子评论
+    if (comments.value[commentIndex.value] && comments.value[commentIndex.value].subComment) {
+      comments.value[commentIndex.value].subComment.unshift({
+        comment: textarea.value,
+        nickname: localUser.value.nickname,
+        avatar: localUser.value.avatar,
+        createTime: new Date().toLocaleString()
+      })
+    } else {
+      console.warn('Parent comment not found or does not have a subComment array.')
+    }
+  } else {
+    // 添加为顶级评论
+    comments.value.unshift({
+      comment: textarea.value,
+      nickname: localUser.value.nickname,
+      avatar: localUser.value.avatar,
+      createTime: new Date().toLocaleString()
+    })
+  }
+
   textarea.value = ''
 }
 //点赞
@@ -105,6 +140,21 @@ const deleteComment = (commentId, index) => {
   console.log(commentId)
   comments.value.splice(index, 1)
   deleteCommentService(commentId)
+  ElMessage.success('成功删除评论')
+}
+const deleteSubComment = (commentId, parentIndex, subIdx) => {
+  // console.log(commentId, parentIndex, subIdx)
+  // console.log(comments.value[parentIndex].subComment[subIdx])
+  comments.value[parentIndex].subComment.splice(subIdx, 1)
+  deleteCommentService(commentId)
+  ElMessage.success('成功删除评论')
+}
+const text = ref(null)
+const selectComment = (commentId, index) => {
+  console.log(index)
+  text.value.focus()
+  parentCommentId.value = commentId
+  commentIndex.value = index
 }
 </script>
 <template>
@@ -157,24 +207,81 @@ const deleteComment = (commentId, index) => {
             <el-divider style="margin: 0" />
             <el-empty v-if="article.commentCount == 0" description="空空如也" />
             <!-- 评论 -->
-            <div
-              v-else
-              v-for="(comment, index) in article.comments"
-              :key="index"
-              class="commentStyle"
-            >
-              <div><el-avatar :size="38" :src="comment.avatar" /></div>
-              <div class="comment_container">
-                <div class="comment_name">{{ comment.nickname }}</div>
-                <div class="comment_content" v-html="comment.comment"></div>
-                <div class="time" style="">{{ comment.createTime }}</div>
+            <div v-else v-for="(comment, index) in comments" :key="index">
+              <div class="commentStyle">
+                <div><el-avatar :size="38" :src="comment.avatar" /></div>
+                <div class="comment_container">
+                  <div class="comment_name">{{ comment.nickname }}</div>
+                  <div class="comment_content" v-html="comment.comment"></div>
+                  <div class="time" style="">{{ comment.createTime }}</div>
+                  <div>
+                    <like theme="outline" size="14" fill="#979797" :strokeWidth="3" />
+                    <comment
+                      theme="outline"
+                      size="13"
+                      fill="#979797"
+                      :strokeWidth="3"
+                      @click="selectComment(comment.commentId, index)"
+                    />
+                  </div>
+                </div>
+                <!-- <div
+                  class="comment-actions"
+                  v-if="localUser.id === comment.userId"
+                  @click="deleteComment(comment.commentId, index)"
+                >
+                  <el-icon><Close style="opacity: 0.3" /></el-icon>
+                </div> -->
+                <div>
+                  <el-popconfirm
+                    v-if="localUser.id === comment.userId"
+                    title="确定删除此评论?"
+                    hide-icon="yes"
+                    hide-after="50"
+                    @confirm="deleteComment(comment.commentId, index)"
+                  >
+                    <template #reference>
+                      <el-icon><Close style="opacity: 0.3" /></el-icon>
+                    </template>
+                  </el-popconfirm>
+                </div>
               </div>
               <div
-                class="comment-actions"
-                v-if="localUser.id === comment.userId"
-                @click="deleteComment(comment.commentId, index)"
+                v-for="(comment, idx) in comment.subComment"
+                :key="idx"
+                class="commentStyle"
+                style="padding-left: 50px"
               >
-                <el-icon><Close style="opacity: 0.3" /></el-icon>
+                <div><el-avatar :size="28" :src="comment.avatar" /></div>
+                <div class="comment_container">
+                  <div class="comment_name">{{ comment.nickname }}</div>
+                  <div class="comment_content" v-html="comment.comment"></div>
+                  <div class="time" style="">{{ comment.createTime }}</div>
+                  <!-- <div>
+                    <like theme="outline" size="14" fill="#979797" :strokeWidth="3" />
+                    <comment theme="outline" size="13" fill="#979797" :strokeWidth="3" />
+                  </div> -->
+                </div>
+                <!-- <div
+                  class="comment-actions"
+                  v-if="localUser.id === comment.userId"
+                  @click="deleteSubComment(comment.commentId, index, idx)"
+                >
+                  <el-icon><Close style="opacity: 0.3" /></el-icon>
+                </div> -->
+                <div>
+                  <el-popconfirm
+                    v-if="localUser.id === comment.userId"
+                    title="确定删除此评论?"
+                    hide-icon="yes"
+                    hide-after="50"
+                    @confirm="deleteSubComment(comment.commentId, index, idx)"
+                  >
+                    <template #reference>
+                      <el-icon><Close style="opacity: 0.3" /></el-icon>
+                    </template>
+                  </el-popconfirm>
+                </div>
               </div>
             </div>
           </div>
@@ -193,11 +300,13 @@ const deleteComment = (commentId, index) => {
 
             <span style="padding-left: 5px">{{ article.likedCount }} </span>
             <!-- <el-icon class="icon" size="large"><ChatRound /></el-icon> -->
-            <comment theme="filled" size="20" fill="#4f83ff" style="padding-left: 10px" />
+            <comment theme="outline" size="18" fill="#333" style="padding-left: 10px" />
+            <!-- <comment theme="filled" size="20" fill="#4f83ff" style="padding-left: 10px" /> -->
             <span style="padding-left: 5px">{{ article.commentCount }}</span>
           </div>
           <div class="footer_input">
             <textarea
+              ref="text"
               class="input"
               v-model="textarea"
               placeholder="留下你的想法吧"
@@ -379,16 +488,40 @@ const deleteComment = (commentId, index) => {
               }
             }
           }
+          .subCommentStyle {
+            display: flex;
+            // flex-direction: row;
+            align-items: flex-start; /* 如果有需要的话，对齐项目 */
+            padding-top: 15px;
+            .comment_container {
+              flex: 1; /* 占据剩余空间，使得 Close 图标可以靠右 */
+              padding-left: 10px; /* 根据需要设置内边距 */
+              // background-color: aqua;
+              .comment_name {
+                color: rgba(0, 0, 0, 0.6);
+                // padding-left: 10px;
+                font-size: small;
+              }
+              .comment_content {
+                // padding: 10px;
+                padding-top: 5px;
+                font-size: small;
+              }
+              .comment-actions {
+                margin-left: auto; /* 这将使元素靠右 */
+              }
+            }
+          }
         }
         .comment-actions:hover {
           background-color: #e1e1e1;
           // border-radius: 50%;
         }
         .time {
-          font-size: x-small;
+          font-size: xx-small;
           color: rgb(153, 153, 153);
           padding-top: 5px;
-          padding-bottom: 10px;
+          // padding-bottom: 10px;
         }
       }
       @media (min-height: 800px) {
@@ -409,6 +542,7 @@ const deleteComment = (commentId, index) => {
         .footer_icon {
           display: flex;
           align-items: center;
+          // justify-content: center;
           font-size: small;
           padding-left: 10px;
         }
@@ -429,14 +563,9 @@ const deleteComment = (commentId, index) => {
             display: flex;
             align-items: center;
             justify-content: center;
-            // padding-left: 10px;
-            // background-color: #fd6b6b;
-            // width: 10%;
-            // height: 50px;
-            // padding-left: 10px;
             background-color: #98c7fd;
-            height: 30px;
-            width: 10%;
+            height: 40px;
+            width: 15%;
             color: white;
           }
           .input {

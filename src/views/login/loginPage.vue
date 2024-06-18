@@ -78,9 +78,20 @@ const rules = ref({
   ]
 })
 
+// import { require } from '@/utils/require'
+// const imageUrl = require('@/assets/icon/welcome.gif')
+const showGIF = ref(true)
+
+const intervalId = setInterval(() => {
+  showGIF.value = !showGIF.value
+}, 2000)
+
 //传递父组件
 const emit = defineEmits(['toParent'])
 const close = () => {
+  //关闭定时执行
+  clearInterval(intervalId)
+  showGIF.value = false
   emit('toParent', false)
 }
 </script>
@@ -90,7 +101,12 @@ const close = () => {
       <div @click="close" class="close">
         <el-icon><Close /></el-icon>
       </div>
-      <div class="left"></div>
+      <div class="left">
+        <div class="title">
+          <span> 登录获取完整用户体验</span>
+        </div>
+        <!-- <div><img :src="imageUrl" width="200px" height="200px" /></div> -->
+      </div>
       <div class="right">
         <!-- 登录 -->
         <span style="margin-bottom: 30px; font-weight: bold"> 用户登录</span>
@@ -104,7 +120,18 @@ const close = () => {
           <el-form-item>
             <button class="loginButton" @click="login" type="button">登录</button>
           </el-form-item>
-          <el-link @click="isRegister = false">注册</el-link>
+          <el-link @click="isRegister = false">
+            <!-- <img :src="imageUrl" /> -->
+            <el-tooltip
+              @click="isRegister = false"
+              content="点击注册"
+              placement="right"
+              effect="light"
+              :visible="showGIF"
+              ><img src="@/assets/icon/welcome.gif" style="width: 50px" />
+              <!-- <el-button>right</el-button> -->
+            </el-tooltip>
+          </el-link>
         </el-form>
         <!-- 注册 -->
         <el-form :model="userform" :rules="rules" ref="form" v-else>
@@ -187,6 +214,19 @@ const close = () => {
       align-items: center;
       flex-direction: column;
       border-right: 1px solid rgba(0, 0, 0, 0.1);
+      margin-top: 48px;
+      .title {
+        // font-weight: bold;
+        color: rgb(61, 162, 225);
+        font-weight: bold;
+        background-color: rgb(210, 232, 248);
+        width: 200px;
+        height: 40px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
     .right {
       width: 400px;

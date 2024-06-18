@@ -11,7 +11,7 @@ const user = ref(userStore.user)
 
 //如果用户信息为空,查询用户信息
 const logout = async () => {
-  userLogoutService()
+  await userLogoutService()
   userStore.removeToken()
   userStore.removeUser()
   // ElNotification({
@@ -35,28 +35,33 @@ watch(
     user.value = newUser
   }
 )
+const activeItem = ref()
 const routeTo = (path) => {
-  if (!userStore.token) {
-    showLoginPage.value = true
-    // ElNotification({
-    //   message: h('i', { style: 'color: red' }, '请先登录')
-    // })
-    ElNotification({
-      title: '请先登录',
-      type: 'error',
-      duration: 1000
-    })
-    return
-  }
-  if (path == 'publish') {
-    router.push('/publish')
-  } else if (path === 'notification') {
-    router.push('/notification')
+  activeItem.value = path
+  if (path == 'explore') {
+    router.push('/explore')
+  } else {
+    if (!userStore.token) {
+      showLoginPage.value = true
+      ElNotification({
+        title: '请先登录',
+        type: 'error',
+        duration: 1500
+      })
+      return
+    }
+    if (path == 'publish') {
+      router.push('/publish')
+    } else if (path === 'notification') {
+      router.push('/notification')
+    } else {
+      router.push(`/user/profile/${user.value.id}`)
+    }
   }
 }
-const push = () => {
-  router.push(`/user/profile/${user.value.id}`)
-}
+// const push = () => {
+//   router.push(`/user/profile/${user.value.id}`)
+// }
 const showUserInfo = ref(false)
 const searchData = ref()
 const search = () => {
@@ -82,6 +87,7 @@ onActivated(() => {
     console.log(placeScroll.value)
   }
 })
+const showCard = ref(false)
 </script>
 
 <template>
@@ -89,7 +95,8 @@ onActivated(() => {
     <el-container class="layout">
       <el-header>
         <el-row>
-          <el-col :span="8" style="padding-left: 100px"></el-col>
+          <el-col :span="1"></el-col>
+          <el-col :span="7" style="padding-left: 100px"></el-col>
           <el-col
             :span="8"
             style="display: flex; justify-content: center; align-items: center"
@@ -108,27 +115,53 @@ onActivated(() => {
         <el-col :span="3" class="side">
           <div>
             <ui>
-              <li class="el-menu-item" @click="router.push('/explore')">
+              <li
+                class="el-menu-item"
+                @click="routeTo('explore')"
+                :class="{ active: activeItem === 'explore' }"
+              >
                 <el-icon><House /></el-icon>
                 <span> 探索</span>
               </li>
-              <li class="el-menu-item" @click="routeTo('publish')">
+              <li
+                class="el-menu-item"
+                @click="routeTo('publish')"
+                :class="{ active: activeItem === 'publish' }"
+              >
                 <el-icon><Plus /></el-icon>
                 <span> 发布</span>
               </li>
-              <li class="el-menu-item" @click="routeTo('notification')">
+              <li
+                class="el-menu-item"
+                @click="routeTo('notification')"
+                :class="{ active: activeItem === 'notification' }"
+              >
                 <el-icon><Bell /></el-icon>
                 <span>通知</span>
               </li>
-              <li class="el-menu-item" v-if="userStore.token" @click="push">
+              <li
+                class="el-menu-item"
+                v-if="userStore.token"
+                @click="routeTo('me')"
+                :class="{ active: activeItem === 'me' }"
+              >
                 <el-avatar :size="30" :src="user.avatar" style="margin-left: 0" />
                 <span>我</span>
               </li>
               <li v-else class="loginItem" @click="showLoginPage = true">
                 <span>登录</span>
               </li>
-              <li class="more">
-                <el-popover placement="bottom" :width="200" trigger="click">
+
+              <div class="toShowCard">
+                <el-card v-if="showCard" class="card">
+                  <div class="popoverContainer">
+                    <button @click="showUserInfo = true" class="exitButton">修改信息</button>
+                    <button @click="logout" class="exitButton">退出登录</button>
+                  </div>
+                </el-card>
+              </div>
+              <li class="more" v-if="userStore.token" @click="showCard = !showCard">
+                <!-- <el-popover placement="bottom" :width="200" trigger="click">
                   <template #reference>
                     <div class="moreButton">
                       <el-icon><Operation /></el-icon><span>更多</span>
@@ -137,12 +170,13 @@ onActivated(() => {
                   <template #default>
                     <div class="popoverContainer">
                       <button @click="showUserInfo = true" class="exitButton">修改信息</button>
-                      <button v-if="userStore.token" @click="logout" class="exitButton">
-                        退出登录
-                      </button>
+                      <button @click="logout" class="exitButton">退出登录</button>
                     </div>
                   </template>
-                </el-popover>
+                </el-popover> -->
+                <div class="moreButton">
+                  <el-icon><Operation /></el-icon><span>更多</span>
+                </div>
               </li>
             </ui>
           </div>
@@ -152,7 +186,7 @@ onActivated(() => {
           <div>
             <!-- <router-view></router-view> -->
             <router-view v-slot="{ Component }">
-              <keep-alive exclude="contentPage,userProfile,publishPage">
+              <keep-alive exclude="contentPage,userProfile,publishPage,loginPage">
                 <component :is="Component" />
               </keep-alive>
             </router-view>
@@ -161,10 +195,20 @@ onActivated(() => {
       </el-row>
     </el-container>
   </div>
-  <loginPage v-show="showLoginPage" @toParent="toChild"></loginPage>
-  <UpdateUserInfo v-show="showUserInfo" @toParent="toChild"></UpdateUserInfo>
+  <transition name="fade">
+    <loginPage v-if="showLoginPage" @toParent="toChild"></loginPage>
+  </transition>
+  <UpdateUserInfo v-if="showUserInfo" @toParent="toChild"></UpdateUserInfo>
 </template>
 <style lang="less" scoped>
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter, .fade-leave-to{
+  opacity: 0;
+}
 
 .layout {
   position: absolute;
@@ -208,12 +252,14 @@ onActivated(() => {
   display: none;
 }
 .exitButton {
-  // width: 80px;
-  margin: 10px;
-  padding: 5px;
+  margin: 10px 0 0 0;
+  height: 40px;
+  // width: 70px;
+  // padding: 5px;
   border: 0;
-  border-radius: 20px;
+  border-radius: 10px;
   background-color: white;
+  text-align: left;
 }
 .exitButton:hover {
   background-color: #f6f6f6;
@@ -238,15 +284,41 @@ onActivated(() => {
     span {
       margin-left: 10px;
     }
+  }
+  .el-menu-item {
+    border-radius: 40px;
+    font-size: large;
+    font-weight: bold;
+    vertical-align: middle;
+    padding-left: 20px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .el-menu-item:hover {
+    background: #f7f7f7;
+  }
+  .el-menu-item.active{
+    background-color: #f7f7f7 ;
+  }
 
+  .toShowCard{
+    // background: lightblue;
+    min-height: 200px;
+    margin-top: calc(100vh - 590px);
+  }
+  .card{
+    border-radius: 20px;
+    // margin-top: calc(100vh - 580px);
+    max-width: 480px;
+    min-height: 100px;
   }
   .more {
+    // margin-top: calc(100vh - 580px);
     border-radius: 40px;
-
-    margin-top: calc(100vh - 370px);
     .moreButton{
       border: 0;
-
       display: flex;
       padding-left: 20px;
       align-items: center;
@@ -272,23 +344,7 @@ onActivated(() => {
     color: white
     // text-align: center;
   }
-  .el-menu-item {
-    border-radius: 40px;
-    font-size: large;
-    font-weight: bold;
-    vertical-align: middle;
-    padding-left: 20px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-  .el-menu-item:hover {
-    background: #f7f7f7;
-  }
-  // .el-menu-item:focus {
-  //   background: rgb(16, 16, 16) !important;
-  // }
+
 }
 /* 响应式布局 让两列堆叠而不是并排 */
 @media screen and (max-width: 800px) {
