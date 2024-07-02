@@ -2,7 +2,8 @@ import axios from 'axios'
 import { useUserStore } from '@/stores'
 
 //基础地址
-const baseURL = '/api'
+// const baseURL = '/api'
+const baseURL = 'http://47.120.46.231:8081'
 const instance = axios.create({
   baseURL,
   timeout: 10000
