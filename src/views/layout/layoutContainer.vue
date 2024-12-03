@@ -109,84 +109,87 @@ const showCard = ref(false)
           <!-- <el-col :span="8"></el-col> -->
         </el-row>
       </el-header>
-      <el-row>
-        <el-col :span="1"></el-col>
-        <el-col :span="3" class="side">
-          <div>
-            <ui>
-              <li
-                class="el-menu-item"
-                @click="routeTo('explore')"
-                :class="{ active: activeItem === 'explore' }"
-              >
-                <el-icon><House /></el-icon>
-                <span> 探索</span>
-              </li>
-              <li
-                class="el-menu-item"
-                @click="routeTo('publish')"
-                :class="{ active: activeItem === 'publish' }"
-              >
-                <el-icon><Plus /></el-icon>
-                <span> 发布</span>
-              </li>
-              <li
-                class="el-menu-item"
-                @click="routeTo('notification')"
-                :class="{ active: activeItem === 'notification' }"
-              >
-                <el-icon><Bell /></el-icon>
-                <span>通知</span>
-              </li>
-              <li
-                class="el-menu-item"
-                v-if="userStore.token"
-                @click="routeTo('me')"
-                :class="{ active: activeItem === 'me' }"
-              >
-                <el-avatar :size="30" :src="user.avatar" style="margin-left: 0" />
-                <span>我</span>
-              </li>
-              <li v-else class="loginItem" @click="showLoginPage = true">
-                <span>登录</span>
-              </li>
+      <div class="grid-container">
+        <div class="grid-item item-1"></div>
+        <div class="grid-item item-2">
+          <el-col class="side">
+            <div>
+              <ui>
+                <li
+                  class="el-menu-item"
+                  @click="routeTo('explore')"
+                  :class="{ active: activeItem === 'explore' }"
+                >
+                  <el-icon><House /></el-icon>
+                  <span> 探索</span>
+                </li>
+                <li
+                  class="el-menu-item"
+                  @click="routeTo('publish')"
+                  :class="{ active: activeItem === 'publish' }"
+                >
+                  <el-icon><Plus /></el-icon>
+                  <span> 发布</span>
+                </li>
+                <li
+                  class="el-menu-item"
+                  @click="routeTo('notification')"
+                  :class="{ active: activeItem === 'notification' }"
+                >
+                  <el-icon><Bell /></el-icon>
+                  <span>通知</span>
+                </li>
+                <li
+                  class="el-menu-item"
+                  v-if="userStore.token"
+                  @click="routeTo('me')"
+                  :class="{ active: activeItem === 'me' }"
+                >
+                  <el-avatar :size="30" :src="user.avatar" style="margin-left: 0" />
+                  <span>我</span>
+                </li>
+                <li v-else class="loginItem" @click="showLoginPage = true">
+                  <span>登录</span>
+                </li>
 
-              <div>
-                <!-- <el-card v-if="showCard" class="card">
+                <div>
+                  <!-- <el-card v-if="showCard" class="card">
                   <div class="popoverContainer">
                     <button @click="showUserInfo = true" class="exitButton">修改信息</button>
                     <button @click="logout" class="exitButton">退出登录</button>
                   </div>
                 </el-card> -->
-              </div>
-              <li class="more" v-if="userStore.token" @click="showCard = !showCard">
-                <el-popover placement="bottom" :width="200" trigger="click">
-                  <template #reference>
-                    <div class="moreButton">
-                      <el-icon><Operation /></el-icon><span>更多</span>
-                    </div>
-                  </template>
-                  <template #default>
-                    <div class="popoverContainer">
-                      <button @click="showUserInfo = true" class="exitButton">修改信息</button>
-                      <button @click="logout" class="exitButton">退出登录</button>
-                    </div>
-                  </template>
-                </el-popover>
-              </li>
-            </ui>
-          </div>
-        </el-col>
-
-        <el-col :span="19">
-          <router-view></router-view>
-          <!-- <router-view v-slot="{ Component }">
+                </div>
+                <li class="more" v-if="userStore.token" @click="showCard = !showCard">
+                  <el-popover placement="bottom" :width="200" trigger="click">
+                    <template #reference>
+                      <div class="moreButton">
+                        <el-icon><Operation /></el-icon><span>更多</span>
+                      </div>
+                    </template>
+                    <template #default>
+                      <div class="popoverContainer">
+                        <button @click="showUserInfo = true" class="exitButton">修改信息</button>
+                        <button @click="logout" class="exitButton">退出登录</button>
+                      </div>
+                    </template>
+                  </el-popover>
+                </li>
+              </ui>
+            </div>
+          </el-col>
+        </div>
+        <div class="grid-item item-8">
+          <el-col>
+            <router-view></router-view>
+            <!-- <router-view v-slot="{ Component }">
               <keep-alive exclude="contentPage,userProfile,publishPage,loginPage">
                 <component :is="Component" />
               </keep-alive>
             </router-view> -->
-        </el-col>
-      </el-row>
+          </el-col>
+        </div>
+      </div>
     </el-container>
   </div>
   <transition name="fade">
@@ -195,6 +198,25 @@ const showCard = ref(false)
   <UpdateUserInfo v-if="showUserInfo" @toParent="toChild"></UpdateUserInfo>
 </template>
 <style lang="less" scoped>
+.grid-container {
+  display: grid;
+  grid-template-columns: 0.5fr 1.2fr  7.8fr 0.5fr;
+  height: 100vh;
+}
+/* 当屏幕宽度小于某个值时调整布局 */
+@media (max-width: 768px) { /* 你可以调整这个断点 */
+  .grid-horizontal-split {
+    grid-template-columns: 1fr; /* 只有一列 */
+  }
+
+  .item-2 {
+    display: none; /* 隐藏20%的部分 */
+  }
+
+  .item-8 {
+    grid-column: 1 / -1; /* 让80%的部分占据全部空间 */
+  }
+}
 
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.5s ease;

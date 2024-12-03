@@ -156,11 +156,16 @@ const showContent = (param) => {
       <Waterfall
         :list="cardList"
         :hasAroundGutter="false"
-        :width="280"
+        :width="282"
         :gutter="20"
+        :breakpoints="{
+          800: { rowPerView: 3 },
+          600: { rowPerView: 2 },
+          500: { rowPerView: 1 }
+        }"
         :lazyload="true"
       >
-        <template #item="{ item, index }">
+        <template #default="{ item, index }">
           <div>
             <div>
               <el-image :src="item.cover" class="img" @click="showContent(item.articleId)" />
@@ -197,7 +202,7 @@ const showContent = (param) => {
             </div>
           </div>
         </template>
-        <div style="height: 50px; background: black"></div>
+        <!-- <div style="height: 50px; background: black"></div> -->
       </Waterfall>
       <div v-if="showFinish" class="finishLoading"><span>没有更多...</span></div>
       <div class="loading" v-if="showLoading">

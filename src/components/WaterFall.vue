@@ -114,9 +114,20 @@ const deleteArticle = (articleId, index) => {
 </script>
 
 <template>
-  <Waterfall :list="notes" :hasAroundGutter="false" :align="center" :width="280" :gutter="20">
+  <Waterfall
+    :list="notes"
+    :hasAroundGutter="false"
+    :align="center"
+    :width="280"
+    :gutter="20"
+    :breakpoints="{
+      800: { rowPerView: 3 },
+      600: { rowPerView: 2 },
+      500: { rowPerView: 1 }
+    }"
+  >
     <!-- 底部 -->
-    <template #item="{ item, index }">
+    <template #default="{ item, index }">
       <div>
         <el-image :src="item.cover" class="img" @click="showContent(item.articleId)" />
         <div class="item-body">
