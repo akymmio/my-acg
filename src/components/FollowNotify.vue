@@ -31,7 +31,7 @@ const push = (id) => {
 </template>
 <style lang="less" scoped>
 .content {
-  width: 60%;
+  width: 70%;
   height: calc(100vh - 200px);
   overflow: scroll;
   .commentStyle {

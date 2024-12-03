@@ -4,11 +4,11 @@ import loginPage from '@/views/login/loginPage.vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useUserStore } from '@/stores'
 import { userLogoutService } from '@/api/user'
-import { ref, watch, onActivated } from 'vue'
+import { ref, watch, onActivated, computed } from 'vue'
 const router = useRouter()
 const userStore = useUserStore()
-const user = ref(userStore.user)
-
+const user = computed(() => userStore.user)
+console.log(user.value)
 //如果用户信息为空,查询用户信息
 const logout = async () => {
   await userLogoutService()
@@ -29,12 +29,12 @@ const toChild = (param) => {
   showUserInfo.value = param
 }
 
-watch(
-  () => userStore.user,
-  (newUser) => {
-    user.value = newUser
-  }
-)
+// watch(
+//   () => userStore.user,
+//   (newUser) => {
+//     user.value = newUser
+//   }
+// )
 const activeItem = ref()
 const routeTo = (path) => {
   activeItem.value = path
@@ -93,10 +93,9 @@ const showCard = ref(false)
 <template>
   <div class="main">
     <el-container class="layout">
-      <el-header>
+      <el-header height="80px">
         <el-row>
-          <el-col :span="1"></el-col>
-          <el-col :span="7" style="padding-left: 100px"></el-col>
+          <el-col :span="9"></el-col>
           <el-col
             :span="8"
             style="display: flex; justify-content: center; align-items: center"
@@ -107,7 +106,7 @@ const showCard = ref(false)
               <el-icon size="large" class="searchIcon"><Search /></el-icon>
             </button>
           </el-col>
-          <el-col :span="8"></el-col>
+          <!-- <el-col :span="8"></el-col> -->
         </el-row>
       </el-header>
       <el-row>
@@ -152,16 +151,16 @@ const showCard = ref(false)
                 <span>登录</span>
               </li>
 
-              <div class="toShowCard">
-                <el-card v-if="showCard" class="card">
+              <div>
+                <!-- <el-card v-if="showCard" class="card">
                   <div class="popoverContainer">
                     <button @click="showUserInfo = true" class="exitButton">修改信息</button>
                     <button @click="logout" class="exitButton">退出登录</button>
                   </div>
-                </el-card>
+                </el-card> -->
               </div>
               <li class="more" v-if="userStore.token" @click="showCard = !showCard">
-                <!-- <el-popover placement="bottom" :width="200" trigger="click">
+                <el-popover placement="bottom" :width="200" trigger="click">
                   <template #reference>
                     <div class="moreButton">
                       <el-icon><Operation /></el-icon><span>更多</span>
@@ -173,24 +172,19 @@ const showCard = ref(false)
                       <button @click="logout" class="exitButton">退出登录</button>
                     </div>
                   </template>
-                </el-popover> -->
-                <div class="moreButton">
-                  <el-icon><Operation /></el-icon><span>更多</span>
-                </div>
+                </el-popover>
               </li>
             </ui>
           </div>
         </el-col>
 
         <el-col :span="19">
-          <div>
-            <!-- <router-view></router-view> -->
-            <router-view v-slot="{ Component }">
+          <router-view></router-view>
+          <!-- <router-view v-slot="{ Component }">
               <keep-alive exclude="contentPage,userProfile,publishPage,loginPage">
                 <component :is="Component" />
               </keep-alive>
-            </router-view>
-          </div>
+            </router-view> -->
         </el-col>
       </el-row>
     </el-container>
@@ -218,7 +212,6 @@ const showCard = ref(false)
   height: 100vh;
   overflow: scroll;
   .el-header {
-    height: 80px;
     background: rgb(255, 255, 255);
 
     .inputSearch {
@@ -302,7 +295,9 @@ const showCard = ref(false)
   .el-menu-item.active{
     background-color: #f7f7f7 ;
   }
-
+  .active{
+    background-color: #f7f7f7 ;
+  }
   .toShowCard{
     // background: lightblue;
     min-height: 200px;

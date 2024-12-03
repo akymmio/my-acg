@@ -2,8 +2,8 @@ import axios from 'axios'
 import { useUserStore } from '@/stores'
 
 //基础地址
-// const baseURL = '/api'
-const baseURL = 'http://47.120.46.231:8081'
+const baseURL = '/api'
+// const baseURL = 'http://47.120.46.231:8081'
 const instance = axios.create({
   baseURL,
   timeout: 10000
@@ -33,10 +33,9 @@ instance.interceptors.response.use(
     // 2xx 范围内的状态码都会触发该函数。
     if (res.data.code === 0) return res
     //业务处理失败，抛出错误
-
     ElNotification({
       title: 'Error',
-      message: res.data.message || 'test',
+      message: res.data.message,
       type: 'error'
     })
     return Promise.reject(res.data.message)

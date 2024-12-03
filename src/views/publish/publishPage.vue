@@ -11,12 +11,12 @@ const route = useRoute()
 import { useUserStore } from '@/stores'
 const userStore = useUserStore()
 const user = ref(userStore.user)
-watch(
-  () => userStore.user,
-  (newUser) => {
-    user.value = newUser
-  }
-)
+// watch(
+//   () => userStore.user,
+//   (newUser) => {
+//     user.value = newUser
+//   }
+// )
 //图片数据对象
 const fileList = ref({
   images: [], //图片数据
@@ -68,7 +68,8 @@ const publish = async () => {
   formData.append('userId', user.value.id)
   //调用发布文章接口
   loading.value = true
-  await publishArticleService(formData)
+  const res = await publishArticleService(formData)
+  console.log(res)
   loading.value = false
   //显示加载图层
   ElMessage({

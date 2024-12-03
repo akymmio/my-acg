@@ -11,7 +11,8 @@ const router = useRouter()
 import { useUserStore } from '@/stores'
 const userStore = useUserStore()
 // 创建一个响应式变量 user 来绑定到模板中
-const localUser = computed(() => userStore.user)
+// const localUser = computed(() => userStore.user)
+const localUser = ref(userStore.user)
 //用户
 const user = ref({})
 //文章
@@ -118,7 +119,13 @@ const deleteComment = (commentId, index) => {
         <div class="media-container">
           <el-carousel height="95vh" interval="3600" trigger="hover">
             <el-carousel-item v-for="(image, index) in article.images" :key="index">
-              <el-image style="width: 100%" :src="image" fit="contain" class="carousel" />
+              <el-image
+                :preview-src-list="article.images"
+                z-index="index"
+                :src="image"
+                fit="contain"
+                class="carousel"
+              />
             </el-carousel-item>
           </el-carousel>
         </div>
@@ -146,9 +153,9 @@ const deleteComment = (commentId, index) => {
         <el-divider style="margin: 0" />
         <div class="content">
           <div class="text">
-            <p style="font-size: 25px; font-weight: bold; margin: 10px 0">{{ article.title }}</p>
+            <p style="font-size: 20px; font-weight: bold; margin: 10px 0">{{ article.title }}</p>
             <!-- <el-text size="large" v-html></el-text> -->
-            <div v-html="article.content" style="width: 100%"></div>
+            <div v-html="article.content" class="text_font"></div>
             <!-- <div class="time" style="padding-top: 0">{{ article.createTime }}</div> -->
             <div class="text_bottom">
               <div>{{ article.createTime }}</div>
@@ -213,9 +220,9 @@ const deleteComment = (commentId, index) => {
 </template>
 
 <style scoped lang="less">
-.carousel {
-  background: white !important;
-}
+// .carousel {
+//   background: white !important;
+// }
 .media-container {
   width: 100%;
   height: auto;
@@ -274,7 +281,7 @@ const deleteComment = (commentId, index) => {
       .carousel {
         width: 100%;
         height: 100%;
-        background: aqua;
+        background: white;
       }
       .el-carousel__item:nth-child(2n) {
         background-color: #99a9bf;
@@ -293,7 +300,7 @@ const deleteComment = (commentId, index) => {
         justify-content: space-between;
         align-items: center;
         .username {
-          color: rgba(0, 0, 0, 0.5);
+          color: #494949;
           padding-left: 10px;
         }
         .avatar {
@@ -333,7 +340,7 @@ const deleteComment = (commentId, index) => {
         }
       }
       .content {
-        height: 70%;
+        height: 75%;
         padding: 20px;
         padding-top: 0;
         padding-bottom: 0;
@@ -346,7 +353,11 @@ const deleteComment = (commentId, index) => {
           width: 100%;
           height: 100%;
           overflow: auto; /* 允许内容滚动 */
-          position: relative; /* 为了定位伪元素 */
+          // position: relative; /* 为了定位伪元素 */
+          .text_font {
+            font-size: 15px;
+            color: #494949;
+          }
           .text_bottom {
             display: flex;
             justify-content: space-between;
@@ -529,7 +540,7 @@ const deleteComment = (commentId, index) => {
         // padding-right: 10px;
         .content {
           // height: 75%;
-          height: calc(100vh - 55vh);
+          // height: calc(100vh - 55vh);
         }
         .footer {
           height: 40%;

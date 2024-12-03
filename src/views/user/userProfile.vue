@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { Waterfall } from 'vue-waterfall-plugin-next'
 
 import 'vue-waterfall-plugin-next/dist/style.css'
@@ -14,15 +14,15 @@ const route = useRoute()
 const router = useRouter()
 //本地用户信息
 const localUser = ref(userStore.user)
-const user = ref({})
+const user = ref(userStore.user)
 
 import { getArticleByUserIdService } from '@/api/article'
 import { getArticleLikedService } from '@/api/liked'
 const notes = ref([])
 const getUserInfo = async () => {
-  //没有用户信息需要通过id查询
+  //没有用户信息需要通过id查询//
+  console.log(localUser.value.id, route.params.id)
   if (route.params.id !== localUser.value.id) {
-    // console.log('route_id', route.params.id)
     const res = await getUserInfoByIdService(route.params.id)
     user.value = res.data.data
   } else {
@@ -30,38 +30,41 @@ const getUserInfo = async () => {
   }
 }
 getUserInfo()
-const fetchData = async (param = 'note') => {
-  let res
-  if (param === undefined || param == 'note') {
-    console.log(user.value.id)
-    res = await getArticleByUserIdService(route.params.id)
-  } else if (param == 'like') {
-    console.log(user.value.id)
-    res = await getArticleLikedService(route.params.id)
-  }
-  notes.value = res.data.data
-  console.log(res.data.data)
-}
-fetchData()
+// const fetchData = async (param = 'note') => {
+//   let res
+//   if (param === undefined || param == 'note') {
+//     console.log(user.value.id)
+//     res = await getArticleByUserIdService(route.params.id)
+//   } else if (param == 'like') {
+//     console.log(user.value.id)
+//     res = await getArticleLikedService(route.params.id)
+//   }
+//   notes.value = res.data.data
+//   console.log(res.data.data)
+// }
+// fetchData()
 
 //通过用户名查询账号信息
-
-// watch(
-//   () => route.params.id,
-//   (newId, oldId) => {
-//     if (newId !== oldId) {
-//       getUserInfo() // 当 userId 变化时，重新获取数据
-//     }
-//   },
-//   { immediate: true } // 立即执行一次，以获取初始数据
-// )
+const param = ref('')
+watch(
+  () => route.params.id,
+  (newId, oldId) => {
+    if (newId !== oldId) {
+      getUserInfo() // 当 userId 变化时，重新获取数据
+      // fetchData()
+      param.value = 'note'
+      console.log(param.value)
+    }
+  },
+  { immediate: true } // 立即执行一次，以获取初始数据
+)
 
 const showUser = ref(true)
 const isFixed = ref(false)
 const scrolling = async (e) => {
-  console.log(1)
   const scrollTop = e.target.scrollTop
-  if (scrollTop > 190) {
+  // console.log(scrollTop)
+  if (scrollTop > 262) {
     isFixed.value = true
   } else {
     isFixed.value = false
@@ -93,6 +96,29 @@ const deleteArticle = (articleId, index) => {
   notes.value.splice(index, 1)
   deleteArticleService(articleId)
 }
+
+import { computed } from 'vue'
+import Comment from '@/components/CommentNotify.vue'
+import Like from '@/components/LikeNotify.vue'
+import Notes from '@/components/WaterFall.vue'
+// 响应式数据，用于跟踪当前激活的标签
+const currentTab = ref('Comment')
+
+// 组件映射
+const components = {
+  Notes
+}
+const currentComponent = computed(() => {
+  return components[currentTab.value]
+})
+
+const handleButtonClick = (value) => {
+  // 设置当前激活的标签和 param 的值
+  param.value = value
+  activeTab.value = value
+  console.log(param.value)
+}
+const activeTab = ref('note')
 </script>
 
 <template>
@@ -143,6 +169,7 @@ const deleteArticle = (articleId, index) => {
           <!-- {{ userInfo.username }} -->
         </div>
       </transition>
+
       <div
         class="fix"
         :style="{
@@ -151,72 +178,44 @@ const deleteArticle = (articleId, index) => {
           width: isFixed ? '79%' : '100%'
         }"
       >
-        <button class="button" @click="fetchData('note')">笔记</button>
-        <button class="button" @click="fetchData('like')">喜欢</button>
+        <!-- <button class="button" @click="fetchData('note')">笔记</button>
+        <button class="button" @click="fetchData('like')">喜欢</button> -->
+        <button
+          class="button"
+          @click="handleButtonClick('note')"
+          :class="{ active: activeTab === 'note' }"
+        >
+          笔记
+        </button>
+        <button
+          class="button"
+          @click="handleButtonClick('like')"
+          :class="{ active: activeTab === 'like' }"
+        >
+          喜欢
+        </button>
+        <!-- <el-divider style="margin: 3px; width: 100%" /> -->
       </div>
     </div>
-    <div>
-      <Waterfall :list="notes" :hasAroundGutter="false" :align="center" :width="280" :gutter="20">
-        <!-- 底部 -->
-        <template #item="{ item, index }">
-          <div>
-            <el-image :src="item.cover" class="img" @click="showContent(item.articleId)" />
-            <div class="item-body">
-              <div class="item-desc" @click="showContent(item.articleId)">
-                <span>{{ item.title }}</span>
-              </div>
-              <div class="item-footer">
-                <div class="footer-left">
-                  <img :src="item.avatar" alt="" srcset="" @click="push(item.userId)" />
-                  <div class="name">{{ item.nickname }}</div>
-                </div>
-                <div class="like">
-                  <like
-                    v-if="item.liked"
-                    theme="two-tone"
-                    size="20"
-                    :fill="['#ff4242', '#ff4242']"
-                    @click="toLike(item.articleId, index)"
-                  />
-                  <like
-                    v-else
-                    theme="outline"
-                    size="20"
-                    fill="#333"
-                    @click="toLike(item.articleId, index)"
-                  />
-                  <div style="padding-left: 2px">{{ item.likedCount }}</div>
-                  <!-- <div>
-                  <el-icon><Delete /></el-icon>
-                </div> -->
-                  <!-- <div style="padding-left: 5px">
-                  <delete theme="two-tone" size="17" :fill="['#18aaff', '#ffffff']" />
-                </div> -->
 
-                  <div style="padding-left: 5px">
-                    <el-popconfirm
-                      confirm-button-text="是"
-                      cancel-button-text="否"
-                      title="删除笔记"
-                      @confirm="deleteArticle(item.articleId, index)"
-                    >
-                      <template #reference>
-                        <delete theme="filled" size="16" fill="#ff6262" />
-                      </template>
-                    </el-popconfirm>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </template>
-      </Waterfall>
-      <div class="finishLoading"><span>没有更多...</span></div>
-    </div>
+    <WaterFall :param="param"></WaterFall>
   </div>
 </template>
 
 <style scoped lang="less">
+
+.slide-fade-enter-active {
+  transition: all 0.5s ease;
+}
+// .slide-fade-leave-active {
+//   transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+// }
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
 .fix{
   // position: fixed;
   z-index: 1000; /* 确保在其他内容之上 */
@@ -227,12 +226,12 @@ const deleteArticle = (articleId, index) => {
   // left: 50%;
   // background-color: yellow;
   // padding-left: 50%;
-  transition: top 0.3s ease;
+  // transition: top 1s ease;
 }
 .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;
 }
- .fade-leave-to {
+.fade-leave-to {
   opacity: 0;
 }
 
@@ -260,23 +259,25 @@ const deleteArticle = (articleId, index) => {
 .main {
   padding-top: 20px;
 }
+
 .button {
   border-radius: 40px;
   font-size: 18px;
-  background-color: white;
+  background-color: rgb(255, 255, 255);
   border: 0;
   width: 80px;
   height: 40px;
   margin-bottom: 15px;
+}.active {
+  background-color:  #f6f6f6;
 }
-.button:hover {
-  background-color: #f6f6f6;
-}
-.button:focus {
-  background-color: #f6f6f6;
-  // font-weight: bold;
-
-}
+// .button:hover {
+//   background-color: #f6f6f6;
+// }
+// .button:focus {
+//   background-color: #f6f6f6;
+//   // font-weight: bold;
+// }
 .followButton {
   color: rgb(255, 255, 255);
   border: 0;

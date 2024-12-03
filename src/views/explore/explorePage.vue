@@ -13,7 +13,7 @@ const route = useRoute()
 import { useUserStore } from '@/stores'
 const userStore = useUserStore()
 const user = computed(() => userStore.user)
-
+// const user = userStore.user
 const imageUrl = require('@/assets/icon/loading.gif')
 //分页参数
 const page = ref({
@@ -70,7 +70,13 @@ watch(
     }
   }
 )
+const activeItem = ref(0)
 const selectChannel = async (channelId) => {
+  page.value.pageNum = 1 // 重置页码
+  page.value.channelId = channelId // 切换频道
+  cardList.value = [] // 清空列表
+
+  activeItem.value = channelId
   router.push({ path: '/explore', query: { channel_id: channelId } })
   await fetchData(channelId)
   console.log(route.query.channel_id)
@@ -91,7 +97,7 @@ const scrolling = async (e) => {
     // console.log(currTotal.value, total.value)
     isFetching.value = true // 设置标志，表示正在加载数据
     try {
-      await fetchData(0)
+      await fetchData(page.value.channelId)
     } finally {
       isFetching.value = false // 数据加载完成，清除标志
     }
@@ -134,7 +140,15 @@ const showContent = (param) => {
 </script>
 <template>
   <div class="main" @scroll="scrolling">
-    <button @click="selectChannel(0)" class="button">推荐</button>
+    <button @click="selectChannel(0)" class="button" :class="{ active: activeItem === 0 }">
+      推荐
+    </button>
+    <button @click="selectChannel(1)" class="button" :class="{ active: activeItem === 1 }">
+      1
+    </button>
+    <button @click="selectChannel(2)" class="button" :class="{ active: activeItem === 2 }">
+      2
+    </button>
     <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
     <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
     <!-- 首页瀑布流 -->
@@ -196,19 +210,11 @@ const showContent = (param) => {
       </div>
     </div>
   </div>
-  <transition name="fade">
+  <transition name="el-zoom-in-bottom">
     <ContentPage v-if="isModalVisible" :id="id" @toParent="toChild" />
   </transition>
 </template>
 <style scoped lang="less">
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 1s;
-}
-.fade-enter,
-.fade-leave-to {
-  transition: opacity 1s;
-}
 .loadButton {
   float: right;
   position: relative;
@@ -247,19 +253,24 @@ const showContent = (param) => {
 
 .button {
   border-radius: 40px;
-  font-size: large;
+  font-size: 16px;
   background-color: white;
   border: 0;
-  width: 80px;
+  width: 100px;
   height: 40px;
   margin-bottom: 15px;
+  color: #494949;
 }
-button:hover {
+.button:hover {
+  color: #000000;
   background-color: #f6f6f6;
 }
-button:focus {
+.button:focus {
   background-color: #f6f6f6;
-  font-weight: bold;
+  // font-weight: bold;
+}
+.active {
+  background-color: #f6f6f6;
 }
 .img {
   border-radius: 20px;

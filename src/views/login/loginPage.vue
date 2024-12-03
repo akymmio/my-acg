@@ -37,12 +37,14 @@ const userStore = useUserStore()
 //登录
 const login = async () => {
   await form.value.validate()
+  userStore.removeUser()
   const res = await userLoginService(userform.value)
   ElNotification({
     title: '登录成功',
     type: 'success',
     duration: 1000
   })
+
   //存储token
   userStore.setToken(res.data.data)
   //获取用户信息

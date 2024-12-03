@@ -20,7 +20,13 @@ const currentComponent = computed(() => {
 <template>
   <div class="title">
     <div>
-      <button class="button" @click="currentTab = 'Comment'">评论</button>
+      <button
+        class="button"
+        @click="currentTab = 'Comment'"
+        :class="{ active: currentTab === 'Comment' }"
+      >
+        评论
+      </button>
       <button class="button" @click="currentTab = 'Like'">赞和收藏</button>
       <button class="button" @click="currentTab = 'Follow'">新增关注</button>
       <!-- <button class="button">评论</button>
@@ -29,11 +35,25 @@ const currentComponent = computed(() => {
     </div>
     <el-divider style="margin: 5px; width: 70%" />
     <!-- <div v-for="(comment, index) in article.comments" :key="index" class="commentStyle"> -->
-    <component :is="currentComponent" v-if="currentComponent"></component>
+    <transition name="slide-fade">
+      <component :is="currentComponent" v-if="currentComponent"></component>
+    </transition>
   </div>
 </template>
 
 <style scoped lang="less">
+.slide-fade-enter-active {
+  transition: all 0.3s ease;
+}
+// .slide-fade-leave-active {
+//   transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+// }
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(100px);
+  opacity: 0;
+}
+
 .title {
   // display: flex;
   // justify-content: center;
@@ -91,18 +111,22 @@ const currentComponent = computed(() => {
 // }
 .button {
   border-radius: 40px;
-  font-size: 18px;
+  font-size: 16px;
   background-color: white;
   border: 0;
   width: 100px;
   height: 40px;
   margin-bottom: 15px;
+  color: #3d3d3d;
 }
 .button:hover {
-  background-color: #f6f6f6;
+  color: #000000;
 }
 .button:focus {
   background-color: #f6f6f6;
   // font-weight: bold;
+}
+.active {
+  background-color: #f6f6f6;
 }
 </style>
