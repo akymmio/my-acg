@@ -96,6 +96,19 @@ const close = () => {
   showGIF.value = false
   emit('toParent', false)
 }
+const rotation = ref()
+rotation.value = {
+  x: 0,
+  y: 0,
+  z: 0,
+};
+function onLoad() {
+  rotate();
+}
+function rotate() {
+  requestAnimationFrame(rotate);
+  rotation.value.y -= 0.01;
+}
 </script>
 <template>
   <div class="mask">
@@ -107,11 +120,21 @@ const close = () => {
         <div class="title">
           <span> 登录获取完整用户体验</span>
         </div>
+        <div>
+          <vue3dLoader 
+              filePath="mountain_and_river_scroll.glb"
+              :rotation="rotation"
+              @load="onLoad()"
+              :height="390"
+              :width="430"
+              :cameraPosition="{ x: 80, y: -15, z: 0 }"
+            />
+        </div>
         <!-- <div><img :src="imageUrl" width="200px" height="200px" /></div> -->
       </div>
       <div class="right">
         <!-- 登录 -->
-        <span style="margin-bottom: 30px; font-weight: bold"> 用户登录</span>
+        <span style="margin-bottom: 30px; font-weight: bold"> 用户登录 </span>
         <el-form :model="userform" :rules="rules" ref="form" v-if="isRegister">
           <el-form-item prop="username">
             <input v-model="userform.username" placeholder="用户名" />
@@ -124,15 +147,7 @@ const close = () => {
           </el-form-item>
           <el-link @click="isRegister = false">
             <!-- <img :src="imageUrl" /> -->
-            <el-tooltip
-              @click="isRegister = false"
-              content="点击注册"
-              placement="right"
-              effect="light"
-              :visible="showGIF"
-              ><img src="@/assets/icon/welcome.gif" style="width: 50px" />
-              <!-- <el-button>right</el-button> -->
-            </el-tooltip>
+            注册
           </el-link>
         </el-form>
         <!-- 注册 -->
@@ -211,7 +226,7 @@ const close = () => {
       // background-color: #f6f6f6;
     }
     .left {
-      width: 400px;
+      width: 500px;
       display: flex;
       align-items: center;
       flex-direction: column;
@@ -228,10 +243,11 @@ const close = () => {
         display: flex;
         align-items: center;
         justify-content: center;
+        
       }
     }
     .right {
-      width: 400px;
+      width: 300px;
       display: flex;
       align-items: center;
       flex-direction: column;

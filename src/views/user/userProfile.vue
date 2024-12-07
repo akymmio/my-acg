@@ -25,6 +25,7 @@ const getUserInfo = async () => {
   if (route.params.id !== localUser.value.id) {
     const res = await getUserInfoByIdService(route.params.id)
     user.value = res.data.data
+    console.log(res.data.data)
   } else {
     user.value = localUser.value
   }
@@ -136,19 +137,22 @@ const activeTab = ref('note')
               :column="1"
               :style="blockMargin"
             >
-              <el-descriptions-item label="账号">{{ user.username }}</el-descriptions-item>
-              <el-descriptions-item>
-                <female
-                  v-if="user.sex === '0'"
-                  theme="two-tone"
-                  size="16"
-                  :fill="['#18aaff', '#ffffff']"
-                />
-                <!-- <el-icon v-if="user.sex === '0'"><Female /></el-icon> -->
-                <male theme="two-tone" size="16" :fill="['#18aaff', '#ffffff']" v-else />
-                <!-- <el-icon v-else><Male /></el-icon> -->
-                <!-- 当 sex 为 1 时显示 Male 图标 -->
+              <el-descriptions-item label="账号">
+                <span style="padding-right: 5px">{{ user.username }}</span>
+                <span>
+                  <female
+                    v-if="user.sex === '0'"
+                    theme="two-tone"
+                    size="16"
+                    :fill="['#18aaff', '#ffffff']"
+                  />
+                  <!-- <el-icon v-if="user.sex === '0'"><Female /></el-icon> -->
+                  <male theme="two-tone" size="16" :fill="['#18aaff', '#ffffff']" v-else />
+                  <!-- <el-icon v-else><Male /></el-icon> -->
+                  <!-- 当 sex 为 1 时显示 Male 图标 -->
+                </span>
               </el-descriptions-item>
+              <!-- <el-descriptions-item> </el-descriptions-item> -->
               <!-- <el-descriptions-item label="昵称">{{ userInfo.nickname }}</el-descriptions-item> -->
               <el-descriptions-item label="简介">{{ user.introduction }}</el-descriptions-item>
               <el-descriptions-item>
@@ -193,6 +197,13 @@ const activeTab = ref('note')
           :class="{ active: activeTab === 'like' }"
         >
           喜欢
+        </button>
+        <button
+          class="button"
+          @click="handleButtonClick('model')"
+          :class="{ active: activeTab === 'model' }"
+        >
+          模型
         </button>
         <!-- <el-divider style="margin: 3px; width: 100%" /> -->
       </div>

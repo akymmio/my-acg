@@ -107,17 +107,41 @@ const deleteComment = (commentId, index) => {
   comments.value.splice(index, 1)
   deleteCommentService(commentId)
 }
+
+const lights = ref([
+  {
+    type: 'AmbientLight',
+    color: 'white',
+    intensity: 2
+  },
+  {
+    type: 'PointLight',
+    color: 'white',
+    position: { x: 0, y: 0, z: 0 },
+    intensity: 0.5
+  }
+])
 </script>
 <template>
   <loginPage v-if="showLoginPage" @toParent="toChild" style="z-index: 2"></loginPage>
-  <div class="mask" v-show="true">
+  <div class="mask">
     <div class="container">
       <div @click="close" class="close">
         <el-icon><Close /></el-icon>
       </div>
+      <!-- <div>
+        <vue3dLoader
+          v-if="article.modelPath"
+          class="modelCss"
+          :filePath="article.modelPath"
+          :lights="lights"
+          :height="650"
+          :width="500"
+        />
+      </div> -->
       <div class="left">
         <div class="media-container">
-          <el-carousel height="95vh" interval="3600" trigger="hover">
+          <el-carousel v-if="article.images.length" height="30vh" interval="3600" trigger="hover">
             <el-carousel-item v-for="(image, index) in article.images" :key="index">
               <el-image
                 :preview-src-list="article.images"
@@ -129,7 +153,20 @@ const deleteComment = (commentId, index) => {
             </el-carousel-item>
           </el-carousel>
         </div>
+
+        <div>
+          <vue3dLoader
+            v-if="article.modelPath"
+            :filePath="article.modelPath"
+            :lights="lights"
+            :height="600"
+            :width="500"
+            :backgroundAlpha="0"
+            :pointLightFollowCamera="true"
+          />
+        </div>
       </div>
+
       <div class="right">
         <div class="header">
           <div class="avatar">
@@ -229,7 +266,12 @@ const deleteComment = (commentId, index) => {
   overflow: hidden;
   border-radius: 20px 0 0 20px;
   object-fit: contain;
+  align-items: center;
+
+  // display: flex;
+  // justify-content: center; /* 水平居中 */
 }
+
 .mask {
   // z-index: 9999; /* 高的 z-index 值 */
   display: flex;
@@ -275,6 +317,12 @@ const deleteComment = (commentId, index) => {
       align-items: center;
       flex-direction: column;
       border-right: 1px solid rgba(0, 0, 0, 0.1);
+      .modelCss {
+        // border-radius: 10px;
+        // margin-left: 10px;
+        // margin-top: 10px;
+        // border: 1px solid rgba(0, 0, 0, 0.1);
+      }
       .imageList {
         height: 90vh;
       }
@@ -436,7 +484,8 @@ const deleteComment = (commentId, index) => {
             // width: 100px;
             cursor: pointer;
             border: 0;
-            border-radius: 20px;
+            // border-radius: 20px;
+            border-radius: 0 20px 20px 0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -445,8 +494,9 @@ const deleteComment = (commentId, index) => {
             // width: 10%;
             // height: 50px;
             // padding-left: 10px;
-            background-color: #98c7fd;
-            height: 30px;
+            // background-color: #98c7fd;
+            background-color: rgb(255, 48, 89);
+            height: 45px;
             width: 10%;
             color: white;
           }
@@ -455,7 +505,8 @@ const deleteComment = (commentId, index) => {
             font-size: larger;
             overflow: auto;
             border: 0;
-            border-radius: 10px;
+            // border-radius: 10px;
+            border-radius: 20px 0 0 20px;
             background-color: #f6f6f6;
             padding-top: 10px;
             padding-left: 10px;

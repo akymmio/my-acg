@@ -1,5 +1,5 @@
 <script setup>
-import { House, Bell, Search, Plus, Operation } from '@element-plus/icons-vue'
+import { House, Bell, Search, Plus, Operation, ArrowRight,MagicStick } from '@element-plus/icons-vue'
 import loginPage from '@/views/login/loginPage.vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useUserStore } from '@/stores'
@@ -54,6 +54,8 @@ const routeTo = (path) => {
       router.push('/publish')
     } else if (path === 'notification') {
       router.push('/notification')
+    } else if (path === 'model') {
+      router.push('/model')
     } else {
       router.push(`/user/profile/${user.value.id}`)
     }
@@ -125,6 +127,14 @@ const showCard = ref(false)
                 </li>
                 <li
                   class="el-menu-item"
+                  @click="routeTo('model')"
+                  :class="{ active: activeItem === 'model' }"
+                >
+                <el-icon><MagicStick /></el-icon>
+                  <span> 展示</span>
+                </li>
+                <li
+                  class="el-menu-item"
                   @click="routeTo('publish')"
                   :class="{ active: activeItem === 'publish' }"
                 >
@@ -160,21 +170,28 @@ const showCard = ref(false)
                   </div>
                 </el-card> -->
                 </div>
-                <li class="more" v-if="userStore.token" @click="showCard = !showCard">
-                  <el-popover placement="bottom" :width="200" trigger="click">
-                    <template #reference>
+                <el-popover placement="bottom" :width="200" trigger="click">
+                  <template #reference>
+                    <li class="more" v-if="userStore.token" @click="showCard = !showCard">
                       <div class="moreButton">
-                        <el-icon><Operation /></el-icon><span>更多</span>
+                        <el-icon><Operation /></el-icon>
+                        <span>更多</span>
                       </div>
-                    </template>
-                    <template #default>
-                      <div class="popoverContainer">
-                        <button @click="showUserInfo = true" class="exitButton">修改信息</button>
-                        <button @click="logout" class="exitButton">退出登录</button>
-                      </div>
-                    </template>
-                  </el-popover>
-                </li>
+                    </li>
+                  </template>
+                  <template #default>
+                    <div class="popoverContainer">
+                      <button @click="showUserInfo = true" class="exitButton">
+                        修改信息
+                        <el-icon><ArrowRight /></el-icon>
+                      </button>
+                      <button @click="logout" class="exitButton">
+                        退出登录
+                        <el-icon><ArrowRight /></el-icon>
+                      </button>
+                    </div>
+                  </template>
+                </el-popover>
               </ui>
             </div>
           </el-col>
@@ -266,26 +283,37 @@ const showCard = ref(false)
 .layout::-webkit-scrollbar {
   display: none;
 }
-.exitButton {
-  margin: 10px 0 0 0;
-  height: 40px;
-  // width: 70px;
-  // padding: 5px;
-  border: 0;
-  border-radius: 10px;
-  background-color: white;
-  text-align: left;
-}
-.exitButton:hover {
-  background-color: #f6f6f6;
-}
+
 .popoverContainer{
   display: flex;
   // justify-content:center;
   flex-direction: column;
   // align-items: center;
+  border-radius: 30px;
+    .exitButton {
+      margin: 10px 0 0 0;
+      height: 40px;
+      // width: 70px;
+      // padding: 5px;
+      border: 0;
+      border-radius: 10px;
+      background-color: white;
+      text-align: left;
+      align-items: center;     /* 垂直居中 */
+
+      display: flex;
+      justify-content: space-between;
+
+    }
+    .exitButton:hover {
+      background-color: #f6f6f6;
+    }
+
 }
 .side {
+
+  letter-spacing: 1px; /* 增加字符间距 */
+
   position: relative;
   margin-right: 20px;
   ul {

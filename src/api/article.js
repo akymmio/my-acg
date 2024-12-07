@@ -5,7 +5,7 @@ export const publishArticleService = (data) => {
   return request.post('/article/publish', data)
 }
 
-//发布文章
+//更新文章
 export const updateArticleService = (data) => {
   return request.put('/article/update', data)
 }

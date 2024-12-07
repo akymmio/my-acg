@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import Comment from '@/components/CommentNotify.vue'
 import Like from '@/components/LikeNotify.vue'
 import Follow from '@/components/FollowNotify.vue'
+import Tt from '@/components/TestPage.vue'
 // 响应式数据，用于跟踪当前激活的标签
 const currentTab = ref('Comment')
 
@@ -10,7 +11,8 @@ const currentTab = ref('Comment')
 const components = {
   Comment,
   Like,
-  Follow
+  Follow,
+  Tt
 }
 const currentComponent = computed(() => {
   return components[currentTab.value]
@@ -29,6 +31,7 @@ const currentComponent = computed(() => {
       </button>
       <button class="button" @click="currentTab = 'Like'">赞和收藏</button>
       <button class="button" @click="currentTab = 'Follow'">新增关注</button>
+      <button class="button" @click="currentTab = 'Tt'">test</button>
       <!-- <button class="button">评论</button>
       <button class="button">赞和收藏</button>
       <button class="button">新增关注</button> -->

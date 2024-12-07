@@ -121,9 +121,10 @@ const deleteArticle = (articleId, index) => {
     :width="280"
     :gutter="20"
     :breakpoints="{
+      1400: { rowPerView: 5 },
+      1200: { rowPerView: 4 },
       800: { rowPerView: 3 },
-      600: { rowPerView: 2 },
-      500: { rowPerView: 1 }
+      600: { rowPerView: 2 }
     }"
   >
     <!-- 底部 -->

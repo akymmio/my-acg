@@ -15,6 +15,8 @@ const userStore = useUserStore()
 const user = computed(() => userStore.user)
 // const user = userStore.user
 const imageUrl = require('@/assets/icon/loading.gif')
+import { vue3dLoader } from 'vue-3d-loader'
+
 //分页参数
 const page = ref({
   pageNum: 1,
@@ -144,10 +146,22 @@ const showContent = (param) => {
       推荐
     </button>
     <button @click="selectChannel(1)" class="button" :class="{ active: activeItem === 1 }">
-      1
+      器具
     </button>
     <button @click="selectChannel(2)" class="button" :class="{ active: activeItem === 2 }">
-      2
+      书画
+    </button>
+    <button @click="selectChannel(3)" class="button" :class="{ active: activeItem === 3 }">
+      雕塑
+    </button>
+    <button @click="selectChannel(4)" class="button" :class="{ active: activeItem === 4 }">
+      工艺品
+    </button>
+    <button @click="selectChannel(5)" class="button" :class="{ active: activeItem === 5 }">
+      外国文物
+    </button>
+    <button @click="selectChannel(20)" class="button" :class="{ active: activeItem === 20 }">
+      其他
     </button>
     <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
     <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
@@ -159,9 +173,10 @@ const showContent = (param) => {
         :width="282"
         :gutter="20"
         :breakpoints="{
+          1400: { rowPerView: 5 },
+          1200: { rowPerView: 4 },
           800: { rowPerView: 3 },
-          600: { rowPerView: 2 },
-          500: { rowPerView: 1 }
+          600: { rowPerView: 2 }
         }"
         :lazyload="true"
       >
@@ -215,7 +230,7 @@ const showContent = (param) => {
       </div>
     </div>
   </div>
-  <transition name="el-zoom-in-bottom">
+  <transition name="el-fade-in-linear">
     <ContentPage v-if="isModalVisible" :id="id" @toParent="toChild" />
   </transition>
 </template>
@@ -247,6 +262,7 @@ const showContent = (param) => {
   margin-top: 10px;
   // background: #000000;
 }
+
 .main {
   overflow: scroll;
   height: calc(100vh - 80px); /* 视口高度减去顶部开始的位置 */
