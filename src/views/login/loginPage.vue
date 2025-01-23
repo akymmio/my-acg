@@ -100,14 +100,14 @@ const rotation = ref()
 rotation.value = {
   x: 0,
   y: 0,
-  z: 0,
-};
+  z: 0
+}
 function onLoad() {
-  rotate();
+  rotate()
 }
 function rotate() {
-  requestAnimationFrame(rotate);
-  rotation.value.y -= 0.01;
+  requestAnimationFrame(rotate)
+  rotation.value.y -= 0.001
 }
 </script>
 <template>
@@ -118,17 +118,18 @@ function rotate() {
       </div>
       <div class="left">
         <div class="title">
-          <span> 登录获取完整用户体验</span>
+          <p>登录获取完整用户体验</p>
         </div>
-        <div>
-          <vue3dLoader 
-              filePath="mountain_and_river_scroll.glb"
-              :rotation="rotation"
-              @load="onLoad()"
-              :height="390"
-              :width="430"
-              :cameraPosition="{ x: 80, y: -15, z: 0 }"
-            />
+        <div class="modelCss">
+          <vue3dLoader
+            filePath="mountain_and_river_scroll.glb"
+            :rotation="rotation"
+            @load="onLoad()"
+            :height="380"
+            :width="430"
+            :backgroundAlpha="0"
+            :cameraPosition="{ x: 80, y: -15, z: 0 }"
+          />
         </div>
         <!-- <div><img :src="imageUrl" width="200px" height="200px" /></div> -->
       </div>
@@ -200,6 +201,7 @@ function rotate() {
   overflow-y: hidden;
 
   .login-container {
+    // background-image: url('/icon/background.png');
     display: flex;
     background-color: #fff;
     width: 800px;
@@ -234,16 +236,24 @@ function rotate() {
       margin-top: 48px;
       .title {
         // font-weight: bold;
-        color: rgb(61, 162, 225);
+        // color: rgb(61, 162, 225);
+        color: #f6f6f6;
         font-weight: bold;
-        background-color: rgb(210, 232, 248);
+        background: #ff2e4d;
+        // background-color: rgb(210, 232, 248);
         width: 200px;
         height: 40px;
         border-radius: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
-        
+        // padding: 10px;
+      }
+      .modelCss {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        padding-top: 10px;
       }
     }
     .right {

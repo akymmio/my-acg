@@ -137,6 +137,12 @@ const activeTab = ref('note')
               :column="1"
               :style="blockMargin"
             >
+              <el-descriptions-item>
+                <div class="title">
+                  <span class="title-expert">专家</span>
+                  <span class="title-user">用户</span>
+                </div>
+              </el-descriptions-item>
               <el-descriptions-item label="账号">
                 <span style="padding-right: 5px">{{ user.username }}</span>
                 <span>
@@ -208,8 +214,9 @@ const activeTab = ref('note')
         <!-- <el-divider style="margin: 3px; width: 100%" /> -->
       </div>
     </div>
-
-    <WaterFall :param="param"></WaterFall>
+    <keep-alive>
+      <WaterFall :param="param"></WaterFall>
+    </keep-alive>
   </div>
 </template>
 
@@ -254,7 +261,7 @@ const activeTab = ref('note')
   color: #b7b7b7;
 }
 .note_style{
-  height: calc(100vh - 80px);
+  height: calc(100vh - 100px);
   overflow: auto;
 }
 .note_style::-webkit-scrollbar{
@@ -265,7 +272,24 @@ const activeTab = ref('note')
   justify-content: center; /* 水平居中 */
   .element {
     margin: 30px 40px;
+
   }
+ .title{
+    color: white;
+
+  .title-expert {
+    margin-right: 5px;
+    background: rgb(255, 48, 89);
+    border-radius: 5px;
+    padding: 5px;
+
+  }
+  .title-user {
+    background: rgb(57, 209, 40);
+    border-radius: 5px;
+    padding: 5px;
+  }
+ }
 }
 .main {
   padding-top: 20px;

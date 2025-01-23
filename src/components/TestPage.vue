@@ -28,6 +28,15 @@
       :backgroundAlpha="0"
       @click="showContent(3)"
     />
+    <div class="block">
+      <el-date-picker
+        v-model="publishtime"
+        type="datetime"
+        placeholder="Select date and time"
+        :default-time="defaultTime"
+      />
+    </div>
+    <button @click="publish">打印</button>
   </div>
 </template>
 <script setup>
@@ -37,6 +46,11 @@ import { queryArticleByIdService } from '@/api/model'
 // 定义文件列表和选择的文件
 const fileList = ref([])
 const selectedFile = ref(null)
+const publishtime = ref()
+
+const publish = () => {
+  console.log(publishtime.value)
+}
 
 // 文件变化事件处理函数
 const handleChange = (file, fileList) => {

@@ -1,5 +1,14 @@
 <script setup>
-import { House, Bell, Search, Plus, Operation, ArrowRight,MagicStick } from '@element-plus/icons-vue'
+import {
+  House,
+  Bell,
+  Search,
+  Plus,
+  Operation,
+  ArrowRight,
+  MagicStick,
+  Star
+} from '@element-plus/icons-vue'
 import loginPage from '@/views/login/loginPage.vue'
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useUserStore } from '@/stores'
@@ -56,7 +65,11 @@ const routeTo = (path) => {
       router.push('/notification')
     } else if (path === 'model') {
       router.push('/model')
-    } else {
+    } else if (path === 'collection') {
+      router.push('/collection')
+    } else if (path === 'activity') {
+      router.push('/collection')
+    } else if (path === 'me') {
       router.push(`/user/profile/${user.value.id}`)
     }
   }
@@ -93,11 +106,11 @@ const showCard = ref(false)
 </script>
 
 <template>
-  <div class="main">
+  <div>
     <el-container class="layout">
-      <el-header height="80px">
+      <el-header class="header" height="80px">
         <el-row>
-          <el-col :span="9"></el-col>
+          <el-col :span="8"></el-col>
           <el-col
             :span="8"
             style="display: flex; justify-content: center; align-items: center"
@@ -112,8 +125,8 @@ const showCard = ref(false)
         </el-row>
       </el-header>
       <div class="grid-container">
-        <div class="grid-item item-1"></div>
-        <div class="grid-item item-2">
+        <div class=""></div>
+        <div class="">
           <el-col class="side">
             <div>
               <ui>
@@ -130,9 +143,26 @@ const showCard = ref(false)
                   @click="routeTo('model')"
                   :class="{ active: activeItem === 'model' }"
                 >
-                <el-icon><MagicStick /></el-icon>
+                  <el-icon><MagicStick /></el-icon>
                   <span> 展示</span>
                 </li>
+                <li
+                  class="el-menu-item"
+                  @click="routeTo('collection')"
+                  :class="{ active: activeItem === 'collection' }"
+                >
+                  <el-icon><Star /></el-icon>
+                  <span> 藏品</span>
+                </li>
+                <li
+                  class="el-menu-item"
+                  @click="routeTo('activity')"
+                  :class="{ active: activeItem === 'activity' }"
+                >
+                  <el-icon><Star /></el-icon>
+                  <span> 活动</span>
+                </li>
+
                 <li
                   class="el-menu-item"
                   @click="routeTo('publish')"
@@ -175,7 +205,7 @@ const showCard = ref(false)
                     <li class="more" v-if="userStore.token" @click="showCard = !showCard">
                       <div class="moreButton">
                         <el-icon><Operation /></el-icon>
-                        <span>更多</span>
+                        <span> 更多</span>
                       </div>
                     </li>
                   </template>
@@ -189,6 +219,10 @@ const showCard = ref(false)
                         退出登录
                         <el-icon><ArrowRight /></el-icon>
                       </button>
+                      <button @click="showApplyExpert" class="exitButton">
+                        申请成为专家
+                        <el-icon><ArrowRight /></el-icon>
+                      </button>
                     </div>
                   </template>
                 </el-popover>
@@ -196,15 +230,13 @@ const showCard = ref(false)
             </div>
           </el-col>
         </div>
-        <div class="grid-item item-8">
-          <el-col>
-            <router-view></router-view>
-            <!-- <router-view v-slot="{ Component }">
+        <div>
+          <router-view style="margin-top: 20px"> </router-view>
+          <!-- <router-view v-slot="{ Component }">
               <keep-alive exclude="contentPage,userProfile,publishPage,loginPage">
                 <component :is="Component" />
               </keep-alive>
             </router-view> -->
-          </el-col>
         </div>
       </div>
     </el-container>
@@ -216,9 +248,11 @@ const showCard = ref(false)
 </template>
 <style lang="less" scoped>
 .grid-container {
+
   display: grid;
   grid-template-columns: 0.5fr 1.2fr  7.8fr 0.5fr;
-  height: 100vh;
+  // height: 100vh;
+
 }
 /* 当屏幕宽度小于某个值时调整布局 */
 @media (max-width: 768px) { /* 你可以调整这个断点 */
@@ -248,12 +282,18 @@ const showCard = ref(false)
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   overflow: scroll;
+  .header{
+    height: 80px;
+  }
   .el-header {
-    background: rgb(255, 255, 255);
+    // background: rgb(255, 255, 255);
+    // background-image: url('/icon/s672da45d46c75.jpg');
+    background-image: url('/icon/png8.png');
 
     .inputSearch {
+      color: rgb(154, 75, 15);
       margin-top: 20px;
       width: 400px;
       height: 40px;
@@ -268,6 +308,7 @@ const showCard = ref(false)
       outline: none;
     }
     .inputIcon {
+      color: rgb(154, 75, 15);
       margin-top: 20px;
       height: 40px;
       width: 50px;
@@ -311,11 +352,10 @@ const showCard = ref(false)
 
 }
 .side {
-
   letter-spacing: 1px; /* 增加字符间距 */
-
-  position: relative;
+  // position: relative;
   margin-right: 20px;
+  padding-top: 20px;
   ul {
     list-style-type: none;
   }
@@ -323,7 +363,7 @@ const showCard = ref(false)
     height: 48px;
     display: flex;
     align-items: center;
-    margin-bottom: 8px;
+    // margin-bottom: 8px;
     span {
       margin-left: 10px;
     }
@@ -332,6 +372,7 @@ const showCard = ref(false)
     border-radius: 40px;
     font-size: large;
     font-weight: bold;
+    color: rgb(154, 75, 15);
     vertical-align: middle;
     padding-left: 20px;
     height: 48px;
@@ -360,8 +401,16 @@ const showCard = ref(false)
     min-height: 100px;
   }
   .more {
-    // margin-top: calc(100vh - 580px);
+    // margin-top: calc(25vh );
+    width: 10%;
     border-radius: 40px;
+    // font-size: large;
+    font-weight: bold;
+    color: rgb(154, 75, 15);
+    position: fixed;
+    bottom: 0;
+    margin-bottom: 20px;
+
     .moreButton{
       border: 0;
       display: flex;

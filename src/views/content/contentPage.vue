@@ -49,7 +49,7 @@ const getData = async () => {
   follow.value = res.data.data.follow
   user.value = res.data.data.userInfo
   comments.value = res.data.data.comments
-  console.log(comments.value)
+  console.log(article.value)
 }
 const props = defineProps({
   id: String
@@ -118,9 +118,26 @@ const lights = ref([
     type: 'PointLight',
     color: 'white',
     position: { x: 0, y: 0, z: 0 },
-    intensity: 0.5
+    intensity: 0.3
   }
 ])
+const rotation = ref()
+rotation.value = {
+  x: 0,
+  y: 0,
+  z: 0
+}
+function onLoad() {
+  rotate()
+}
+function rotate() {
+  requestAnimationFrame(rotate)
+  rotation.value.y -= 0.005
+}
+const controlRotate = () => {
+  requestAnimationFrame(rotate)
+  rotation.value.y += 0.005
+}
 </script>
 <template>
   <loginPage v-if="showLoginPage" @toParent="toChild" style="z-index: 2"></loginPage>
@@ -141,7 +158,18 @@ const lights = ref([
       </div> -->
       <div class="left">
         <div class="media-container">
-          <el-carousel v-if="article.images.length" height="30vh" interval="3600" trigger="hover">
+          <!-- <el-carousel v-if="article.modelPath" height="30vh" interval="3600" trigger="hover">
+            <el-carousel-item v-for="(image, index) in article.images" :key="index">
+              <el-image
+                :preview-src-list="article.images"
+                z-index="index"
+                :src="image"
+                fit="contain"
+                class="carousel"
+              />
+            </el-carousel-item>
+          </el-carousel> -->
+          <el-carousel v-if="!article.modelPath" height="95vh" interval="3600" trigger="hover">
             <el-carousel-item v-for="(image, index) in article.images" :key="index">
               <el-image
                 :preview-src-list="article.images"
@@ -155,16 +183,30 @@ const lights = ref([
         </div>
 
         <div>
-          <vue3dLoader
+          <!-- <vue3dLoader
             v-if="article.modelPath"
             :filePath="article.modelPath"
             :lights="lights"
             :height="600"
             :width="500"
             :backgroundAlpha="0"
+            class="modelCss"
+            :pointLightFollowCamera="true"
+          /> -->
+          <vue3dLoader
+            v-if="article.modelPath"
+            :filePath="article.modelPath"
+            :lights="lights"
+            :height="850"
+            :width="500"
+            :backgroundAlpha="0"
+            :rotation="rotation"
+            @load="onLoad()"
+            class="modelCss"
             :pointLightFollowCamera="true"
           />
         </div>
+        <button class="" @click="controlRotate">test</button>
       </div>
 
       <div class="right">
@@ -267,7 +309,7 @@ const lights = ref([
   border-radius: 20px 0 0 20px;
   object-fit: contain;
   align-items: center;
-
+  border: 1px solid rgba(0, 0, 0, 0.1);
   // display: flex;
   // justify-content: center; /* 水平居中 */
 }
@@ -321,7 +363,7 @@ const lights = ref([
         // border-radius: 10px;
         // margin-left: 10px;
         // margin-top: 10px;
-        // border: 1px solid rgba(0, 0, 0, 0.1);
+        // border: 2px solid rgba(0, 0, 0, 0.1);
       }
       .imageList {
         height: 90vh;

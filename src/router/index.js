@@ -14,6 +14,16 @@ const router = createRouter({
           meta: { keepAlive: true } // 表明这个组件应该被缓存
         },
         {
+          path: '/collection',
+          component: () => import('@/views/collection/collectionPage.vue'),
+          meta: { keepAlive: true } // 表明这个组件应该被缓存
+        },
+        {
+          path: '/activity',
+          component: () => import('@/views/activity/activityPage.vue'),
+          meta: { keepAlive: true } // 表明这个组件应该被缓存
+        },
+        {
           path: '/explore/:id',
           component: () => import('@/views/content/contentPage.vue'),
           meta: { keepAlive: true } // 表明这个组件应该被缓存

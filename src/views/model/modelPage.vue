@@ -48,7 +48,9 @@ const fetchData = async (channelId) => {
   }
   await getArticleService(page.value).then((newData) => {
     // await getModelService(page.value).then((newData) => {
-    cardList.value = [...cardList.value, ...newData.data.data.items]
+    console.log(newData)
+    // cardList.value = [...cardList.value, ...newData.data.data.items]
+    cardList.value.push(...newData.data.data.items)
     currTotal.value += newData.data.data.items.length
     console.log(cardList.value)
     page.value.pageNum++

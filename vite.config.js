@@ -30,7 +30,8 @@ export default defineConfig({
         target: 'http://localhost:8081',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
-      }
+      },
+      '/models/**': 'http://localhost:8081/models'
     }
   }
 })

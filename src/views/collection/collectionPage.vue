@@ -146,9 +146,6 @@ const showContent = (param) => {
       <button @click="selectChannel(0)" class="button" :class="{ active: activeItem === 0 }">
         推荐
       </button>
-      <button @click="selectChannel(0)" class="button" :class="{ active: activeItem === 0 }">
-        陶瓷
-      </button>
       <button @click="selectChannel(1)" class="button" :class="{ active: activeItem === 1 }">
         器具
       </button>

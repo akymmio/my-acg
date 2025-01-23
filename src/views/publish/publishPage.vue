@@ -26,7 +26,8 @@ const fileList = ref({
   content: '',
   imagesList: [], //图片url
   state: 'public', //状态
-  channelId: '分类'
+  channelId: 0,
+  publishTime: ''
 })
 //存入照片墙展示的图片
 const imagesList = ref({
@@ -75,10 +76,11 @@ const publish = async () => {
   formData.append('title', fileList.value.title)
   formData.append('content', fileList.value.content)
   if (fileList.value.state === 'public') {
-    formData.append('state', 1)
+    formData.append('state', true)
   } else {
-    formData.append('state', 2)
+    formData.append('state', false)
   }
+  formData.append('createTime', fileList.value.publishTime)
   formData.append('channelId', fileList.value.channelId)
   formData.append('userId', user.value.id)
 
@@ -152,15 +154,16 @@ const update = async () => {
     duration: 1500
   })
 }
-
+const quill = ref()
 const cancel = () => {
   fileList.value = {
     images: [], // 图片数据清空
     title: '', // 标题清空
-    content: '', // 内容清空
+    content: '<p></p>', // 内容清空
     imagesList: [], // 图片url清空
     state: 1 //状态
   }
+
   imagesList.value.imagesList = [] // 清空imagesList数组
   showButton.value = false
   showUpdateButton.value = false
@@ -169,6 +172,7 @@ const cancel = () => {
   showExampleModel.value = false
   modelList.value = []
   showImage.value = false
+  quill.value.quill.setText('')
 }
 //删除图片
 const removeImage = (uploadFile) => {
@@ -327,27 +331,20 @@ const uploadTest = (file) => {
                 />
               </el-form-item>
 
-              <!-- <el-form-item>
+              <el-form-item>
                 <div>
                   <quill-editor
                     ref="quill"
-                    style="height: 200px; width: 500px"
+                    class="custom-quill-editor"
+                    style="height: 200px; width: 600px"
                     theme="snow"
-                    v-model:content="fileList.content"
+                    :content="fileList.content"
                     content-type="html"
                   ></quill-editor>
                 </div>
-              </el-form-item> -->
-              <!-- <el-form-item >
-                
-                
-                <textarea
-                  class="input"
-                  v-model="fileList.content"
-                  placeholder="留下你的想法吧"
-                ></textarea>
-              </el-form-item> -->
-              <el-form-item>
+              </el-form-item>
+
+              <!-- <el-form-item>
                 <el-input
                   placeholder="留下你的想法吧"
                   :rows="7"
@@ -356,7 +353,7 @@ const uploadTest = (file) => {
                   v-model="fileList.content"
                   type="textarea"
                 />
-              </el-form-item>
+              </el-form-item> -->
 
               <el-form-item label="可见范围">
                 <div>
@@ -368,7 +365,7 @@ const uploadTest = (file) => {
               </el-form-item>
 
               <el-form-item>
-                <el-select v-model="fileList.channelId" placeholder="分类" style="width: 240px">
+                <el-select v-model="fileList.channelId" placeholder="分类" style="width: 100px">
                   <el-option
                     v-for="item in options"
                     :key="item.id"
@@ -376,9 +373,11 @@ const uploadTest = (file) => {
                     :value="item.id"
                   />
                 </el-select>
-              </el-form-item>
-              <el-form-item>
-                <el-select v-model="selectedModelType" placeholder="模型类型" style="width: 240px">
+                <el-select
+                  v-model="selectedModelType"
+                  placeholder="模型类型"
+                  style="width: 100px; padding-left: 20px"
+                >
                   <el-option
                     v-for="item in modelTypeOptions"
                     :key="item.id"
@@ -386,7 +385,19 @@ const uploadTest = (file) => {
                     :value="item.id"
                   />
                 </el-select>
+                <div class="block">
+                  <el-date-picker
+                    style="padding-left: 20px"
+                    v-model="fileList.publishTime"
+                    type="datetime"
+                    placeholder="发布时间"
+                    :default-time="defaultTime"
+                    format="YYYY-MM-DD HH:mm:ss"
+                    value-format="YYYY-MM-DD HH:mm:ss"
+                  />
+                </div>
               </el-form-item>
+              <el-form-item> </el-form-item>
               <el-form-item>
                 <div class="button-container">
                   <div class="left-container">
@@ -397,6 +408,7 @@ const uploadTest = (file) => {
                     >
                       模型示例
                     </button>
+
                     <el-upload
                       ref="upload"
                       action
@@ -474,26 +486,33 @@ const uploadTest = (file) => {
         :rotation="rotation"
         @load="onLoad()"
         :autoPlay="autoPlay"
-        backgroundColor="white"
+        :backgroundAlpha="0"
       />
     </div>
     <div class="modelCss" v-if="showExampleModel">
       <p>模型展示</p>
       <vue3dLoader
-        filePath="aphrodite_of_milos_a_plaster_cast.glb"
+        filePath="http://localhost:8081/models/20241209/aphrodite_of_milos_a_plaster_cast.glb"
         :lights="lights"
-        :height="670"
+        :height="700"
         :width="400"
         :rotation="rotation"
         @load="onLoad()"
         :autoPlay="autoPlay"
-        backgroundColor="white"
+        :backgroundAlpha="0"
       />
     </div>
+    <!-- <img src="http://127.0.0.1:8081/models/20241209/png8.png" alt="" /> -->
   </div>
 </template>
 
 <style lang="less" scoped>
+.ql-container {
+  height: 400px; /* 设置高度（根据需要调整） */
+}
+.custom-quill-editor {
+  width: 200px; /* 设置宽度为百分比 */
+}
 .button-container {
   width: 100%;
   // height: 100px;
@@ -524,12 +543,15 @@ const uploadTest = (file) => {
     flex-direction: column;
     border-radius: 10px;
     margin-left: 10px;
+    background-image: url('/icon/background.png');
     border: 1px solid rgba(0, 0, 0, 0.1);
     p {
       padding: 5px;
       border-radius: 20px;
-      background-color: #f2f2f2;
-      color: #565656;
+      // background-color: #f2f2f2;
+      // color: #565656;
+      font-size: large;
+      color: #f2f2f2;
     }
   }
   .container-right {
@@ -539,12 +561,14 @@ const uploadTest = (file) => {
     flex-direction: column;
     border-radius: 10px;
     border: 1px solid rgba(0, 0, 0, 0.1);
-
+    background-image: url('/icon/background.png');
     p {
       padding: 5px;
       border-radius: 20px;
-      background-color: #f2f2f2;
-      color: #565656;
+      // background-color: #f2f2f2;
+      // color: #565656;
+      font-size: large;
+      color: #f2f2f2;
     }
 
     .media-container {
@@ -554,7 +578,7 @@ const uploadTest = (file) => {
     .carousel {
       width: 100%;
       height: 100%;
-      background: white;
+      // background: white;
     }
     // .el-carousel__item:nth-child(2n) {
     //   background-color: #99a9bf;
