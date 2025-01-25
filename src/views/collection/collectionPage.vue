@@ -7,7 +7,7 @@ import { require } from '@/utils/require'
 import { Plus } from '@element-plus/icons-vue'
 import { getArticleService } from '@/api/article'
 import { addLikedCount } from '@/api/liked'
-import { Like as like } from '@icon-park/vue-next'
+import { Like as like, Sync } from '@icon-park/vue-next'
 const router = useRouter()
 const route = useRoute()
 import { useUserStore } from '@/stores'
@@ -16,62 +16,63 @@ const user = computed(() => userStore.user)
 // const user = userStore.user
 const imageUrl = require('@/assets/icon/loading.gif')
 import { vue3dLoader } from 'vue-3d-loader'
-
+import { getCategoryService } from '@/api/category'
 //分页参数
 const page = ref({
   pageNum: 1,
-  pageSize: 20,
+  pageSize: 10,
   channelId: 0,
-  keyword: ''
+  keyword: '',
+  createTime: '',
+  order: ''
 })
 //获取文章数据
 const cardList = ref([])
 //记录总数
 const currTotal = ref(0)
-const total = ref(page.value.pageSize)
-const showLoading = ref(false)
+const pageTotal = ref(10)
 
-const fetchData = async (channelId) => {
-  if (page.value.channelId !== channelId) {
-    console.log(page.value.channelId)
-    console.log(channelId)
-    //   page.value.pageNum = 0
-    //   page.value.channelId = channelId
-    //   const res = await getArticleService(page.value)
-    //   cardList.value = res.data.data.items
-    //   currTotal.value = res.data.data.items.length
-    //   total.value = res.data.data.total
-    //   page.value.pageNum++
-    //   console.log(cardList.value)
-    //   return
-  }
-  await getArticleService(page.value).then((newData) => {
-    cardList.value = [...cardList.value, ...newData.data.data.items]
-    currTotal.value += newData.data.data.items.length
-    console.log(cardList.value)
-    page.value.pageNum++
-    total.value = newData.data.data.total
-  })
-  console.log(currTotal.value, total.value)
-}
-fetchData(0)
+// const fetchData = async (channelId) => {
+//   if (page.value.channelId !== channelId) {
+//     console.log(page.value.channelId)
+//     console.log(channelId)
+//     //   page.value.pageNum = 0
+//     //   page.value.channelId = channelId
+//     //   const res = await getArticleService(page.value)
+//     //   cardList.value = res.data.data.items
+//     //   currTotal.value = res.data.data.items.length
+//     //   total.value = res.data.data.total
+//     //   page.value.pageNum++
+//     //   console.log(cardList.value)
+//     //   return
+//   }
+//   await getArticleService(page.value).then((newData) => {
+//     cardList.value = [...cardList.value, ...newData.data.data.items]
+//     currTotal.value += newData.data.data.items.length
+//     console.log(cardList.value)
+//     page.value.pageNum++
+//     pageTotal.value = newData.data.data.total
+//   })
+//   console.log(currTotal.value, pageTotal.value)
+// }
+// fetchData(0)
 //监视是否搜索
-watch(
-  () => route.query.key_word,
-  async (newVal, oldVal) => {
-    if (newVal !== oldVal && newVal) {
-      page.value.keyword = route.query.key_word
-      page.value.pageNum = 1
-      const res = await getArticleService(page.value)
-      cardList.value = res.data.data.items
-      currTotal.value = res.data.data.items.length
-      total.value = res.data.data.total
-      page.value.pageNum++
-      page.value.keyword = ''
-      console.log('查找')
-    }
-  }
-)
+// watch(
+//   () => route.query.key_word,
+//   async (newVal, oldVal) => {
+//     if (newVal !== oldVal && newVal) {
+//       page.value.keyword = route.query.key_word
+//       page.value.pageNum = 1
+//       const res = await getArticleService(page.value)
+//       cardList.value = res.data.data.items
+//       currTotal.value = res.data.data.items.length
+//       pageTotal.value = res.data.data.total
+//       page.value.pageNum++
+//       page.value.keyword = ''
+//       console.log('查找')
+//     }
+//   }
+// )
 const activeItem = ref(0)
 const selectChannel = async (channelId) => {
   page.value.pageNum = 1 // 重置页码
@@ -87,31 +88,6 @@ const selectChannel = async (channelId) => {
 const push = (param) => {
   console.log('ex', param)
   router.push(`/user/profile/${param}`)
-}
-const showFinish = ref(false)
-const isFetching = ref(false)
-const scrolling = async (e) => {
-  const clientHeight = e.target.clientHeight
-  const scrollHeight = e.target.scrollHeight
-  const scrollTop = e.target.scrollTop
-  const threshold = 0.4 * scrollHeight
-  if (scrollTop + clientHeight >= threshold && currTotal.value < total.value && !isFetching.value) {
-    // console.log(currTotal.value, total.value)
-    isFetching.value = true // 设置标志，表示正在加载数据
-    try {
-      await fetchData(page.value.channelId)
-    } finally {
-      isFetching.value = false // 数据加载完成，清除标志
-    }
-  } else {
-    showFinish.value = true
-    showLoadMore.value = false
-  }
-}
-
-const showLoadMore = ref(true)
-const loadMore = async () => {
-  await fetchData(0)
 }
 
 import ContentPage from '../content/contentPage.vue'
@@ -139,33 +115,121 @@ const showContent = (param) => {
   id.value = param
   // router.push(`/explore/${param}`)
 }
+
+//分页
+
+const handleSizeChange = (val) => {
+  console.log(`${val} items per page`)
+  page.value.pageNum = val
+}
+
+const handleCurrentChange = async (val) => {
+  console.log(`current page: ${val}`)
+
+  await getArticleService(page.value).then((newData) => {
+    cardList.value = [...newData.data.data.items]
+    currTotal.value += newData.data.data.items.length
+    console.log(cardList.value)
+    page.value.pageNum = val
+    pageTotal.value = parseInt(newData.data.data.total)
+  })
+  console.log(currTotal.value, pageTotal.value, page.value.pageNum)
+}
+handleCurrentChange(0)
+
+const options = ref()
+const orderOptions = ref([
+  { id: 0, orderName: '创建时间升序' },
+  { id: 1, orderName: '创建时间降序' },
+  { id: 2, orderName: '名称升序' },
+  { id: 2, orderName: '名称降序' }
+])
+const getCategory = async () => {
+  const result = await getCategoryService()
+  options.value = result.data.data
+  console.log(options.value)
+}
+getCategory()
+
+const fetchData = async () => {
+  await getArticleService(page.value).then((newData) => {
+    cardList.value = [...newData.data.data.items]
+    currTotal.value += newData.data.data.items.length
+    console.log(cardList.value)
+    pageTotal.value = parseInt(newData.data.data.total)
+  })
+}
 </script>
 <template>
-  <div class="main" @scroll="scrolling">
+  <div class="main">
     <div style="margin-top: 20px">
-      <button @click="selectChannel(0)" class="button" :class="{ active: activeItem === 0 }">
+      <el-form :inline="true" :model="formInline">
+        <!-- <el-form-item label="Approved by">
+          <el-input v-model="formInline.user" placeholder="Approved by" clearable />
+        </el-form-item> -->
+        <el-form-item>
+          <el-select placeholder="分类" v-model="page.channelId" style="width: 100px">
+            <el-option
+              v-for="item in options"
+              :key="item.id"
+              :label="item.channelName"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select placeholder="默认排序" v-model="page.order" style="width: 100px">
+            <el-option
+              v-for="item in orderOptions"
+              :key="item.id"
+              :label="item.orderName"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="page.keyword" placeholder="文物名称" clearable style="width: 100px" />
+        </el-form-item>
+
+        <el-form-item>
+          <el-date-picker
+            v-model="page.createTime"
+            type="datetime"
+            placeholder="发布时间"
+            :default-time="defaultTime"
+            format="YYYY-MM-DD HH:mm:ss"
+            value-format="YYYY-MM-DD HH:mm:ss"
+          />
+        </el-form-item>
+        <el-form-item>
+          <button class="button" @click="fetchData()" type="button">搜索</button>
+        </el-form-item>
+      </el-form>
+      <!-- <button @click="selectChannel(0)" class="button" :class="{ active: activeItem === 0 }">
         推荐
       </button>
       <button @click="selectChannel(1)" class="button" :class="{ active: activeItem === 1 }">
-        器具
+        陶瓷
       </button>
       <button @click="selectChannel(2)" class="button" :class="{ active: activeItem === 2 }">
-        书画
+        器具
       </button>
       <button @click="selectChannel(3)" class="button" :class="{ active: activeItem === 3 }">
-        雕塑
+        书画
       </button>
       <button @click="selectChannel(4)" class="button" :class="{ active: activeItem === 4 }">
-        工艺品
+        雕塑
       </button>
       <button @click="selectChannel(5)" class="button" :class="{ active: activeItem === 5 }">
+        工艺品
+      </button>
+      <button @click="selectChannel(6)" class="button" :class="{ active: activeItem === 6 }">
         外国文物
       </button>
       <button @click="selectChannel(20)" class="button" :class="{ active: activeItem === 20 }">
         其他
-      </button>
-      <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
-      <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
+      </button> -->
+
       <!-- 首页瀑布流 -->
       <div @scroll="scrolling" ref="myElement">
         <Waterfall
@@ -220,14 +284,17 @@ const showContent = (param) => {
           </template>
           <!-- <div style="height: 50px; background: black"></div> -->
         </Waterfall>
-        <div v-if="showFinish" class="finishLoading"><span>没有更多...</span></div>
-        <div class="loading" v-if="showLoading">
-          <img :src="imageUrl" alt="Dynamic Image" style="width: 60px" />
-        </div>
-        <div v-if="showLoadMore">
-          <el-tooltip content="加载更多" effect="light">
-            <el-icon @click="loadMore" class="loadButton"><Plus /></el-icon>
-          </el-tooltip>
+
+        <div class="pagination-block">
+          <el-pagination
+            v-model:current-page="page.pageNum"
+            v-model:page-size="page.pageSize"
+            :page-sizes="[10, 20, 30, 40]"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="pageTotal"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
         </div>
       </div>
     </div>
@@ -237,6 +304,10 @@ const showContent = (param) => {
   </transition>
 </template>
 <style scoped lang="less">
+.pagination-block {
+  display: flex;
+  justify-content: center;
+}
 .loadButton {
   float: right;
   position: relative;
@@ -275,25 +346,33 @@ const showContent = (param) => {
 }
 
 .button {
-  border-radius: 40px;
-  font-size: 16px;
-  background-color: white;
-  border: 0;
-  width: 100px;
-  height: 40px;
-  margin-bottom: 15px;
-  // color: #494949;
-  font-weight: bold;
-  color: rgb(154, 75, 15);
-}
-.button:hover {
-  // color: #000000;
-  background-color: #f6f6f6;
-}
-.button:focus {
-  background-color: #f6f6f6;
+  // border-radius: 40px;
+  // font-size: 16px;
+  // background-color: white;
+  // border: 0;
+  // width: 100px;
+  // height: 40px;
+  // // color: #494949;
   // font-weight: bold;
+  // color: rgb(154, 75, 15);
+  border-radius: 5px;
+  font-size: large;
+  // background-color: #f6f6f6;
+  color: rgb(255, 255, 255);
+  background: rgb(255, 48, 89);
+  border: 0;
+  width: 80px;
+  height: 32px;
+  margin-right: 10px;
 }
+// .button:hover {
+//   // color: #000000;
+//   background-color: #f6f6f6;
+// }
+// .button:focus {
+//   background-color: #f6f6f6;
+//   // font-weight: bold;
+// }
 .active {
   background-color: #f6f6f6;
 }

@@ -146,22 +146,22 @@ const showContent = (param) => {
       <button @click="selectChannel(0)" class="button" :class="{ active: activeItem === 0 }">
         推荐
       </button>
-      <button @click="selectChannel(0)" class="button" :class="{ active: activeItem === 0 }">
+      <button @click="selectChannel(1)" class="button" :class="{ active: activeItem === 1 }">
         陶瓷
       </button>
-      <button @click="selectChannel(1)" class="button" :class="{ active: activeItem === 1 }">
+      <button @click="selectChannel(2)" class="button" :class="{ active: activeItem === 2 }">
         器具
       </button>
-      <button @click="selectChannel(2)" class="button" :class="{ active: activeItem === 2 }">
+      <button @click="selectChannel(3)" class="button" :class="{ active: activeItem === 3 }">
         书画
       </button>
-      <button @click="selectChannel(3)" class="button" :class="{ active: activeItem === 3 }">
+      <button @click="selectChannel(4)" class="button" :class="{ active: activeItem === 4 }">
         雕塑
       </button>
-      <button @click="selectChannel(4)" class="button" :class="{ active: activeItem === 4 }">
+      <button @click="selectChannel(5)" class="button" :class="{ active: activeItem === 5 }">
         工艺品
       </button>
-      <button @click="selectChannel(5)" class="button" :class="{ active: activeItem === 5 }">
+      <button @click="selectChannel(6)" class="button" :class="{ active: activeItem === 6 }">
         外国文物
       </button>
       <button @click="selectChannel(20)" class="button" :class="{ active: activeItem === 20 }">
@@ -285,9 +285,9 @@ const showContent = (param) => {
   width: 100px;
   height: 40px;
   margin-bottom: 15px;
-  // color: #494949;
+  color: #494949;
   font-weight: bold;
-  color: rgb(154, 75, 15);
+  // color: rgb(154, 75, 15);
 }
 .button:hover {
   // color: #000000;

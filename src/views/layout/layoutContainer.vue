@@ -68,7 +68,7 @@ const routeTo = (path) => {
     } else if (path === 'collection') {
       router.push('/collection')
     } else if (path === 'activity') {
-      router.push('/collection')
+      router.push('/activity')
     } else if (path === 'me') {
       router.push(`/user/profile/${user.value.id}`)
     }
@@ -140,20 +140,21 @@ const showCard = ref(false)
                 </li>
                 <li
                   class="el-menu-item"
-                  @click="routeTo('model')"
-                  :class="{ active: activeItem === 'model' }"
-                >
-                  <el-icon><MagicStick /></el-icon>
-                  <span> 展示</span>
-                </li>
-                <li
-                  class="el-menu-item"
                   @click="routeTo('collection')"
                   :class="{ active: activeItem === 'collection' }"
                 >
                   <el-icon><Star /></el-icon>
                   <span> 藏品</span>
                 </li>
+                <li
+                  class="el-menu-item"
+                  @click="routeTo('model')"
+                  :class="{ active: activeItem === 'model' }"
+                >
+                  <el-icon><MagicStick /></el-icon>
+                  <span> 模型</span>
+                </li>
+
                 <li
                   class="el-menu-item"
                   @click="routeTo('activity')"

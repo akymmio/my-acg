@@ -185,7 +185,7 @@ const activeTab = ref('note')
         :style="{
           position: isFixed ? 'fixed' : 'static',
           top: isFixed ? '80px' : '',
-          width: isFixed ? '79%' : '100%'
+          width: isFixed ? '78%' : '100%'
         }"
       >
         <!-- <button class="button" @click="fetchData('note')">笔记</button>
@@ -236,7 +236,7 @@ const activeTab = ref('note')
 
 .fix{
   // position: fixed;
-  z-index: 1000; /* 确保在其他内容之上 */
+  z-index: 1; /* 确保在其他内容之上 */
   // top: 80px;
   background-color: white;
   // width: 80%;

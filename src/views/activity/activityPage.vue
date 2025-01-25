@@ -79,7 +79,7 @@ const selectChannel = async (channelId) => {
   cardList.value = [] // 清空列表
 
   activeItem.value = channelId
-  router.push({ path: '/explore', query: { channel_id: channelId } })
+  router.push({ path: '/activity', query: { channel_id: channelId } })
   await fetchData(channelId)
   console.log(route.query.channel_id)
 }
@@ -115,6 +115,7 @@ const loadMore = async () => {
 }
 
 import ContentPage from '../content/contentPage.vue'
+import activityContentPage from '../content/activityContentPage.vue'
 const toLike = (id, index) => {
   if (Object.keys(user.value).length === 0) {
     return
@@ -143,27 +144,17 @@ const showContent = (param) => {
 <template>
   <div class="main" @scroll="scrolling">
     <div style="margin-top: 20px">
-      <button @click="selectChannel(0)" class="button" :class="{ active: activeItem === 0 }">
-        推荐
-      </button>
-      <button @click="selectChannel(1)" class="button" :class="{ active: activeItem === 1 }">
-        器具
-      </button>
-      <button @click="selectChannel(2)" class="button" :class="{ active: activeItem === 2 }">
-        书画
-      </button>
-      <button @click="selectChannel(3)" class="button" :class="{ active: activeItem === 3 }">
-        雕塑
-      </button>
-      <button @click="selectChannel(4)" class="button" :class="{ active: activeItem === 4 }">
-        工艺品
-      </button>
-      <button @click="selectChannel(5)" class="button" :class="{ active: activeItem === 5 }">
-        外国文物
-      </button>
-      <button @click="selectChannel(20)" class="button" :class="{ active: activeItem === 20 }">
-        其他
-      </button>
+      <div class="topButton">
+        <button @click="selectChannel(0)" class="button" :class="{ active: activeItem === 0 }">
+          全部活动
+        </button>
+        <button @click="selectChannel(1)" class="button" :class="{ active: activeItem === 1 }">
+          进行中
+        </button>
+        <button @click="selectChannel(2)" class="button" :class="{ active: activeItem === 2 }">
+          已结束
+        </button>
+      </div>
       <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
       <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
       <!-- 首页瀑布流 -->
@@ -171,7 +162,8 @@ const showContent = (param) => {
         <Waterfall
           :list="cardList"
           :hasAroundGutter="false"
-          :width="282"
+          :width="400"
+          :heigh="180"
           :gutter="20"
           :breakpoints="{
             1400: { rowPerView: 5 },
@@ -188,31 +180,21 @@ const showContent = (param) => {
               </div>
               <div class="item-body">
                 <div class="item-desc" @click="showContent(item.articleId)">
-                  <span>{{ item.title }}</span>
+                  <!-- <span>{{ item.title }}</span> -->
+                  <div>{{ '活动名称' }}——{{ '活动主题' }}</div>
+                  <div>
+                    活动时间:{{}}
+                    <span v-if="true" class="title-user">进行中</span>
+                    <span v-else class="title-expert">已结束</span>
+                  </div>
+
+                  <div>活动地点:</div>
                 </div>
                 <div class="item-footer">
                   <div class="footer-left">
-                    <img :src="item.avatar" @click="push(item.userId)" />
-                    <div class="name">{{ item.nickname }}</div>
-                  </div>
-                  <div class="like">
-                    <like
-                      v-if="item.liked"
-                      theme="two-tone"
-                      size="20"
-                      :fill="['#ff4242', '#ff4242']"
-                      @click="toLike(item.articleId, index)"
-                    />
-                    <like
-                      v-else
-                      theme="outline"
-                      size="20"
-                      fill="#333"
-                      @click="toLike(item.articleId, index)"
-                    />
-                    <!-- {{ item.liked }} -->
-                    <!-- <i class="bi bi-heart" @click="toLike(item.articleId, index)"></i> -->
-                    <div style="padding-left: 2px">{{ item.likedCount }}</div>
+                    <!-- <img :src="item.avatar" @click="push(item.userId)" />
+                    <div class="name">{{ item.nickname }}</div> -->
+                    <!-- <div class="name">{{ '——活动主题' }}</div> -->
                   </div>
                 </div>
               </div>
@@ -233,10 +215,15 @@ const showContent = (param) => {
     </div>
   </div>
   <transition name="el-fade-in-linear">
-    <ContentPage v-if="isModalVisible" :id="id" @toParent="toChild" />
+    <!-- <ContentPage v-if="isModalVisible" :id="id" @toParent="toChild" /> -->
+    <activityContentPage v-if="isModalVisible" :id="id" @toParent="toChild" />
   </transition>
 </template>
 <style scoped lang="less">
+.topButton {
+  display: flex;
+  //   justify-content: center;
+}
 .loadButton {
   float: right;
   position: relative;
@@ -282,9 +269,9 @@ const showContent = (param) => {
   width: 100px;
   height: 40px;
   margin-bottom: 15px;
-  // color: #494949;
+  color: #494949;
   font-weight: bold;
-  color: rgb(154, 75, 15);
+  // color: rgb(154, 75, 15);
 }
 .button:hover {
   // color: #000000;
@@ -312,12 +299,25 @@ const showContent = (param) => {
   margin: 10px;
   .item-desc {
     text-align: left;
-    font-family: Roboto;
-    font-style: normal;
-    font-weight: normal;
-    font-size: 14px;
-    line-height: 16px;
+    // font-family: Roboto;
+    // font-style: normal;
+    // font-weight: normal;
+    // font-size: 14px;
+    line-height: 25px;
     color: #000000;
+    color: #3d3d3d;
+    .title-user {
+      background: rgb(57, 209, 40);
+      border-radius: 5px;
+      padding: 3px;
+      color: white;
+    }
+    .title-expert {
+      background: rgb(255, 48, 89);
+      border-radius: 5px;
+      padding: 3px;
+      color: white;
+    }
   }
 
   .item-footer {
@@ -325,23 +325,23 @@ const showContent = (param) => {
     justify-content: space-between;
     padding-top: 10px;
 
-    .footer-left {
-      display: flex;
-      align-items: center;
-      font-family: SF Pro Display;
-      font-style: normal;
-      font-weight: normal;
-      font-size: 12px;
-      line-height: 14px;
-      color: rgba(0, 0, 0, 0.6);
+    // .footer-left {
+    //   display: flex;
+    //   align-items: center;
+    //   font-family: SF Pro Display;
+    //   font-style: normal;
+    //   font-weight: normal;
+    //   font-size: 12px;
+    //   line-height: 14px;
+    //   color: rgba(0, 0, 0, 0.6);
 
-      img {
-        border-radius: 50%;
-        width: 22px;
-        height: 22px;
-        margin-right: 4px;
-      }
-    }
+    //   img {
+    //     border-radius: 50%;
+    //     width: 22px;
+    //     height: 22px;
+    //     margin-right: 4px;
+    //   }
+    // }
 
     .like {
       display: flex;

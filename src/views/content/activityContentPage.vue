@@ -6,6 +6,7 @@ import { addLikedCount } from '@/api/liked'
 import { followService } from '@/api/user'
 import { useRoute, useRouter } from 'vue-router'
 import { Like as like, Comment as comment } from '@icon-park/vue-next'
+import { User, Location, Clock, Iphone } from '@element-plus/icons-vue'
 const route = useRoute()
 const router = useRouter()
 import { useUserStore } from '@/stores'
@@ -146,31 +147,19 @@ const controlRotate = () => {
       <div @click="close" class="close">
         <el-icon><Close /></el-icon>
       </div>
-      <div>
-        <!-- <vue3dLoader
+      <!-- <div>
+        <vue3dLoader
           v-if="article.modelPath"
           class="modelCss"
           :filePath="article.modelPath"
           :lights="lights"
           :height="650"
           :width="500"
-        /> -->
-      </div>
+        />
+      </div> -->
       <div class="left">
         <div class="media-container">
-          <el-carousel v-if="article.modelPath" height="30vh" interval="3600" trigger="hover">
-            <el-carousel-item v-for="(image, index) in article.images" :key="index">
-              <el-image
-                :preview-src-list="article.images"
-                z-index="index"
-                :src="image"
-                fit="contain"
-                class="carousel"
-              />
-            </el-carousel-item>
-          </el-carousel>
-          <!-- v-if="!article.modelPath" -->
-          <!-- <el-carousel height="95vh" interval="3600" trigger="hover">
+          <!-- <el-carousel v-if="article.modelPath" height="30vh" interval="3600" trigger="hover">
             <el-carousel-item v-for="(image, index) in article.images" :key="index">
               <el-image
                 :preview-src-list="article.images"
@@ -181,10 +170,22 @@ const controlRotate = () => {
               />
             </el-carousel-item>
           </el-carousel> -->
+          <!-- v-if="!article.modelPath" -->
+          <el-carousel height="95vh" interval="3600" trigger="hover">
+            <el-carousel-item v-for="(image, index) in article.images" :key="index">
+              <el-image
+                :preview-src-list="article.images"
+                z-index="index"
+                :src="image"
+                fit="contain"
+                class="carousel"
+              />
+            </el-carousel-item>
+          </el-carousel>
         </div>
 
         <div>
-          <vue3dLoader
+          <!-- <vue3dLoader
             v-if="article.modelPath"
             :filePath="article.modelPath"
             :lights="lights"
@@ -193,7 +194,7 @@ const controlRotate = () => {
             :backgroundAlpha="0"
             class="modelCss"
             :pointLightFollowCamera="true"
-          />
+          /> -->
           <!-- <vue3dLoader
             v-if="article.modelPath"
             :filePath="article.modelPath"
@@ -210,89 +211,74 @@ const controlRotate = () => {
       </div>
 
       <div class="right">
-        <div class="header">
-          <div class="avatar">
-            <el-avatar :size="40" :src="user.avatar" />
-            <span class="username">{{ user.nickname }}</span>
-          </div>
-          <div v-if="user.id === localUser.id" class="editButton">
-            <span @click="router.push({ path: '/publish', query: { id: article.articleId } })">
-              编辑
-            </span>
-          </div>
-          <div
-            v-else-if="user.id !== localUser.id"
-            @click="toFollow()"
-            :class="{ active: follow }"
-            class="followButton"
-          >
-            <span v-show="follow">已关注</span> <span v-show="!follow">关注</span>
-          </div>
-        </div>
         <!-- <el-divider style="margin: 0" /> -->
         <div class="content">
           <div class="text">
-            <p style="font-size: 20px; font-weight: bold; margin: 10px 0">{{ article.title }}</p>
+            <div class="title">玉出昆冈</div>
+            <div class="subTitle">清代宫廷和田玉文化特展</div>
+            <el-divider />
+            <p class="subTitle">活动介绍</p>
+            <!-- <p style="font-size: 20px; font-weight: bold; margin: 10px 0">{{ article.title }}</p> -->
             <!-- <el-text size="large" v-html></el-text> -->
             <div v-html="article.content" class="text_font"></div>
-            <!-- <div class="time" style="padding-top: 0">{{ article.createTime }}</div> -->
-            <div class="text_bottom">
-              <div>{{ article.createTime }}</div>
-              <div>共{{ article.commentCount }}条评论</div>
-            </div>
-            <el-divider style="margin: 0" />
-            <el-empty v-if="article.commentCount == 0" description="空空如也" />
-            <!-- 评论 -->
-            <div
-              v-else
-              v-for="(comment, index) in article.comments"
-              :key="index"
-              class="commentStyle"
-            >
-              <div><el-avatar :size="38" :src="comment.avatar" /></div>
-              <div class="comment_container">
-                <div class="comment_name">{{ comment.nickname }}</div>
-                <div class="comment_content" v-html="comment.comment"></div>
-                <div class="time" style="">{{ comment.createTime }}</div>
-              </div>
-              <div
-                class="comment-actions"
-                v-if="localUser.id === comment.userId"
-                @click="deleteComment(comment.commentId, index)"
-              >
-                <el-icon><Close style="opacity: 0.3" /></el-icon>
-              </div>
-            </div>
-          </div>
-        </div>
-        <el-divider style="margin: 0" />
-        <div class="footer">
-          <div class="footer_icon">
-            <like
-              theme="two-tone"
-              size="20"
-              :fill="['#ff4242', '#ff4242']"
-              @click="toLike"
-              v-if="liked"
-            />
-            <like theme="outline" size="20" fill="#333" @click="toLike" v-else />
+            <p class="subTitle">活动信息</p>
+            <el-descriptions class="margin-top" :column="1" :size="size" border>
+              <!-- <template #extra>
+              <el-button type="primary">Operation</el-button>
+            </template> -->
 
-            <span style="padding-left: 5px">{{ article.likedCount }} </span>
-            <!-- <el-icon class="icon" size="large"><ChatRound /></el-icon> -->
-            <comment theme="filled" size="20" fill="#4f83ff" style="padding-left: 10px" />
-            <span style="padding-left: 5px">{{ article.commentCount }}</span>
-          </div>
-          <div class="footer_input">
-            <textarea
-              class="input"
-              v-model="textarea"
-              placeholder="留下你的想法吧"
-              rows="2"
-              cols="50"
-            ></textarea>
-            <span class="iconPublish" @click="sendComment">发送</span>
+              <el-descriptions-item>
+                <template #label>
+                  <div class="cell-item">
+                    <el-icon><User /></el-icon>
+                    <span> 负责人</span>
+                  </div>
+                </template>
+                mike
+              </el-descriptions-item>
+              <el-descriptions-item>
+                <template #label>
+                  <div class="cell-item">
+                    <el-icon><Iphone /></el-icon>
+                    <span>联系电话</span>
+                  </div>
+                </template>
+                18100000000
+              </el-descriptions-item>
+              <el-descriptions-item>
+                <template #label>
+                  <div class="cell-item">
+                    <el-icon><Clock /></el-icon>
+                    <span>活动时间</span>
+                  </div>
+                </template>
+                Suzhou
+              </el-descriptions-item>
+              <!-- <el-descriptions-item>
+                <template #label>
+                  <div class="cell-item">
+                    <el-icon :style="iconStyle">
+                      <tickets />
+                    </el-icon>
+                    活动地址
+                  </div>
+                </template>
+                Suzhou
+              </el-descriptions-item> -->
+              <el-descriptions-item>
+                <template #label>
+                  <div class="cell-item">
+                    <el-icon><Location /></el-icon>
+                    <span>活动地址</span>
+                  </div>
+                </template>
+                No.1188, Wuzhong Avenue, Wuzhong District, Suzhou, Jiangsu Province
+              </el-descriptions-item>
+            </el-descriptions>
+            <!-- <el-divider style="margin: 0" /> -->
           </div>
         </div>
+        <!-- <el-divider style="margin: 0" /> -->
       </div>
     </div>
   </div>
@@ -302,6 +288,44 @@ const controlRotate = () => {
 // .carousel {
 //   background: white !important;
 // }
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  font-size: 40px;
+  color: rgb(154, 75, 15);
+}
+.subTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-top: 10px;
+  color: rgb(154, 75, 15);
+}
+.title-user {
+  background: rgb(57, 209, 40);
+  border-radius: 5px;
+  padding: 5px;
+  color: white;
+  margin-left: 10px;
+}
+.el-descriptions {
+  margin-top: 20px;
+}
+.cell-item {
+  display: flex;
+  // justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+  width: 100px;
+}
+.cell-item span {
+  margin-left: 5px;
+}
+// .margin-top {
+//   margin-top: 20px;
+// }
 .media-container {
   width: 100%;
   height: auto;
@@ -309,7 +333,7 @@ const controlRotate = () => {
   border-radius: 20px 0 0 20px;
   object-fit: contain;
   align-items: center;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  // border: 1px solid rgba(0, 0, 0, 0.1);
   // display: flex;
   // justify-content: center; /* 水平居中 */
 }
@@ -354,11 +378,11 @@ const controlRotate = () => {
       // background-color: #f6f6f6;
     }
     .left {
-      width: 60%;
+      width: 40%;
       display: flex;
       align-items: center;
       flex-direction: column;
-      border-right: 1px solid rgba(0, 0, 0, 0.1);
+      // border-right: 1px solid rgba(0, 0, 0, 0.1);
       .modelCss {
         // border-radius: 10px;
         // margin-left: 10px;
@@ -382,53 +406,53 @@ const controlRotate = () => {
       }
     }
     .right {
-      width: 40%;
+      width: 60%;
       overflow: hidden;
-      .header {
-        margin: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        .username {
-          color: #494949;
-          padding-left: 10px;
-        }
-        .avatar {
-          display: flex; /* 使得avatar和文本可以在同一行上 */
-          align-items: center; /* 垂直居中文本和avatar */
-        }
-        .editButton {
-          display: flex; /* 使得关注文本可以垂直居中 */
-          align-items: center; /* 垂直居中关注文本 */
-          justify-content: center; /* 水平居中关注文本 */
-          color: rgba(0, 0, 0, 0.7);
-          border: 0;
-          border-radius: 40px;
-          font-size: large;
-          font-weight: bold;
-          background-color: #f6f6f6;
-          width: 80px;
-          height: 40px;
-        }
-        .followButton {
-          display: flex; /* 使得关注文本可以垂直居中 */
-          align-items: center; /* 垂直居中关注文本 */
-          justify-content: center; /* 水平居中关注文本 */
-          color: rgb(255, 255, 255);
-          border: 0;
-          border-radius: 40px;
-          font-size: large;
-          font-weight: bold;
-          background: rgb(255, 48, 89);
-          width: 80px;
-          height: 40px;
-        }
-        .followButton.active {
-          background-color: #f6f6f6;
-          border: 2px, solid;
-          color: rgba(0, 0, 0, 0.7);
-        }
-      }
+      // .header {
+      //   margin: 20px;
+      //   display: flex;
+      //   justify-content: space-between;
+      //   align-items: center;
+      //   .username {
+      //     color: #494949;
+      //     padding-left: 10px;
+      //   }
+      //   .avatar {
+      //     display: flex; /* 使得avatar和文本可以在同一行上 */
+      //     align-items: center; /* 垂直居中文本和avatar */
+      //   }
+      //   .editButton {
+      //     display: flex; /* 使得关注文本可以垂直居中 */
+      //     align-items: center; /* 垂直居中关注文本 */
+      //     justify-content: center; /* 水平居中关注文本 */
+      //     color: rgba(0, 0, 0, 0.7);
+      //     border: 0;
+      //     border-radius: 40px;
+      //     font-size: large;
+      //     font-weight: bold;
+      //     background-color: #f6f6f6;
+      //     width: 80px;
+      //     height: 40px;
+      //   }
+      //   .followButton {
+      //     display: flex; /* 使得关注文本可以垂直居中 */
+      //     align-items: center; /* 垂直居中关注文本 */
+      //     justify-content: center; /* 水平居中关注文本 */
+      //     color: rgb(255, 255, 255);
+      //     border: 0;
+      //     border-radius: 40px;
+      //     font-size: large;
+      //     font-weight: bold;
+      //     background: rgb(255, 48, 89);
+      //     width: 80px;
+      //     height: 40px;
+      //   }
+      //   .followButton.active {
+      //     background-color: #f6f6f6;
+      //     border: 2px, solid;
+      //     color: rgba(0, 0, 0, 0.7);
+      //   }
+      // }
       .content {
         height: 75%;
         padding: 20px;
@@ -494,7 +518,7 @@ const controlRotate = () => {
       }
       @media (min-height: 800px) {
         .content {
-          height: 80%;
+          height: 90%;
         }
       }
       .text::-webkit-scrollbar {

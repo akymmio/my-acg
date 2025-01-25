@@ -76,19 +76,25 @@ watch(
 
 const showUser = ref(true)
 const isFixed = ref(false)
-const scrolling = async (e) => {
-  console.log(1)
-  const scrollTop = e.target.scrollTop
-  if (scrollTop > 190) {
-    isFixed.value = true
-  } else {
-    isFixed.value = false
-  }
-}
+
 import { Male as male, Female as female } from '@icon-park/vue-next'
-const showContent = (param) => {
-  router.push(`/explore/${param}`)
+// const showContent = (param) => {
+//   router.push(`/explore/${param}`)
+// }
+
+const isModalVisible = ref(false)
+const toChild = (param) => {
+  isModalVisible.value = param
 }
+//查看文章详情
+const id = ref()
+const showContent = (param) => {
+  isModalVisible.value = !isModalVisible.value
+  id.value = param
+  // router.push(`/explore/${param}`)
+}
+import ContentPage from '@/views/content/contentPage.vue'
+
 import { addLikedCount } from '@/api/liked'
 const toLike = (id, index) => {
   if (Object.keys(user.value).length === 0) {
@@ -181,8 +187,8 @@ const deleteArticle = (articleId, index) => {
       </div>
     </template>
   </Waterfall>
-
-  <div class="finishLoading"><span>没有更多...</span></div>
+  <ContentPage v-if="isModalVisible" :id="id" @toParent="toChild" />
+  <!-- <div class="finishLoading"><span>没有更多...</span></div> -->
 </template>
 
 <style scoped lang="less">

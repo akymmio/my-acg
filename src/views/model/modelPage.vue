@@ -201,7 +201,7 @@ lights.value = [
         <template #default="{ item, index }">
           <div>
             <div class="img">
-              <vue3dLoader
+              <!-- <vue3dLoader
                 class="model"
                 :filePath="item.modelPath"
                 :lights="lights"
@@ -209,8 +209,8 @@ lights.value = [
                 :width="250"
                 :backgroundAlpha="0"
                 @click="showContent(item.articleId)"
-              />
-              <!-- <el-image :src="item.cover" class="img" @click="showContent(item.articleId)" /> -->
+              /> -->
+              <el-image :src="item.cover" class="img" @click="showContent(item.articleId)" />
             </div>
             <div class="item-body">
               <div class="item-desc" @click="showContent(item.articleId)">
@@ -291,7 +291,8 @@ lights.value = [
 }
 .main {
   overflow: scroll;
-  height: calc(100vh - 80px); /* 视口高度减去顶部开始的位置 */
+  height: calc(100vh - 100px); /* 视口高度减去顶部开始的位置 */
+  margin-top: 20px;
 }
 
 .main::-webkit-scrollbar {
