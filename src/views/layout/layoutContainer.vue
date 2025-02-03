@@ -69,6 +69,8 @@ const routeTo = (path) => {
       router.push('/collection')
     } else if (path === 'activity') {
       router.push('/activity')
+    } else if (path === 'activityPublish') {
+      router.push('/activityPublish')
     } else if (path === 'me') {
       router.push(`/user/profile/${user.value.id}`)
     }
@@ -128,107 +130,231 @@ const showCard = ref(false)
         <div class=""></div>
         <div class="">
           <el-col class="side">
-            <div>
-              <ui>
-                <li
-                  class="el-menu-item"
-                  @click="routeTo('explore')"
-                  :class="{ active: activeItem === 'explore' }"
-                >
-                  <el-icon><House /></el-icon>
-                  <span> 探索</span>
-                </li>
-                <li
-                  class="el-menu-item"
-                  @click="routeTo('collection')"
-                  :class="{ active: activeItem === 'collection' }"
-                >
-                  <el-icon><Star /></el-icon>
-                  <span> 藏品</span>
-                </li>
-                <li
-                  class="el-menu-item"
-                  @click="routeTo('model')"
-                  :class="{ active: activeItem === 'model' }"
-                >
-                  <el-icon><MagicStick /></el-icon>
-                  <span> 模型</span>
-                </li>
+            <!-- <ui>
+              <li
+                class="el-menu-item"
+                @click="routeTo('explore')"
+                :class="{ active: activeItem === 'explore' }"
+              >
+                <el-icon><House /></el-icon>
+                <span> 探索</span>
+              </li>
+              <li
+                class="el-menu-item"
+                @click="routeTo('collection')"
+                :class="{ active: activeItem === 'collection' }"
+              >
+                <el-icon><Star /></el-icon>
+                <span> 藏品</span>
+              </li>
+              <li
+                class="el-menu-item"
+                @click="routeTo('model')"
+                :class="{ active: activeItem === 'model' }"
+              >
+                <el-icon><MagicStick /></el-icon>
+                <span> 模型</span>
+              </li>
 
-                <li
-                  class="el-menu-item"
-                  @click="routeTo('activity')"
-                  :class="{ active: activeItem === 'activity' }"
-                >
-                  <el-icon><Star /></el-icon>
-                  <span> 活动</span>
-                </li>
+              <li
+                class="el-menu-item"
+                @click="routeTo('activity')"
+                :class="{ active: activeItem === 'activity' }"
+              >
+                <el-icon><Star /></el-icon>
+                <span> 活动</span>
+              </li>
 
-                <li
-                  class="el-menu-item"
-                  @click="routeTo('publish')"
-                  :class="{ active: activeItem === 'publish' }"
-                >
-                  <el-icon><Plus /></el-icon>
-                  <span> 发布</span>
-                </li>
-                <li
-                  class="el-menu-item"
-                  @click="routeTo('notification')"
-                  :class="{ active: activeItem === 'notification' }"
-                >
-                  <el-icon><Bell /></el-icon>
-                  <span>通知</span>
-                </li>
-                <li
-                  class="el-menu-item"
-                  v-if="userStore.token"
-                  @click="routeTo('me')"
-                  :class="{ active: activeItem === 'me' }"
-                >
-                  <el-avatar :size="30" :src="user.avatar" style="margin-left: 0" />
-                  <span>我</span>
-                </li>
-                <li v-else class="loginItem" @click="showLoginPage = true">
-                  <span>登录</span>
-                </li>
+              <li
+                class="el-menu-item"
+                @click="routeTo('publish')"
+                :class="{ active: activeItem === 'publish' }"
+              >
+                <el-icon><Plus /></el-icon>
+                <span> 发布</span>
+              </li>
 
-                <div>
-                  <!-- <el-card v-if="showCard" class="card">
-                  <div class="popoverContainer">
-                    <button @click="showUserInfo = true" class="exitButton">修改信息</button>
-                    <button @click="logout" class="exitButton">退出登录</button>
-                  </div>
-                </el-card> -->
-                </div>
-                <el-popover placement="bottom" :width="200" trigger="click">
-                  <template #reference>
-                    <li class="more" v-if="userStore.token" @click="showCard = !showCard">
-                      <div class="moreButton">
-                        <el-icon><Operation /></el-icon>
-                        <span> 更多</span>
-                      </div>
-                    </li>
-                  </template>
-                  <template #default>
-                    <div class="popoverContainer">
-                      <button @click="showUserInfo = true" class="exitButton">
-                        修改信息
-                        <el-icon><ArrowRight /></el-icon>
-                      </button>
-                      <button @click="logout" class="exitButton">
-                        退出登录
-                        <el-icon><ArrowRight /></el-icon>
-                      </button>
-                      <button @click="showApplyExpert" class="exitButton">
-                        申请成为专家
-                        <el-icon><ArrowRight /></el-icon>
-                      </button>
+              <li
+                class="el-menu-item"
+                @click="routeTo('notification')"
+                :class="{ active: activeItem === 'notification' }"
+              >
+                <el-icon><Bell /></el-icon>
+                <span>通知</span>
+              </li>
+              <li
+                class="el-menu-item"
+                v-if="userStore.token"
+                @click="routeTo('me')"
+                :class="{ active: activeItem === 'me' }"
+              >
+                <el-avatar :size="30" :src="user.avatar" style="margin-left: 0" />
+                <span>我</span>
+              </li>
+              <li v-else class="loginItem" @click="showLoginPage = true">
+                <span>登录</span>
+              </li>
+
+              <div>
+              
+              </div>
+              <el-popover placement="bottom" :width="200" trigger="click">
+                <template #reference>
+                  <li class="more" v-if="userStore.token" @click="showCard = !showCard">
+                    <div class="moreButton">
+                      <el-icon><Operation /></el-icon>
+                      <span> 更多</span>
                     </div>
-                  </template>
-                </el-popover>
-              </ui>
-            </div>
+                  </li>
+                </template>
+                <template #default>
+                  <div class="popoverContainer">
+                    <button @click="showUserInfo = true" class="exitButton">
+                      修改信息
+                      <el-icon><ArrowRight /></el-icon>
+                    </button>
+                    <button @click="logout" class="exitButton">
+                      退出登录
+                      <el-icon><ArrowRight /></el-icon>
+                    </button>
+                    <button @click="showApplyExpert" class="exitButton">
+                      申请成为专家
+                      <el-icon><ArrowRight /></el-icon>
+                    </button>
+                  </div>
+                </template>
+              </el-popover>
+            </ui> -->
+            <el-popover placement="bottom" :width="200" trigger="click">
+              <template #reference>
+                <li class="more" v-if="userStore.token" @click="showCard = !showCard">
+                  <div class="moreButton">
+                    <el-icon><Operation /></el-icon>
+                    <span> 更多</span>
+                  </div>
+                </li>
+              </template>
+              <template #default>
+                <div class="popoverContainer">
+                  <button @click="showApplyExpert" class="exitButton">
+                    申请成为专家
+                    <el-icon><ArrowRight /></el-icon>
+                  </button>
+                  <button @click="showUserInfo = true" class="exitButton">
+                    修改用户信息
+                    <el-icon><ArrowRight /></el-icon>
+                  </button>
+                  <button @click="logout" class="exitButton">
+                    退出登录
+                    <el-icon><ArrowRight /></el-icon>
+                  </button>
+                </div>
+              </template>
+            </el-popover>
+            <el-menu
+              active-text-color="#ffd04b"
+              default-active="1"
+              text-color="rgb(154,75,15)"
+              @open="handleOpen"
+              @close="handleClose"
+            >
+              <!-- <el-menu
+              default-active="1"
+              class="el-menu-vertical-demo"
+              @open="handleOpen"
+              @close="handleClose"
+            > -->
+
+              <el-menu-item
+                index="2"
+                @click="routeTo('explore')"
+                :class="{ active: activeItem === 'explore' }"
+              >
+                <el-icon><House /></el-icon>
+                <span> 探索</span>
+              </el-menu-item>
+
+              <el-menu-item
+                index="2"
+                @click="routeTo('collection')"
+                :class="{ active: activeItem === 'collection' }"
+              >
+                <el-icon><Star /></el-icon>
+                <span> 藏品</span>
+              </el-menu-item>
+              <el-menu-item
+                index="2"
+                @click="routeTo('model')"
+                :class="{ active: activeItem === 'model' }"
+              >
+                <el-icon><MagicStick /></el-icon>
+                <span> 模型</span>
+              </el-menu-item>
+              <el-menu-item
+                index="2"
+                @click="routeTo('activity')"
+                :class="{ active: activeItem === 'activity' }"
+              >
+                <el-icon><Star /></el-icon>
+                <span> 活动</span>
+              </el-menu-item>
+              <!-- <el-menu-item
+                index="2"
+                @click="routeTo('publish')"
+                :class="{ active: activeItem === 'publish' }"
+              >
+                <el-icon><Plus /></el-icon>
+                <span> 发布</span>
+              </el-menu-item> -->
+              <el-menu-item
+                index="2"
+                @click="routeTo('notification')"
+                :class="{ active: activeItem === 'notification' }"
+              >
+                <el-icon><Bell /></el-icon>
+                <span>通知</span>
+              </el-menu-item>
+
+              <el-menu-item
+                index="2"
+                @click="routeTo('me')"
+                :class="{ active: activeItem === 'me' }"
+              >
+                <el-avatar
+                  v-if="user.avatar"
+                  :size="30"
+                  :src="user.avatar"
+                  style="margin-left: 0"
+                />
+                <span>我</span>
+              </el-menu-item>
+              <el-sub-menu index="2" v-if="user.admin === true">
+                <template #title
+                  ><el-icon><Plus /></el-icon> 发布</template
+                >
+                <el-menu-item index="2-1" @click="routeTo('publish')">笔记</el-menu-item>
+                <el-menu-item index="2-2" @click="routeTo('activityPublish')">活动</el-menu-item>
+              </el-sub-menu>
+              <el-menu-item
+                v-else
+                index="2"
+                @click="routeTo('publish')"
+                :class="{ active: activeItem === 'publish' }"
+              >
+                <el-icon><Plus /></el-icon>
+                <span> 发布</span>
+              </el-menu-item>
+              <!-- <el-sub-menu index="1">
+                <template #title>
+                  <el-icon><Plus /></el-icon>
+                  <span>发布</span>
+                </template>
+                <el-menu-item-group>
+                  <el-menu-item index="1-1">item one</el-menu-item>
+                  <el-menu-item index="1-2">item two</el-menu-item>
+                </el-menu-item-group>
+              </el-sub-menu> -->
+            </el-menu>
           </el-col>
         </div>
         <div>
@@ -357,17 +483,33 @@ const showCard = ref(false)
   // position: relative;
   margin-right: 20px;
   padding-top: 20px;
-  ul {
-    list-style-type: none;
-  }
+  // ul {
+    // list-style-type: none;
+  // }
   li {
+    list-style-type: none;
     height: 48px;
-    display: flex;
-    align-items: center;
+    // display: flex;
+    // align-items: center;
     // margin-bottom: 8px;
     span {
       margin-left: 10px;
     }
+  }
+  .el-menu{
+    border-right: 0!important;
+  }
+  .el-sub-menu{
+    border-radius: 40px;
+    font-size: large;
+    font-weight: bold;
+    color: rgb(154, 75, 15);
+    vertical-align: middle;
+    padding-left: 20px;
+    // height: 48px;
+    // display: flex;
+    // align-items: center;
+    margin-bottom: 8px;
   }
   .el-menu-item {
     border-radius: 40px;
@@ -377,8 +519,8 @@ const showCard = ref(false)
     vertical-align: middle;
     padding-left: 20px;
     height: 48px;
-    display: flex;
-    align-items: center;
+    // display: flex;
+    // align-items: center;
     margin-bottom: 8px;
   }
   .el-menu-item:hover {
@@ -411,12 +553,16 @@ const showCard = ref(false)
     position: fixed;
     bottom: 0;
     margin-bottom: 20px;
+    display: flex;
+
+
 
     .moreButton{
       border: 0;
       display: flex;
-      padding-left: 20px;
       align-items: center;
+      padding-left: 20px;
+
       border-radius: 40px;
     }
 

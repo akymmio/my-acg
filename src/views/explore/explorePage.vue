@@ -196,7 +196,7 @@ const showContent = (param) => {
                 <div class="item-footer">
                   <div class="footer-left">
                     <img :src="item.avatar" @click="push(item.userId)" />
-                    <div class="name">{{ item.nickname }}</div>
+                    <div>{{ item.nickname }}</div>
                   </div>
                   <div class="like">
                     <like

@@ -61,11 +61,11 @@ const rules = ref({
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { pattern: /^\S{5,16}$/, message: '长度大于5,小于16', trigger: 'blur' }
+    { pattern: /^\S{7,16}$/, message: '长度大于7,小于16', trigger: 'blur' }
   ],
   repassword: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { pattern: /^\S{5,16}$/, message: '长度大于8,小于16', trigger: 'blur' },
+    { pattern: /^\S{7,16}$/, message: '长度大于7,小于16', trigger: 'blur' },
     //自定义校验队则
     {
       validator: (rule, value, callback) => {

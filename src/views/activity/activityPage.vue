@@ -5,7 +5,7 @@ import { Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
 import { require } from '@/utils/require'
 import { Plus } from '@element-plus/icons-vue'
-import { getArticleService } from '@/api/article'
+import { getActivityService } from '@/api/activity'
 import { addLikedCount } from '@/api/liked'
 import { Like as like } from '@icon-park/vue-next'
 const router = useRouter()
@@ -21,7 +21,7 @@ import { vue3dLoader } from 'vue-3d-loader'
 const page = ref({
   pageNum: 1,
   pageSize: 20,
-  channelId: 0,
+  channelId: 1,
   keyword: ''
 })
 //获取文章数据
@@ -45,7 +45,7 @@ const fetchData = async (channelId) => {
     //   console.log(cardList.value)
     //   return
   }
-  await getArticleService(page.value).then((newData) => {
+  await getActivityService(page.value).then((newData) => {
     cardList.value = [...cardList.value, ...newData.data.data.items]
     currTotal.value += newData.data.data.items.length
     console.log(cardList.value)
@@ -54,24 +54,24 @@ const fetchData = async (channelId) => {
   })
   console.log(currTotal.value, total.value)
 }
-fetchData(0)
+fetchData(1)
 //监视是否搜索
-watch(
-  () => route.query.key_word,
-  async (newVal, oldVal) => {
-    if (newVal !== oldVal && newVal) {
-      page.value.keyword = route.query.key_word
-      page.value.pageNum = 1
-      const res = await getArticleService(page.value)
-      cardList.value = res.data.data.items
-      currTotal.value = res.data.data.items.length
-      total.value = res.data.data.total
-      page.value.pageNum++
-      page.value.keyword = ''
-      console.log('查找')
-    }
-  }
-)
+// watch(
+//   () => route.query.key_word,
+//   async (newVal, oldVal) => {
+//     if (newVal !== oldVal && newVal) {
+//       page.value.keyword = route.query.key_word
+//       page.value.pageNum = 1
+//       const res = await getArticleService(page.value)
+//       cardList.value = res.data.data.items
+//       currTotal.value = res.data.data.items.length
+//       total.value = res.data.data.total
+//       page.value.pageNum++
+//       page.value.keyword = ''
+//       console.log('查找')
+//     }
+//   }
+// )
 const activeItem = ref(0)
 const selectChannel = async (channelId) => {
   page.value.pageNum = 1 // 重置页码
@@ -145,19 +145,26 @@ const showContent = (param) => {
   <div class="main" @scroll="scrolling">
     <div style="margin-top: 20px">
       <div class="topButton">
-        <button @click="selectChannel(0)" class="button" :class="{ active: activeItem === 0 }">
+        <!-- <button @click="selectChannel(1)" class="button" :class="{ active: activeItem === 0 }">
           全部活动
-        </button>
+        </button> -->
         <button @click="selectChannel(1)" class="button" :class="{ active: activeItem === 1 }">
           进行中
         </button>
-        <button @click="selectChannel(2)" class="button" :class="{ active: activeItem === 2 }">
+        <button @click="selectChannel(0)" class="button" :class="{ active: activeItem === 2 }">
           已结束
         </button>
       </div>
       <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
       <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
       <!-- 首页瀑布流 -->
+      <template>
+        <el-carousel indicator-position="outside">
+          <el-carousel-item v-for="item in 4" :key="item">
+            <h3>test</h3>
+          </el-carousel-item>
+        </el-carousel>
+      </template>
       <div @scroll="scrolling" ref="myElement">
         <Waterfall
           :list="cardList"
@@ -176,25 +183,25 @@ const showContent = (param) => {
           <template #default="{ item, index }">
             <div>
               <div>
-                <el-image :src="item.cover" class="img" @click="showContent(item.articleId)" />
+                <el-image :src="item.cover" class="img" @click="showContent(item.id)" />
               </div>
               <div class="item-body">
                 <div class="item-desc" @click="showContent(item.articleId)">
                   <!-- <span>{{ item.title }}</span> -->
-                  <div>{{ '活动名称' }}——{{ '活动主题' }}</div>
-                  <div>
-                    活动时间:{{}}
-                    <span v-if="true" class="title-user">进行中</span>
-                    <span v-else class="title-expert">已结束</span>
-                  </div>
-
-                  <div>活动地点:</div>
+                  <div>{{ item.title }}——{{ item.subject }}</div>
                 </div>
                 <div class="item-footer">
                   <div class="footer-left">
                     <!-- <img :src="item.avatar" @click="push(item.userId)" />
                     <div class="name">{{ item.nickname }}</div> -->
                     <!-- <div class="name">{{ '——活动主题' }}</div> -->
+                    <div>
+                      活动时间:{{ item.duration }}
+                      <span v-if="item.channelId" class="title-user">进行中</span>
+                      <span v-else class="title-expert">已结束</span>
+                    </div>
+
+                    <div>活动地点: {{ item.address }}</div>
                   </div>
                 </div>
               </div>
@@ -296,6 +303,18 @@ const showContent = (param) => {
 }
 
 .item-body {
+  .title-user {
+    background: rgb(57, 209, 40);
+    border-radius: 5px;
+    padding: 3px;
+    color: white;
+  }
+  .title-expert {
+    background: rgb(255, 48, 89);
+    border-radius: 5px;
+    padding: 3px;
+    color: white;
+  }
   margin: 10px;
   .item-desc {
     text-align: left;
@@ -306,25 +325,13 @@ const showContent = (param) => {
     line-height: 25px;
     color: #000000;
     color: #3d3d3d;
-    .title-user {
-      background: rgb(57, 209, 40);
-      border-radius: 5px;
-      padding: 3px;
-      color: white;
-    }
-    .title-expert {
-      background: rgb(255, 48, 89);
-      border-radius: 5px;
-      padding: 3px;
-      color: white;
-    }
   }
 
   .item-footer {
     display: flex;
     justify-content: space-between;
     padding-top: 10px;
-
+    color: rgba(0, 0, 0, 0.6);
     // .footer-left {
     //   display: flex;
     //   align-items: center;

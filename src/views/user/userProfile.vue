@@ -139,8 +139,8 @@ const activeTab = ref('note')
             >
               <el-descriptions-item>
                 <div class="title">
-                  <span class="title-expert">专家</span>
-                  <span class="title-user">用户</span>
+                  <span class="title-expert" v-if="user.admin === true">专家</span>
+                  <span class="title-user" v-else>用户</span>
                 </div>
               </el-descriptions-item>
               <el-descriptions-item label="账号">

@@ -43,6 +43,10 @@ const router = createRouter({
           component: () => import('@/views/publish/publishPage.vue')
         },
         {
+          path: '/activityPublish',
+          component: () => import('@/views/publish/activityPublishPage.vue')
+        },
+        {
           path: '/model',
           component: () => import('@/views/model/modelPage.vue')
         }

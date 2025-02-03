@@ -254,7 +254,7 @@ const fetchData = async () => {
                 <div class="item-desc" @click="showContent(item.articleId)">
                   <span>{{ item.title }}</span>
                 </div>
-                <div class="item-footer">
+                <!-- <div class="item-footer">
                   <div class="footer-left">
                     <img :src="item.avatar" @click="push(item.userId)" />
                     <div class="name">{{ item.nickname }}</div>
@@ -274,11 +274,9 @@ const fetchData = async () => {
                       fill="#333"
                       @click="toLike(item.articleId, index)"
                     />
-                    <!-- {{ item.liked }} -->
-                    <!-- <i class="bi bi-heart" @click="toLike(item.articleId, index)"></i> -->
                     <div style="padding-left: 2px">{{ item.likedCount }}</div>
                   </div>
-                </div>
+                </div> -->
               </div>
             </div>
           </template>
