@@ -196,7 +196,7 @@ const showContent = (param) => {
                     <div class="name">{{ item.nickname }}</div> -->
                     <!-- <div class="name">{{ '——活动主题' }}</div> -->
                     <div>
-                      活动时间:{{ item.duration }}
+                      活动时间: {{ item.duration }}
                       <span v-if="item.channelId" class="title-user">进行中</span>
                       <span v-else class="title-expert">已结束</span>
                     </div>

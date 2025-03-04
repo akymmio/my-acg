@@ -1,5 +1,6 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import _ from 'lodash'
 import { useRouter, useRoute } from 'vue-router'
 import { Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
@@ -28,7 +29,7 @@ const page = ref({
 const cardList = ref([])
 //记录总数
 const currTotal = ref(0)
-const total = ref(page.value.pageSize)
+const total = ref(0)
 const showLoading = ref(false)
 
 const fetchData = async (channelId) => {
@@ -77,6 +78,8 @@ const selectChannel = async (channelId) => {
   page.value.pageNum = 1 // 重置页码
   page.value.channelId = channelId // 切换频道
   cardList.value = [] // 清空列表
+  currTotal.value = 0
+  total.value = 0
 
   activeItem.value = channelId
   router.push({ path: '/explore', query: { channel_id: channelId } })
@@ -91,24 +94,49 @@ const push = (param) => {
 const showFinish = ref(false)
 const isFetching = ref(false)
 const scrolling = async (e) => {
-  const clientHeight = e.target.clientHeight
-  const scrollHeight = e.target.scrollHeight
-  const scrollTop = e.target.scrollTop
-  const threshold = 0.4 * scrollHeight
-  if (scrollTop + clientHeight >= threshold && currTotal.value < total.value && !isFetching.value) {
-    // console.log(currTotal.value, total.value)
-    isFetching.value = true // 设置标志，表示正在加载数据
+  // 1. 确保获取正确的滚动容器（可能需要指定特定元素）
+  const container = e.target // 或 document.documentElement（如果是页面滚动）
+
+  // 2. 计算滚动位置参数
+  const { clientHeight, scrollHeight, scrollTop } = container
+
+  // 3. 调整阈值：距离底部 100px 时触发（更符合常见需求）
+  const threshold = 100 // 或设置为 clientHeight 的比例（如 0.8 * clientHeight）
+  const isNearBottom = scrollTop + clientHeight >= scrollHeight - threshold
+
+  // window.scrollY + window.innerHeight >= container.offsetHeight
+
+  // 4. 添加防抖逻辑（避免频繁触发）
+  if (!isFetching.value && isNearBottom && currTotal.value < total.value) {
+    console.log(1)
     try {
+      isFetching.value = true
       await fetchData(page.value.channelId)
+
+      // 5. 确保页码递增（需在 fetchData 中处理或在此处更新）
+      // page.value.current += 1;
     } finally {
-      isFetching.value = false // 数据加载完成，清除标志
+      console.log(2)
+      isFetching.value = false
     }
-  } else {
+  } else if (currTotal.value >= total.value) {
+    // 6. 仅在数据全部加载完成时显示结束提示
     showFinish.value = true
     showLoadMore.value = false
   }
 }
 
+// 4. 使用稳定引用的防抖函数（确保在组件setup外部定义或使用ref保存）
+const debouncedScroll = _.debounce(scrolling, 200)
+
+onMounted(() => {
+  window.addEventListener('scroll', debouncedScroll)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', debouncedScroll)
+  debouncedScroll.cancel() // 取消可能的 pending 执行
+})
 const showLoadMore = ref(true)
 const loadMore = async () => {
   await fetchData(0)
@@ -174,7 +202,7 @@ const showContent = (param) => {
         <Waterfall
           :list="cardList"
           :hasAroundGutter="false"
-          :width="282"
+          :width="276"
           :gutter="20"
           :breakpoints="{
             1400: { rowPerView: 5 },

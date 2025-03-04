@@ -21,7 +21,7 @@ import { getCategoryService } from '@/api/category'
 const page = ref({
   pageNum: 1,
   pageSize: 10,
-  channelId: 0,
+  channelId: '',
   keyword: '',
   createTime: '',
   order: ''
@@ -142,7 +142,7 @@ const orderOptions = ref([
   { id: 0, orderName: '创建时间升序' },
   { id: 1, orderName: '创建时间降序' },
   { id: 2, orderName: '名称升序' },
-  { id: 2, orderName: '名称降序' }
+  { id: 3, orderName: '名称降序' }
 ])
 const getCategory = async () => {
   const result = await getCategoryService()
@@ -188,7 +188,7 @@ const fetchData = async () => {
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-input v-model="page.keyword" placeholder="文物名称" clearable style="width: 100px" />
+          <el-input v-model="page.keyword" placeholder="文物名称" clearable style="width: 200px" />
         </el-form-item>
 
         <el-form-item>
@@ -203,6 +203,9 @@ const fetchData = async () => {
         </el-form-item>
         <el-form-item>
           <button class="button" @click="fetchData()" type="button">搜索</button>
+        </el-form-item>
+        <el-form-item>
+          <button class="button" @click="claerSearchData()" type="button">重置</button>
         </el-form-item>
       </el-form>
       <!-- <button @click="selectChannel(0)" class="button" :class="{ active: activeItem === 0 }">
@@ -235,7 +238,7 @@ const fetchData = async () => {
         <Waterfall
           :list="cardList"
           :hasAroundGutter="false"
-          :width="282"
+          :width="276"
           :gutter="20"
           :breakpoints="{
             1400: { rowPerView: 5 },
@@ -288,7 +291,7 @@ const fetchData = async () => {
             v-model:current-page="page.pageNum"
             v-model:page-size="page.pageSize"
             :page-sizes="[10, 20, 30, 40]"
-            layout="total, sizes, prev, pager, next, jumper"
+            layout="jumper, total, sizes, prev, pager, next"
             :total="pageTotal"
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
@@ -361,7 +364,6 @@ const fetchData = async () => {
   border: 0;
   width: 80px;
   height: 32px;
-  margin-right: 10px;
 }
 // .button:hover {
 //   // color: #000000;

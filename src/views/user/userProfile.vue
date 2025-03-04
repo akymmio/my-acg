@@ -30,7 +30,7 @@ const getUserInfo = async () => {
     user.value = localUser.value
   }
 }
-getUserInfo()
+// getUserInfo()
 // const fetchData = async (param = 'note') => {
 //   let res
 //   if (param === undefined || param == 'note') {
@@ -125,94 +125,91 @@ const activeTab = ref('note')
 <template>
   <div class="note_style" @scroll="scrolling">
     <div>
-      <transition name="fade">
-        <div class="header" v-show="showUser">
-          <div class="element">
-            <el-avatar :size="180" :src="user.avatar" :fit="cover" />
-          </div>
-          <div class="element">
-            <el-descriptions
-              class="margin-top"
-              :title="user.nickname"
-              :column="1"
-              :style="blockMargin"
-            >
-              <el-descriptions-item>
-                <div class="title">
-                  <span class="title-expert" v-if="user.admin === true">专家</span>
-                  <span class="title-user" v-else>用户</span>
-                </div>
-              </el-descriptions-item>
-              <el-descriptions-item label="账号">
-                <span style="padding-right: 5px">{{ user.username }}</span>
-                <span>
-                  <female
-                    v-if="user.sex === '0'"
-                    theme="two-tone"
-                    size="16"
-                    :fill="['#18aaff', '#ffffff']"
-                  />
-                  <!-- <el-icon v-if="user.sex === '0'"><Female /></el-icon> -->
-                  <male theme="two-tone" size="16" :fill="['#18aaff', '#ffffff']" v-else />
-                  <!-- <el-icon v-else><Male /></el-icon> -->
-                  <!-- 当 sex 为 1 时显示 Male 图标 -->
-                </span>
-              </el-descriptions-item>
-              <!-- <el-descriptions-item> </el-descriptions-item> -->
-              <!-- <el-descriptions-item label="昵称">{{ userInfo.nickname }}</el-descriptions-item> -->
-              <el-descriptions-item label="简介">{{ user.introduction }}</el-descriptions-item>
-              <el-descriptions-item>
-                <span style="margin-right: 10px">关注 {{ user.follow }}</span>
-                <span>获赞 {{ user.likedCount }}</span>
-              </el-descriptions-item>
-            </el-descriptions>
-          </div>
-          <div
-            class="element"
-            @click="follow"
-            v-if="route.params.id !== localUser.id"
-            :style="{ position: isSticky ? 'fixed' : 'relative', top: isSticky ? '0' : '' }"
-          >
-            <button class="unFollowButton" v-if="user.followed">已关注</button>
-            <button class="followButton" v-else>关注</button>
-          </div>
-          <!-- {{ userInfo.username }} -->
+      <div class="header" v-show="showUser">
+        <div class="element">
+          <el-avatar :size="180" :src="user.avatar" :fit="cover" />
         </div>
-      </transition>
-
-      <div
-        class="fix"
-        :style="{
-          position: isFixed ? 'fixed' : 'static',
-          top: isFixed ? '80px' : '',
-          width: isFixed ? '78%' : '100%'
-        }"
-      >
-        <!-- <button class="button" @click="fetchData('note')">笔记</button>
-        <button class="button" @click="fetchData('like')">喜欢</button> -->
-        <button
-          class="button"
-          @click="handleButtonClick('note')"
-          :class="{ active: activeTab === 'note' }"
+        <div class="element">
+          <el-descriptions
+            class="margin-top"
+            :title="user.nickname"
+            :column="1"
+            :style="blockMargin"
+          >
+            <el-descriptions-item>
+              <div class="title">
+                <span class="title-expert" v-if="user.admin === true">管理员</span>
+                <span class="title-user" v-else>用户</span>
+              </div>
+            </el-descriptions-item>
+            <el-descriptions-item label="账号">
+              <span style="padding-right: 5px">{{ user.username }}</span>
+              <span>
+                <female
+                  v-if="user.sex === '0'"
+                  theme="two-tone"
+                  size="16"
+                  :fill="['#18aaff', '#ffffff']"
+                />
+                <!-- <el-icon v-if="user.sex === '0'"><Female /></el-icon> -->
+                <male theme="two-tone" size="16" :fill="['#18aaff', '#ffffff']" v-else />
+                <!-- <el-icon v-else><Male /></el-icon> -->
+                <!-- 当 sex 为 1 时显示 Male 图标 -->
+              </span>
+            </el-descriptions-item>
+            <!-- <el-descriptions-item> </el-descriptions-item> -->
+            <!-- <el-descriptions-item label="昵称">{{ userInfo.nickname }}</el-descriptions-item> -->
+            <el-descriptions-item label="简介">{{ user.introduction }}</el-descriptions-item>
+            <el-descriptions-item>
+              <span style="margin-right: 10px">粉丝 {{ user.follow }}</span>
+              <span>获赞 {{ user.likedCount }}</span>
+            </el-descriptions-item>
+          </el-descriptions>
+        </div>
+        <div
+          class="element"
+          @click="follow"
+          v-if="route.params.id !== localUser.id"
+          :style="{ position: isSticky ? 'fixed' : 'relative', top: isSticky ? '0' : '' }"
         >
-          笔记
-        </button>
-        <button
-          class="button"
-          @click="handleButtonClick('like')"
-          :class="{ active: activeTab === 'like' }"
-        >
-          喜欢
-        </button>
-        <button
-          class="button"
-          @click="handleButtonClick('model')"
-          :class="{ active: activeTab === 'model' }"
-        >
-          模型
-        </button>
-        <!-- <el-divider style="margin: 3px; width: 100%" /> -->
+          <button class="unFollowButton" v-if="user.followed">已关注</button>
+          <button class="followButton" v-else>关注</button>
+        </div>
+        <!-- {{ userInfo.username }} -->
       </div>
+    </div>
+    <div class="fix">
+      <!-- <button class="button" @click="fetchData('note')">笔记</button>
+        <button class="button" @click="fetchData('like')">喜欢</button> -->
+      <button
+        class="button"
+        @click="handleButtonClick('note')"
+        :class="{ active: activeTab === 'note' }"
+      >
+        笔记
+      </button>
+      <button
+        class="button"
+        @click="handleButtonClick('like')"
+        :class="{ active: activeTab === 'like' }"
+      >
+        喜欢
+      </button>
+      <button
+        class="button"
+        @click="handleButtonClick('model')"
+        :class="{ active: activeTab === 'model' }"
+      >
+        模型
+      </button>
+      <button
+        class="button"
+        @click="handleButtonClick('follow')"
+        :class="{ active: activeTab === 'follow' }"
+      >
+        关注
+      </button>
+      <!-- <el-divider style="margin: 3px; width: 100%" /> -->
     </div>
     <keep-alive>
       <WaterFall :param="param"></WaterFall>
@@ -241,10 +238,11 @@ const activeTab = ref('note')
   background-color: white;
   // width: 80%;
   text-align: center;
-  // left: 50%;
-  // background-color: yellow;
-  // padding-left: 50%;
-  // transition: top 1s ease;
+
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top:0
+
 }
 .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;

@@ -410,9 +410,9 @@ const duration = ref('')
                 </div>
               </el-form-item>
 
-              <el-form-item><button @click="publish()" type="button">test</button></el-form-item>
-              <!-- <el-form-item>
-                <div class="button-container">     
+              <!-- <el-form-item><button @click="publish()" type="button">test</button></el-form-item> -->
+              <el-form-item>
+                <div class="button-container">
                   <div class="right-container">
                     <div v-if="showButton">
                       <button type="button" @click="cancel" class="button">取消</button>
@@ -440,7 +440,7 @@ const duration = ref('')
                     </div>
                   </div>
                 </div>
-              </el-form-item> -->
+              </el-form-item>
             </el-form>
           </el-col>
         </el-row>

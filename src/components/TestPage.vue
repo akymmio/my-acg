@@ -20,13 +20,25 @@
     <!-- 显示当前文件信息 -->
     <p v-if="selectedFile">已选文件：{{ selectedFile.name }}</p>
     <vue3dLoader
-      class="model"
-      :filePath="modelPath"
-      :lights="lights"
-      :height="300"
-      :width="250"
+      filePath="tmpfb6cop0j.obj"
+      :rotation="rotation"
+      @load="onLoad()"
+      :height="380"
+      :width="430"
       :backgroundAlpha="0"
-      @click="showContent(3)"
+      :lights="lights"
+      :pointLightFollowCamera="true"
+    />
+
+    <vue3dLoader
+      filePath="wan.obj"
+      :rotation="rotation"
+      @load="onLoad()"
+      :height="380"
+      :width="430"
+      :backgroundAlpha="0"
+      :lights="lights"
+      :pointLightFollowCamera="true"
     />
     <div class="block">
       <el-date-picker
@@ -90,12 +102,37 @@ const submitUpload = () => {
   ElMessage.success('文件上传成功！')
 }
 const modelPath = ref()
-const getData = async () => {
-  //根据文章id,获取文章信息
-  // console.log(route.params.id)
-  const res = await queryArticleByIdService(3)
-  modelPath.value = res.data.data.modelPath
-  console.log(modelPath.value)
-}
-getData()
+// const getData = async () => {
+//   //根据文章id,获取文章信息
+//   // console.log(route.params.id)
+//   const res = await queryArticleByIdService(3)
+//   modelPath.value = res.data.data.modelPath
+//   console.log(modelPath.value)
+// }
+// getData()
+const lights = ref()
+lights.value = [
+  {
+    type: 'AmbientLight',
+    color: 'white',
+    intensity: 1
+  },
+  // {
+  //   type: 'DirectionalLight',
+  //   color: 'white',
+  //   intensity: 1,
+  //   position: { x: 1000, y: 1000, z: 10 }
+  // },
+  // {
+  //   type: 'PointLight',
+  //   color: 'white',
+  //   intensity: 1
+  // },
+  {
+    type: 'HemisphereLight',
+    skyColor: ' white',
+    groundColor: 'white',
+    intensity: 0.5
+  }
+]
 </script>

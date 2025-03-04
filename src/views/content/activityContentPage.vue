@@ -2,6 +2,7 @@
 import { Close } from '@element-plus/icons-vue'
 import { ref, computed } from 'vue'
 import { getArticleByIdService, addComment } from '@/api/article'
+import { getActivityByIdService } from '@/api/activity'
 import { addLikedCount } from '@/api/liked'
 import { followService } from '@/api/user'
 import { useRoute, useRouter } from 'vue-router'
@@ -17,7 +18,7 @@ const localUser = ref(userStore.user)
 //用户
 const user = ref({})
 //文章
-const article = ref({})
+const article = ref()
 //评论
 const comments = ref([])
 //评论
@@ -44,12 +45,14 @@ const liked = ref(false)
 const getData = async () => {
   //根据文章id,获取文章信息
   // console.log(route.params.id)
-  const res = await getArticleByIdService(props.id || route.params.id)
+  // const res = await getArticleByIdService(props.id || route.params.id)
+  const res = await getActivityByIdService(props.id || route.params.id)
+  console.log(res.data.data)
   article.value = res.data.data
-  liked.value = res.data.data.liked
-  follow.value = res.data.data.follow
-  user.value = res.data.data.userInfo
-  comments.value = res.data.data.comments
+  // liked.value = res.data.data.liked
+  // follow.value = res.data.data.follow
+  // user.value = res.data.data.userInfo
+  // comments.value = res.data.data.comments
   console.log(article.value)
 }
 const props = defineProps({
@@ -214,8 +217,8 @@ const controlRotate = () => {
         <!-- <el-divider style="margin: 0" /> -->
         <div class="content">
           <div class="text">
-            <div class="title">玉出昆冈</div>
-            <div class="subTitle">清代宫廷和田玉文化特展</div>
+            <div class="title">{{ article.title }}</div>
+            <div class="subTitle">{{ article.subject }}</div>
             <el-divider />
             <p class="subTitle">活动介绍</p>
             <!-- <p style="font-size: 20px; font-weight: bold; margin: 10px 0">{{ article.title }}</p> -->
@@ -234,7 +237,7 @@ const controlRotate = () => {
                     <span> 负责人</span>
                   </div>
                 </template>
-                mike
+                {{ article.userName }}
               </el-descriptions-item>
               <el-descriptions-item>
                 <template #label>
@@ -243,7 +246,7 @@ const controlRotate = () => {
                     <span>联系电话</span>
                   </div>
                 </template>
-                18100000000
+                {{ article.phoneNumber }}
               </el-descriptions-item>
               <el-descriptions-item>
                 <template #label>
@@ -252,7 +255,7 @@ const controlRotate = () => {
                     <span>活动时间</span>
                   </div>
                 </template>
-                Suzhou
+                {{ article.duration }}
               </el-descriptions-item>
               <!-- <el-descriptions-item>
                 <template #label>
@@ -272,7 +275,7 @@ const controlRotate = () => {
                     <span>活动地址</span>
                   </div>
                 </template>
-                No.1188, Wuzhong Avenue, Wuzhong District, Suzhou, Jiangsu Province
+                {{ article.address }}
               </el-descriptions-item>
             </el-descriptions>
             <!-- <el-divider style="margin: 0" /> -->
@@ -378,7 +381,7 @@ const controlRotate = () => {
       // background-color: #f6f6f6;
     }
     .left {
-      width: 40%;
+      width: 50%;
       display: flex;
       align-items: center;
       flex-direction: column;
@@ -469,8 +472,10 @@ const controlRotate = () => {
           overflow: auto; /* 允许内容滚动 */
           // position: relative; /* 为了定位伪元素 */
           .text_font {
-            font-size: 15px;
+            font-size: 17px;
             color: #494949;
+            background-color: rgb(232, 227, 209);
+            color: rgb(51, 51, 51);
           }
           .text_bottom {
             display: flex;

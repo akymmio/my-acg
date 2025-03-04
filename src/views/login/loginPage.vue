@@ -49,6 +49,7 @@ const login = async () => {
   userStore.setToken(res.data.data)
   //获取用户信息
   await userStore.getUser()
+  console.log(userStore.user)
   //跳转首页
   close()
 }
@@ -56,16 +57,16 @@ const login = async () => {
 //表单校验规则
 const rules = ref({
   username: [
-    { required: true, message: '请输入用户名', trigger: 'change' },
-    { min: 2, max: 26, message: '长度大于3', trigger: 'change' }
+    { required: true, message: '请输入账号', trigger: 'blur' },
+    { pattern: /^\d{8,16}$/, message: '长度介于8-16位的数字', trigger: 'blur' }
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { pattern: /^\S{7,16}$/, message: '长度大于7,小于16', trigger: 'blur' }
+    { pattern: /^\S{5,16}$/, message: '长度介于6-16位', trigger: 'blur' }
   ],
   repassword: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { pattern: /^\S{7,16}$/, message: '长度大于7,小于16', trigger: 'blur' },
+    { required: true, message: '请再次输入密码', trigger: 'blur' },
+    { pattern: /^\S{5,16}$/, message: '长度介于6-16位', trigger: 'blur' },
     //自定义校验队则
     {
       validator: (rule, value, callback) => {
@@ -135,13 +136,15 @@ function rotate() {
       </div>
       <div class="right">
         <!-- 登录 -->
+
         <span style="margin-bottom: 30px; font-weight: bold"> 用户登录 </span>
+        <!-- <transition name="fade" mode="out-in"> -->
         <el-form :model="userform" :rules="rules" ref="form" v-if="isRegister">
           <el-form-item prop="username">
-            <input v-model="userform.username" placeholder="用户名" />
+            <el-input v-model="userform.username" placeholder="用户名" />
           </el-form-item>
           <el-form-item prop="password">
-            <input v-model="userform.password" type="password" placeholder="密码" />
+            <el-input v-model="userform.password" type="password" placeholder="密码" />
           </el-form-item>
           <el-form-item>
             <button class="loginButton" @click="login" type="button">登录</button>
@@ -181,6 +184,7 @@ function rotate() {
           </el-form-item>
           <el-link @click="isRegister = !isRegister">返回</el-link>
         </el-form>
+        <!-- </transition> -->
       </div>
     </div>
   </div>
@@ -188,6 +192,16 @@ function rotate() {
   <!-- <el-col :span="6">test</el-col> -->
 </template>
 <style lang="less" scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
 .mask {
   display: flex;
   align-items: center;
@@ -262,17 +276,17 @@ function rotate() {
       align-items: center;
       flex-direction: column;
       margin-top: 48px;
-      input {
-        padding-left: 10px;
-        width: 240px;
-        height: 40px;
-        border-radius: 20px;
-        border: 0;
-        background-color: #f6f6f6;
-      }
-      input:focus {
-        outline: none;
-      }
+      // .el-input {
+      //   padding-left: 10px;
+      //   width: 240px;
+      //   height: 40px;
+      //   border-radius: 20px;
+      //   border: 0;
+      //   background-color: #f6f6f6;
+      // }
+      // input:focus {
+      //   outline: none;
+      // }
       .loginButton {
         height: 40px;
         width: 100%;

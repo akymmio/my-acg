@@ -15,6 +15,11 @@ export const getArticleService = (param) => {
     params: param // 直接传递params对象
   })
 }
+export const getModelArticleService = (param) => {
+  return request.get('/article/modelList', {
+    params: param // 直接传递params对象
+  })
+}
 export const getArticleByChannelService = (channelId) => {
   return request.get(`/article?channel_id=${channelId}`)
 }
@@ -34,6 +39,10 @@ export const addComment = (data) => {
 //根据用户id获取文章
 export const getArticleByUserIdService = (userId) => {
   return request.get(`/article/myArticle/${userId}`)
+}
+
+export const getModelArticleByUserIdService = (userId) => {
+  return request.get(`/article/myModel/${userId}`)
 }
 
 export const deleteArticleService = (articleId) => {

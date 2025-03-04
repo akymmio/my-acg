@@ -11,3 +11,7 @@ export const queryFollowService = (id) => {
 export const getFollowMeService = () => {
   return request.get('/follow/followMe')
 }
+
+export const getFollowService = () => {
+  return request.get('/follow')
+}

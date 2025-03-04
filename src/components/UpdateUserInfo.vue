@@ -161,12 +161,13 @@ const rules = ref({
               </el-radio-group>
             </el-form-item>
             <el-form-item label="简介">
-              <el-input type="textarea" v-model="form.introduction" class="textarea" />
+              <el-input type="textarea" rows="3" v-model="form.introduction" class="textarea" />
             </el-form-item>
           </el-form>
           <el-form-item>
-            <el-button type="primary" @click="submitForm()"> 提交 </el-button>
+            <!-- <el-button type="primary" @click="submitForm()"> 提交 </el-button> -->
             <!-- <el-button @click="resetForm()">重置</el-button> -->
+            <button class="updateButton" @click="submitForm()">更新</button>
           </el-form-item>
         </div>
       </div>
@@ -249,5 +250,24 @@ const rules = ref({
       display: block;
     }
   }
+}
+.updateButton {
+  // border-radius: 40px;
+  // font-size: 16px;
+  // background-color: white;
+  // border: 0;
+  // width: 100px;
+  // height: 40px;
+  // // color: #494949;
+  // font-weight: bold;
+  // color: rgb(154, 75, 15);
+  border-radius: 5px;
+  font-size: large;
+  // background-color: #f6f6f6;
+  color: rgb(255, 255, 255);
+  background: rgb(255, 48, 89);
+  border: 0;
+  width: 50px;
+  height: 30px;
 }
 </style>

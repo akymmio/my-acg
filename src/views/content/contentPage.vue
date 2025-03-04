@@ -59,20 +59,43 @@ getData()
 const sendComment = async () => {
   if (!check()) return
   if (textarea.value === '') return
+
   let commentData = {
     comment: textarea.value,
     userId: localUser.value.id,
     articleId: article.value.articleId
   }
-  await addComment(commentData)
-  article.value.commentCount += 1
-  comments.value.unshift({
-    comment: textarea.value,
-    nickname: localUser.value.nickname,
-    avatar: localUser.value.avatar,
-    createTime: new Date().toLocaleString()
-  })
-  textarea.value = ''
+
+  try {
+    // 等待 addComment 完成
+    await addComment(commentData)
+
+    // 只有在 addComment 成功后才执行下面的代码
+    article.value.commentCount += 1
+    comments.value.unshift({
+      comment: textarea.value,
+      nickname: localUser.value.nickname,
+      avatar: localUser.value.avatar,
+      createTime: new Date().toLocaleString()
+    })
+    ElNotification({
+      title: '评论成功',
+      type: 'success',
+      duration: 500,
+      position: 'top-left'
+    })
+    // 清空输入框
+    textarea.value = ''
+  } catch (error) {
+    ElNotification({
+      title: '评论失败,请重试',
+      type: 'error',
+      duration: 500,
+      position: 'top-left'
+    })
+    console.log(error)
+    // 你可以在这里处理错误，比如显示错误提示
+  }
 }
 //点赞
 const toLike = () => {
@@ -140,7 +163,7 @@ const controlRotate = () => {
 }
 </script>
 <template>
-  <loginPage v-if="showLoginPage" @toParent="toChild" style="z-index: 2"></loginPage>
+  <loginPage v-if="showLoginPage" @toParent="toChild" style="z-index: 4"></loginPage>
   <div class="mask">
     <div class="container">
       <div @click="close" class="close">
@@ -170,7 +193,7 @@ const controlRotate = () => {
             </el-carousel-item>
           </el-carousel>
           <!-- v-if="!article.modelPath" -->
-          <!-- <el-carousel height="95vh" interval="3600" trigger="hover">
+          <el-carousel v-else height="95vh" interval="3600" trigger="hover">
             <el-carousel-item v-for="(image, index) in article.images" :key="index">
               <el-image
                 :preview-src-list="article.images"
@@ -180,7 +203,7 @@ const controlRotate = () => {
                 class="carousel"
               />
             </el-carousel-item>
-          </el-carousel> -->
+          </el-carousel>
         </div>
 
         <div>
@@ -315,7 +338,8 @@ const controlRotate = () => {
 }
 
 .mask {
-  z-index: 9999; /* 高的 z-index 值 */
+  z-index: 3; /* 高的 z-index 值 */
+
   display: flex;
   align-items: center;
   justify-content: center;

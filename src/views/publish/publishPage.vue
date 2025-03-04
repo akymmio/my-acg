@@ -25,9 +25,10 @@ const fileList = ref({
   title: '',
   content: '',
   imagesList: [], //图片url
-  state: 'public', //状态
-  channelId: 0,
-  publishTime: ''
+  state: 'true', //状态
+  channelId: '分类',
+  publishTime: '',
+  is_collection: 'false'
 })
 //存入照片墙展示的图片
 const imagesList = ref({
@@ -75,33 +76,52 @@ const publish = async () => {
   // 添加其他表单字段到formData中
   formData.append('title', fileList.value.title)
   formData.append('content', fileList.value.content)
-  if (fileList.value.state === 'public') {
-    formData.append('state', true)
-  } else {
-    formData.append('state', false)
-  }
+  // if (fileList.value.state === 'true') {
+  //   formData.append('state', true)
+  // } else {
+  //   formData.append('state', false)
+  // }
+  formData.append('state', fileList.value.state)
   formData.append('createTime', fileList.value.publishTime)
   formData.append('channelId', fileList.value.channelId)
   formData.append('userId', user.value.id)
-
+  formData.append('is_collection', fileList.value.is_collection)
   if (modelPath.value) {
     console.log('上传模型')
     // formData.append('model', fileList.value.images[0])
     formData.append('file', modelList.value)
-    console.log(modelList.value)
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}:`, value)
-    }
-    await publishModelService(formData)
-  } else {
-    console.log('上传图文')
-    for (let key in fileList.value.images) {
-      formData.append(`images[]`, fileList.value.images[key])
-    }
-    // //调用发布文章接口
-    // loading.value = true
-    await publishArticleService(formData)
+    // console.log(modelList.value)
+    // for (let [key, value] of formData.entries()) {
+    //   console.log(`${key}:`, value)
+    // }
+    // await publishModelService(formData)
   }
+  console.log('上传图文')
+  for (let key in fileList.value.images) {
+    formData.append(`images[]`, fileList.value.images[key])
+  }
+  // //调用发布文章接口
+  // loading.value = true
+  await publishArticleService(formData)
+
+  // if (modelPath.value) {
+  //   console.log('上传模型')
+  //   // formData.append('model', fileList.value.images[0])
+  //   formData.append('file', modelList.value)
+  //   console.log(modelList.value)
+  //   for (let [key, value] of formData.entries()) {
+  //     console.log(`${key}:`, value)
+  //   }
+  //   await publishModelService(formData)
+  // } else {
+  //   console.log('上传图文')
+  //   for (let key in fileList.value.images) {
+  //     formData.append(`images[]`, fileList.value.images[key])
+  //   }
+  //   // //调用发布文章接口
+  //   // loading.value = true
+  //   await publishArticleService(formData)
+  // }
   // if (res) {
   //   //显示加载图层
   //   ElMessage({
@@ -124,7 +144,9 @@ const publish = async () => {
   // }
   // loading.value = false
 }
-
+// const publish = async () => {
+//   console.log(fileList.value)
+// }
 const update = async () => {
   await form.value.validate()
   const formData = new FormData()
@@ -135,6 +157,11 @@ const update = async () => {
   formData.append('title', fileList.value.title)
   formData.append('content', fileList.value.content)
   formData.append('userId', user.value.id)
+  formData.append('is_collection', fileList.value.is_collection)
+  if (modelPath.value) {
+    console.log('上传模型')
+    formData.append('file', modelList.value)
+  }
   if (fileList.value.state === 'private') {
     formData.append('state', 0)
   } else {
@@ -146,13 +173,18 @@ const update = async () => {
   formData.append('id', route.query.id)
   //调用更新文章接口
   loading.value = true
-  await updateArticleService(formData)
-  loading.value = false
-  ElMessage({
-    message: '更新成功',
-    type: 'success',
-    duration: 1500
-  })
+  try {
+    await updateArticleService(formData)
+    loading.value = false
+    ElMessage({
+      message: '更新成功',
+      type: 'success',
+      duration: 1500
+    })
+  } catch (err) {
+    loading.value = false
+    ElMessage.error('更新失败')
+  }
 }
 const quill = ref()
 const cancel = () => {
@@ -239,13 +271,13 @@ const modelPath = ref(null)
 const lights = ref()
 const selectedModelType = ref('模型类型')
 const modelTypeOptions = ref([
-  {
-    type: 'obj',
-    id: 1
-  },
+  // {
+  //   type: 'obj',
+  //   id: 1
+  // },
   {
     type: 'glb',
-    id: 2
+    id: 1
   }
 ])
 
@@ -305,7 +337,6 @@ const uploadTest = (file) => {
             :on-preview="handlePictureCardPreview"
             :on-change="selectFiles"
             :on-remove="removeImage"
-            :disabled="showModel"
           >
             <el-icon><Plus /></el-icon>
           </el-upload>
@@ -336,9 +367,9 @@ const uploadTest = (file) => {
                   <quill-editor
                     ref="quill"
                     class="custom-quill-editor"
-                    style="height: 200px; width: 600px"
+                    style="height: 200px; width: 500px"
                     theme="snow"
-                    :content="fileList.content"
+                    v-model:content="fileList.content"
                     content-type="html"
                   ></quill-editor>
                 </div>
@@ -358,8 +389,16 @@ const uploadTest = (file) => {
               <el-form-item label="可见范围">
                 <div>
                   <el-radio-group v-model="fileList.state">
-                    <el-radio value="public">公开</el-radio>
-                    <el-radio value="private">私密</el-radio>
+                    <el-radio value="true">公开</el-radio>
+                    <el-radio value="false">私密</el-radio>
+                  </el-radio-group>
+                </div>
+              </el-form-item>
+              <el-form-item label="文章类型" v-if="user.admin">
+                <div>
+                  <el-radio-group v-model="fileList.is_collection">
+                    <el-radio value="false">普通文章</el-radio>
+                    <el-radio value="true">藏品文章</el-radio>
                   </el-radio-group>
                 </div>
               </el-form-item>
@@ -420,14 +459,7 @@ const uploadTest = (file) => {
                       :limit="1"
                     >
                       <template #trigger>
-                        <button
-                          type="button"
-                          :disabled="imagesList.imagesList.length"
-                          @click="selectModel"
-                          class="uploadModelButton"
-                        >
-                          上传模型
-                        </button>
+                        <button type="button" class="uploadModelButton">上传模型</button>
                       </template>
                     </el-upload>
                   </div>

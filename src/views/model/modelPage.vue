@@ -5,7 +5,7 @@ import { Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
 import { require } from '@/utils/require'
 import { Plus } from '@element-plus/icons-vue'
-import { getArticleService } from '@/api/article'
+import { getArticleService, getModelArticleService } from '@/api/article'
 import { getModelService } from '@/api/model'
 import { addLikedCount } from '@/api/liked'
 import { Like as like } from '@icon-park/vue-next'
@@ -46,7 +46,7 @@ const fetchData = async (channelId) => {
     //   console.log(cardList.value)
     //   return
   }
-  await getArticleService(page.value).then((newData) => {
+  await getModelArticleService(page.value).then((newData) => {
     // await getModelService(page.value).then((newData) => {
     console.log(newData)
     // cardList.value = [...cardList.value, ...newData.data.data.items]
@@ -189,7 +189,7 @@ lights.value = [
       <Waterfall
         :list="cardList"
         :hasAroundGutter="false"
-        :width="282"
+        :width="276"
         :gutter="20"
         :breakpoints="{
           1200: { rowPerView: 4 },
@@ -199,18 +199,23 @@ lights.value = [
         :lazyload="true"
       >
         <template #default="{ item, index }">
-          <div>
+          <div @click="showContent(item.articleId)">
             <div class="img">
-              <!-- <vue3dLoader
+              <vue3dLoader
                 class="model"
                 :filePath="item.modelPath"
                 :lights="lights"
                 :height="300"
                 :width="250"
+                :controlsOptions="{
+                  enablePan: true,
+                  enableZoom: false,
+                  enableRotate: true
+                }"
                 :backgroundAlpha="0"
-                @click="showContent(item.articleId)"
-              /> -->
-              <el-image :src="item.cover" class="img" @click="showContent(item.articleId)" />
+                :cameraPosition="{ x: 0, y: 0, z: 0 }"
+              />
+              <!-- <el-image :src="item.cover" class="img" @click="showContent(item.articleId)" /> -->
             </div>
             <div class="item-body">
               <div class="item-desc" @click="showContent(item.articleId)">

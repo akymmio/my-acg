@@ -43,7 +43,12 @@ instance.interceptors.response.use(
   function (error) {
     //权限不足
     if (error.response.status === 401) {
-      ElMessage.error('请重新登录')
+      ElNotification({
+        title: '请先登录',
+        type: 'error',
+        duration: 1000,
+        position: 'top-left'
+      })
       const userStore = useUserStore()
       userStore.removeUser()
       userStore.removeToken()

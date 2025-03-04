@@ -11,3 +11,7 @@ export const getActivityService = (param) => {
     params: param // 直接传递params对象
   })
 }
+
+export const getActivityByIdService = (activityId) => {
+  return request.get(`/activity/${activityId}`)
+}

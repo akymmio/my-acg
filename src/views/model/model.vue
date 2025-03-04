@@ -2,7 +2,7 @@
   <Waterfall
     :list="list"
     :hasAroundGutter="false"
-    :width="280"
+    :width="276"
     :gutter="20"
     :breakpoints="{
       800: { rowPerView: 3 },

@@ -75,7 +75,12 @@ const router = createRouter({
 //导航守卫
 router.beforeEach((to) => {
   const userStore = useUserStore()
-  if (!userStore.token && !to.path.startsWith('/explore')) {
+
+  // 定义不需要登录的白名单路径
+  const whiteList = ['/explore', '/model', '/collection', '/activity'] // 添加你希望放开的路径
+
+  // 如果用户未登录且访问的路径不在白名单中，则重定向到首页
+  if (!userStore.token && !whiteList.some((path) => to.path.startsWith(path))) {
     return '/'
   }
 })

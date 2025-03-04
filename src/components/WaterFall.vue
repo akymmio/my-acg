@@ -9,6 +9,7 @@ import { useUserStore } from '@/stores'
 import { Like as like } from '@icon-park/vue-next'
 // import '@icon-park/vue/styles/index.css'
 import { Delete } from '@icon-park/vue-next'
+import { getFollowService } from '@/api/follow'
 const userStore = useUserStore()
 const route = useRoute()
 const router = useRouter()
@@ -16,7 +17,7 @@ const router = useRouter()
 const localUser = ref(userStore.user)
 const user = ref({})
 
-import { getArticleByUserIdService } from '@/api/article'
+import { getArticleByUserIdService, getModelArticleByUserIdService } from '@/api/article'
 import { getArticleLikedService } from '@/api/liked'
 const notes = ref([])
 const getUserInfo = async () => {
@@ -45,12 +46,18 @@ const fetchData = async () => {
   } else if (c == 'like') {
     console.log(user.value.id)
     res = await getArticleLikedService(route.params.id)
+  } else if (c == 'follow') {
+    console.log(user.value.id)
+    res = await getFollowService(route.params.id)
+  } else if (c == 'model') {
+    console.log(user.value.id)
+    res = await getModelArticleByUserIdService(route.params.id)
   }
   notes.value = res.data.data
   console.log(res.data.data)
+  // console.log(notes.value[0].id)
 }
 fetchData()
-// watch(() => props.param, fetchData)
 
 watch(
   () => props.param,
@@ -67,8 +74,6 @@ watch(
     if (newId !== oldId) {
       getUserInfo() // 当 userId 变化时，重新获取数据
       fetchData() // 当 userId 变化时，重新获取数据
-      // notes.value = []
-      // reload()
     }
   },
   { immediate: true } // 立即执行一次，以获取初始数据
@@ -117,14 +122,34 @@ const deleteArticle = (articleId, index) => {
   notes.value.splice(index, 1)
   deleteArticleService(articleId)
 }
+import { followService } from '@/api/follow'
+const toFollow = async (follow_user_id, index) => {
+  notes.value.splice(index, 1)
+  await followService(follow_user_id, false)
+}
+const lights = ref()
+
+lights.value = [
+  {
+    type: 'AmbientLight',
+    color: 'white',
+    intensity: 2
+  },
+  {
+    type: 'PointLight',
+    color: 'white',
+    intensity: 2
+  }
+]
 </script>
 
 <template>
+  <el-empty v-if="!notes" description="空空如也" />
   <Waterfall
     :list="notes"
     :hasAroundGutter="false"
     :align="center"
-    :width="280"
+    :width="276"
     :gutter="20"
     :breakpoints="{
       1400: { rowPerView: 5 },
@@ -135,10 +160,38 @@ const deleteArticle = (articleId, index) => {
   >
     <!-- 底部 -->
     <template #default="{ item, index }">
-      <div>
-        <el-image :src="item.cover" class="img" @click="showContent(item.articleId)" />
+      <div v-if="props.param === 'follow'">
+        <div class="focus-body">
+          <div class="focus-footer">
+            <div class="footer-left">
+              <img :src="item.avatar" alt="" srcset="" @click="push(item.userId)" />
+              <div>{{ item.nickname }}</div>
+            </div>
+            <div @click="toFollow(item.id, index)" class="followButton">
+              <span>取关</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-else @click="showContent(item.articleId)">
+        <vue3dLoader
+          v-if="props.param === 'model'"
+          class="model"
+          :filePath="item.modelPath"
+          :lights="lights"
+          :height="300"
+          :width="250"
+          :controlsOptions="{
+            enablePan: true,
+            enableZoom: false,
+            enableRotate: true
+          }"
+          :backgroundAlpha="0"
+          :cameraPosition="{ x: 0, y: 0, z: 0 }"
+        />
+        <el-image v-else :src="item.cover" class="img" />
         <div class="item-body">
-          <div class="item-desc" @click="showContent(item.articleId)">
+          <div class="item-desc">
             <span>{{ item.title }}</span>
           </div>
           <div class="item-footer">
@@ -162,12 +215,6 @@ const deleteArticle = (articleId, index) => {
                 @click="toLike(item.articleId, index)"
               />
               <div style="padding-left: 2px">{{ item.likedCount }}</div>
-              <!-- <div>
-                  <el-icon><Delete /></el-icon>
-                </div> -->
-              <!-- <div style="padding-left: 5px">
-                  <delete theme="two-tone" size="17" :fill="['#18aaff', '#ffffff']" />
-                </div> -->
 
               <div style="padding-left: 5px">
                 <el-popconfirm
@@ -185,13 +232,65 @@ const deleteArticle = (articleId, index) => {
           </div>
         </div>
       </div>
+
+      <!-- <div class="focus-container">
+        <div class="focus">
+          <img :src="item.avatar" alt="" srcset="" @click="push(item.userId)" />
+          <div class="name">{{ item.nickname }}</div>
+        </div>
+        <div>test</div>
+      </div> -->
     </template>
   </Waterfall>
-  <ContentPage v-if="isModalVisible" :id="id" @toParent="toChild" />
+  <ContentPage v-if="isModalVisible" :id="id" @toParent="toChild" style="z-index: 10" />
   <!-- <div class="finishLoading"><span>没有更多...</span></div> -->
 </template>
 
 <style scoped lang="less">
+.focus-body {
+  padding: 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  height: 100px;
+  // .focus-desc {
+  //   text-align: left;
+  //   font-family: Roboto;
+  //   font-style: normal;
+  //   font-weight: normal;
+  //   font-size: 14px;
+  //   line-height: 16px;
+  //   color: #000000;
+  // }
+
+  .focus-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    // padding-top: 10px;
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      font-family: SF Pro Display;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 16px;
+      line-height: 14px;
+      color: rgba(0, 0, 0, 0.6);
+
+      img {
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        margin-right: 4px;
+      }
+    }
+
+
+
+  }
+}
 
 .finishLoading {
   display: flex;
@@ -221,6 +320,10 @@ const deleteArticle = (articleId, index) => {
 
 }
 .followButton {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: rgb(255, 255, 255);
   border: 0;
   border-radius: 40px;
@@ -229,10 +332,14 @@ const deleteArticle = (articleId, index) => {
   background: rgb(255, 48, 89);
   width: 80px;
   height: 40px;
-  margin-left: 150px
+  // height: 40px;
+  // margin-left: 150px
   // display: flex;
   // justify-content: center;
   // align-items: center;
+}
+.followButton:hover{
+  background: rgb(198, 39, 71);
 }
 .unFollowButton {
   border:solid 1px;
