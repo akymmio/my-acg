@@ -232,7 +232,7 @@ const showApplyExpert = ref(false)
             <template #default>
               <div class="popoverContainer">
                 <button @click="showApplyExpert = true" class="exitButton">
-                  申请成为专家
+                  申请成为管理员
                   <el-icon><ArrowRight /></el-icon>
                 </button>
                 <button @click="showUserInfo = true" class="exitButton">

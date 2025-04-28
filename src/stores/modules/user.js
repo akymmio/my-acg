@@ -17,6 +17,7 @@ export const useUserStore = defineStore(
     const user = ref({})
     const getUser = async () => {
       const res = await getUserInfoService()
+      // 原响应式连接断裂user.value = reactive({ ...res.data.data })
       user.value = res.data.data
     }
     const removeUser = () => {

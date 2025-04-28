@@ -29,7 +29,8 @@ const fileList = ref({
   duration: '',
   address: '',
   userName: '',
-  phoneNumber: ''
+  phoneNumber: '',
+  channelId: 0
 })
 //存入照片墙展示的图片
 const imagesList = ref({
@@ -77,13 +78,13 @@ const publish = async () => {
   // 添加其他表单字段到formData中
   formData.append('title', fileList.value.title)
   formData.append('content', fileList.value.content)
-  if (fileList.value.state === 'public') {
+  if (fileList.value.channelId === 1) {
     formData.append('state', true)
   } else {
     formData.append('state', false)
   }
   formData.append('createTime', fileList.value.publishTime)
-  formData.append('channelId', fileList.value.channelId)
+  // formData.append('channelId', fileList.value.channelId)
   formData.append('userId', user.value.id)
   console.log(fileList.value)
   console.log(duration.value[0])
@@ -93,6 +94,10 @@ const publish = async () => {
   formData.append('phoneNumber', fileList.value.phoneNumber)
   formData.append('address', fileList.value.address)
   formData.append('duration', duration.value[0] + '/' + duration.value[1])
+  console.log('上传图文')
+  for (let key in fileList.value.images) {
+    formData.append(`images[]`, fileList.value.images[key])
+  }
   await publishActivityService(formData)
   // if (res) {
   //   //显示加载图层
@@ -382,7 +387,7 @@ const duration = ref('')
                   <quill-editor
                     ref="quill"
                     class="custom-quill-editor"
-                    style="height: 200px; width: 750px"
+                    style="height: 200px; width: 700px"
                     theme="snow"
                     v-model:content="fileList.content"
                     content-type="html"
@@ -403,9 +408,9 @@ const duration = ref('')
 
               <el-form-item label="可见范围">
                 <div>
-                  <el-radio-group v-model="fileList.state">
-                    <el-radio value="public">公开</el-radio>
-                    <el-radio value="private">私密</el-radio>
+                  <el-radio-group v-model="fileList.channelId">
+                    <el-radio value="1">公开</el-radio>
+                    <el-radio value="0">私密</el-radio>
                   </el-radio-group>
                 </div>
               </el-form-item>

@@ -11,7 +11,14 @@ const router = createRouter({
         {
           path: '/explore',
           component: () => import('@/views/explore/explorePage.vue'),
-          meta: { keepAlive: true } // 表明这个组件应该被缓存
+          // meta: { keepAlive: true }, // 表明这个组件应该被缓存
+          children: [
+            {
+              path: 'content/:id', // 这会匹配 /explore/content/123
+              name: 'ExploreDetail',
+              component: () => import('../views/content/contentPage.vue')
+            }
+          ]
         },
         {
           path: '/collection',
@@ -23,11 +30,11 @@ const router = createRouter({
           component: () => import('@/views/activity/activityPage.vue'),
           meta: { keepAlive: true } // 表明这个组件应该被缓存
         },
-        {
-          path: '/explore/:id',
-          component: () => import('@/views/content/contentPage.vue'),
-          meta: { keepAlive: true } // 表明这个组件应该被缓存
-        },
+        // {
+        //   path: '/explore/:id',
+        //   component: () => import('@/views/content/contentPage.vue')
+        //   // meta: { keepAlive: true } // 表明这个组件应该被缓存
+        // },
 
         {
           path: '/user/profile/:id',

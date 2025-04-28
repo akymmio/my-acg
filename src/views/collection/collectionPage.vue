@@ -300,11 +300,40 @@ const fetchData = async () => {
       </div>
     </div>
   </div>
-  <transition name="el-fade-in-linear">
+  <div class="overlay" ref="overlay"></div>
+  <div class="close-btn" @click="closeDetail">
+    <el-icon><Close /></el-icon>
+  </div>
+  <div class="detail-page" ref="detailPage">
+    <div v-if="isLoading" class="loading-container">
+      <el-icon class="is-loading"><Loading /></el-icon>
+    </div>
     <ContentPage v-if="isModalVisible" :id="id" @toParent="toChild" />
-  </transition>
+  </div>
 </template>
 <style scoped lang="less">
+.close-btn {
+  position: fixed;
+  top: 20px;
+  right: calc(20% - 50px); // 根据内容区域右边缘计算位置
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  z-index: 1001;
+  opacity: 0;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #f3f3f3;
+    transform: rotate(90deg);
+  }
+}
 .pagination-block {
   display: flex;
   justify-content: center;

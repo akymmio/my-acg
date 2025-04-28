@@ -31,7 +31,7 @@ const currentComponent = computed(() => {
       </button>
       <button class="button" @click="currentTab = 'Like'">赞和收藏</button>
       <button class="button" @click="currentTab = 'Follow'">新增关注</button>
-      <button class="button" @click="currentTab = 'Tt'">test</button>
+      <!-- <button class="button" @click="currentTab = 'Tt'">test</button> -->
       <!-- <button class="button">评论</button>
       <button class="button">赞和收藏</button>
       <button class="button">新增关注</button> -->

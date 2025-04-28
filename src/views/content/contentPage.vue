@@ -42,7 +42,7 @@ const liked = ref(false)
 //加载数据
 const getData = async () => {
   //根据文章id,获取文章信息
-  // console.log(route.params.id)
+  console.log(route.params.id)
   const res = await getArticleByIdService(props.id || route.params.id)
   article.value = res.data.data
   liked.value = res.data.data.liked
@@ -131,19 +131,31 @@ const deleteComment = (commentId, index) => {
   deleteCommentService(commentId)
 }
 
-const lights = ref([
+const lights = ref()
+lights.value = [
   {
     type: 'AmbientLight',
     color: 'white',
-    intensity: 2
+    intensity: 1
   },
+  // {
+  //   type: 'DirectionalLight',
+  //   color: 'white',
+  //   intensity: 1,
+  //   position: { x: 1000, y: 1000, z: 10 }
+  // },
+  // {
+  //   type: 'PointLight',
+  //   color: 'white',
+  //   intensity: 1
+  // },
   {
-    type: 'PointLight',
-    color: 'white',
-    position: { x: 0, y: 0, z: 0 },
-    intensity: 0.3
+    type: 'HemisphereLight',
+    skyColor: ' white',
+    groundColor: 'white',
+    intensity: 0.5
   }
-])
+]
 const rotation = ref()
 rotation.value = {
   x: 0,
@@ -216,6 +228,7 @@ const controlRotate = () => {
             :backgroundAlpha="0"
             class="modelCss"
             :pointLightFollowCamera="true"
+            :cameraPosition="{ x: -3, y: 1, z: -3 }"
           />
           <!-- <vue3dLoader
             v-if="article.modelPath"
@@ -349,7 +362,7 @@ const controlRotate = () => {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.25);
-  overflow-y: hidden;
+  // overflow-y: hidden;
 
   .container {
     display: flex;
@@ -360,6 +373,7 @@ const controlRotate = () => {
     height: 95%;
 
     .close {
+      z-index: -1;
       position: absolute;
       top: 3%;
       right: 3%;

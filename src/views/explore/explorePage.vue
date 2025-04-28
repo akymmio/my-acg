@@ -5,7 +5,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
 import { require } from '@/utils/require'
-import { Plus } from '@element-plus/icons-vue'
+import { Plus, Close, Loading } from '@element-plus/icons-vue'
 import { getArticleService } from '@/api/article'
 import { addLikedCount } from '@/api/liked'
 import { Like as like } from '@icon-park/vue-next'
@@ -159,19 +159,144 @@ const toLike = (id, index) => {
 const isModalVisible = ref(false)
 const toChild = (param) => {
   isModalVisible.value = param
+  if (!param) {
+    closeDetail()
+  } else {
+    isLoading.value = false
+  }
 }
 //查看文章详情
 const id = ref()
-const showContent = (param) => {
-  isModalVisible.value = !isModalVisible.value
-  id.value = param
-  // router.push(`/explore/${param}`)
+const detailPage = ref(null)
+const detailImage = ref(null)
+const overlay = ref(null)
+const activeCard = ref(null)
+
+const isLoading = ref(false)
+
+const showContent = async (articleId) => {
+  id.value = articleId
+  const card = event.currentTarget
+  activeCard.value = card
+  const rect = card.getBoundingClientRect()
+
+  // 设置详情页的初始位置和大小
+  detailPage.value.style.left = `${rect.left}px`
+  detailPage.value.style.top = `${rect.top}px`
+  detailPage.value.style.width = `${rect.width}px`
+  detailPage.value.style.height = `${rect.height}px`
+  detailPage.value.style.display = 'block'
+
+  // 显示遮罩层
+  overlay.value.style.display = 'block'
+
+  // 先执行展开动画
+  gsap.to(detailPage.value, {
+    left: '50%',
+    top: '50%',
+    width: '60%',
+    height: '95vh',
+    xPercent: -50,
+    yPercent: -50,
+    duration: 0.5
+  })
+
+  gsap.to(overlay.value, {
+    opacity: 1,
+    duration: 0.5
+  })
+
+  // 显示关闭按钮
+  gsap.to('.close-btn', {
+    opacity: 1,
+    duration: 0.1,
+    delay: 0.3
+  })
+
+  // 显示加载状态
+  isLoading.value = true
+  isModalVisible.value = true
+
+  // 更新路由
+  router.push(`/explore/content/${articleId}`)
 }
+
+const closeDetail = () => {
+  if (!activeCard.value) return
+
+  const rect = activeCard.value.getBoundingClientRect()
+
+  // 隐藏关闭按钮
+  gsap.to('.close-btn', {
+    opacity: 0,
+    duration: 0
+  })
+
+  gsap.to(detailPage.value, {
+    left: `${rect.left}px`,
+    top: `${rect.top}px`,
+    width: `${rect.width}px`,
+    height: `${rect.height}px`,
+    xPercent: 0,
+    yPercent: 0,
+    duration: 0.5,
+    onComplete: () => {
+      isModalVisible.value = false
+      detailPage.value.style.display = 'none'
+      activeCard.value = null
+    }
+  })
+
+  gsap.to(overlay.value, {
+    opacity: 0,
+    duration: 0.5,
+    onComplete: () => {
+      overlay.value.style.display = 'none'
+    }
+  })
+  // 返回上一级路由
+  setTimeout(() => {
+    router.push('/explore')
+  }, 500)
+}
+
+// 添加点击遮罩层关闭详情页的功能
+watch(overlay, (el) => {
+  if (el) {
+    el.addEventListener('click', closeDetail)
+  }
+})
+
+import { gsap } from 'gsap'
 </script>
 <template>
   <div class="main" @scroll="scrolling">
-    <div style="margin-top: 20px">
+    <div>
       <button @click="selectChannel(0)" class="button" :class="{ active: activeItem === 0 }">
+        推荐
+      </button>
+      <button @click="selectChannel(1)" class="button" :class="{ active: activeItem === 1 }">
+        文物珍萃
+      </button>
+      <button @click="selectChannel(2)" class="button" :class="{ active: activeItem === 2 }">
+        书画典籍
+      </button>
+      <button @click="selectChannel(3)" class="button" :class="{ active: activeItem === 3 }">
+        建筑遗址
+      </button>
+      <button @click="selectChannel(4)" class="button" :class="{ active: activeItem === 4 }">
+        非遗技艺
+      </button>
+      <button @click="selectChannel(5)" class="button" :class="{ active: activeItem === 5 }">
+        活态文化
+      </button>
+      <button @click="selectChannel(6)" class="button" :class="{ active: activeItem === 6 }">
+        外国文化
+      </button>
+      <button @click="selectChannel(20)" class="button" :class="{ active: activeItem === 20 }">
+        其他
+      </button>
+      <!-- <button @click="selectChannel(0)" class="button" :class="{ active: activeItem === 0 }">
         推荐
       </button>
       <button @click="selectChannel(1)" class="button" :class="{ active: activeItem === 1 }">
@@ -194,7 +319,7 @@ const showContent = (param) => {
       </button>
       <button @click="selectChannel(20)" class="button" :class="{ active: activeItem === 20 }">
         其他
-      </button>
+      </button> -->
       <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
       <!-- <button @click="selectChannel(1)" class="button">推荐</button> -->
       <!-- 首页瀑布流 -->
@@ -262,10 +387,22 @@ const showContent = (param) => {
         </div>
       </div>
     </div>
+    <div class="overlay" ref="overlay"></div>
+    <div class="close-btn" @click="closeDetail">
+      <el-icon><Close /></el-icon>
+    </div>
+    <div class="detail-page" ref="detailPage">
+      <div v-if="isLoading" class="loading-container">
+        <el-icon class="is-loading"><Loading /></el-icon>
+      </div>
+      <!-- <ContentPage v-if="isModalVisible" :id="id" @toParent="toChild" /> -->
+      <router-view v-slot="{ Component }">
+        <transition>
+          <component :is="Component" />
+        </transition>
+      </router-view>
+    </div>
   </div>
-  <transition name="el-fade-in-linear">
-    <ContentPage v-if="isModalVisible" :id="id" @toParent="toChild" />
-  </transition>
 </template>
 <style scoped lang="less">
 .loadButton {
@@ -408,5 +545,129 @@ const showContent = (param) => {
 }
 .infinite-list .infinite-list-item + .list-item {
   margin-top: 10px;
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 999;
+}
+
+.detail-page {
+  position: fixed;
+  display: none;
+  z-index: 1000;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+
+  .loading-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+
+    .el-icon {
+      font-size: 30px;
+      color: #409eff;
+    }
+  }
+
+  :deep(.mask) {
+    position: relative;
+    background: none;
+    height: 100%;
+    width: 100%;
+
+    .container {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      display: flex;
+
+      .left {
+        width: 60%;
+        border-right: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      .right {
+        width: 40%;
+        overflow: auto;
+      }
+    }
+  }
+}
+
+.close-btn {
+  position: fixed;
+  top: 20px;
+  right: calc(20% - 50px); // 根据内容区域右边缘计算位置
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  z-index: 1001;
+  opacity: 0;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #f3f3f3;
+    transform: rotate(90deg);
+  }
+}
+
+// 媒体查询优化
+@media screen and (max-width: 1200px) {
+  .detail-page {
+    width: 80% !important; // 覆盖内联样式
+
+    :deep(.mask .container) {
+      flex-direction: column;
+
+      .left,
+      .right {
+        width: 100%;
+        height: auto;
+      }
+
+      .left {
+        border-right: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  .close-btn {
+    right: 20px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .detail-page {
+    width: 95% !important;
+    height: 95vh !important;
+    margin: auto;
+  }
+}
+
+.detail-content {
+  width: 100%;
+  height: 100%;
+  background: white;
+  opacity: 0;
 }
 </style>

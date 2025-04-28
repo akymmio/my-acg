@@ -157,13 +157,13 @@ function rotate() {
         <!-- 注册 -->
         <el-form :model="userform" :rules="rules" ref="form" v-else>
           <el-form-item prop="username">
-            <input v-model="userform.username" size="large" placeholder="用户名" />
+            <el-input v-model="userform.username" size="large" placeholder="用户名" />
           </el-form-item>
           <el-form-item prop="password">
-            <input v-model="userform.password" size="large" type="password" placeholder="密码" />
+            <el-input v-model="userform.password" size="large" type="password" placeholder="密码" />
           </el-form-item>
           <el-form-item prop="repassword">
-            <input
+            <el-input
               v-model="userform.repassword"
               size="large"
               type="password"
@@ -252,8 +252,9 @@ function rotate() {
         // font-weight: bold;
         // color: rgb(61, 162, 225);
         color: #f6f6f6;
+
         font-weight: bold;
-        background: #ff2e4d;
+        background: rgb(154, 75, 15);
         // background-color: rgb(210, 232, 248);
         width: 200px;
         height: 40px;
@@ -296,7 +297,7 @@ function rotate() {
         // font-size: large;
         font-weight: bold;
         color: #fff;
-        background: #ff2e4d;
+        background: rgb(154, 75, 15);
         // text-align: center;
       }
     }

@@ -187,7 +187,7 @@ lights.value = [
             enableRotate: true
           }"
           :backgroundAlpha="0"
-          :cameraPosition="{ x: 0, y: 0, z: 0 }"
+          :cameraPosition="{ x: -2, y: 1, z: -3 }"
         />
         <el-image v-else :src="item.cover" class="img" />
         <div class="item-body">

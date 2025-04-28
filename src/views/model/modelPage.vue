@@ -144,7 +144,6 @@ const showContent = (param) => {
   // router.push(`/explore/${param}`)
 }
 
-const lights = ref()
 const list = ref()
 list.value = [
   {
@@ -166,16 +165,29 @@ list.value = [
     title: '测试1'
   }
 ]
+const lights = ref()
 lights.value = [
   {
     type: 'AmbientLight',
     color: 'white',
-    intensity: 2
+    intensity: 1
+  },
+  {
+    type: 'DirectionalLight',
+    color: 'white',
+    intensity: 1,
+    position: { x: 1000, y: 1000, z: 10 }
   },
   {
     type: 'PointLight',
     color: 'white',
-    intensity: 2
+    intensity: 1
+  },
+  {
+    type: 'HemisphereLight',
+    skyColor: ' white',
+    groundColor: 'white',
+    intensity: 0.5
   }
 ]
 </script>
@@ -199,8 +211,8 @@ lights.value = [
         :lazyload="true"
       >
         <template #default="{ item, index }">
-          <div @click="showContent(item.articleId)">
-            <div class="img">
+          <div>
+            <div class="img" @click="showContent(item.articleId)">
               <vue3dLoader
                 class="model"
                 :filePath="item.modelPath"
@@ -213,7 +225,7 @@ lights.value = [
                   enableRotate: true
                 }"
                 :backgroundAlpha="0"
-                :cameraPosition="{ x: 0, y: 0, z: 0 }"
+                :cameraPosition="{ x: -2, y: 1, z: -3 }"
               />
               <!-- <el-image :src="item.cover" class="img" @click="showContent(item.articleId)" /> -->
             </div>
